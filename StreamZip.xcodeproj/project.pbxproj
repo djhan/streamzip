@@ -10,6 +10,9 @@
 		EE7732CA25D0D37C00414625 /* StreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7732C025D0D37C00414625 /* StreamZip.framework */; };
 		EE7732CF25D0D37C00414625 /* StreamZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732CE25D0D37C00414625 /* StreamZipTests.swift */; };
 		EE7732D125D0D37C00414625 /* StreamZip.h in Headers */ = {isa = PBXBuildFile; fileRef = EE7732C325D0D37C00414625 /* StreamZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732DC25D0F98000414625 /* StreamZipEntry.swift */; };
+		EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E025D0FF4100414625 /* StreamZipArchive.swift */; };
+		EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E425D106AE00414625 /* StreamZipStructures.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +32,9 @@
 		EE7732C925D0D37C00414625 /* StreamZipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreamZipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE7732CE25D0D37C00414625 /* StreamZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipTests.swift; sourceTree = "<group>"; };
 		EE7732D025D0D37C00414625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EE7732DC25D0F98000414625 /* StreamZipEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipEntry.swift; sourceTree = "<group>"; };
+		EE7732E025D0FF4100414625 /* StreamZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipArchive.swift; sourceTree = "<group>"; };
+		EE7732E425D106AE00414625 /* StreamZipStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipStructures.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +79,9 @@
 			children = (
 				EE7732C325D0D37C00414625 /* StreamZip.h */,
 				EE7732C425D0D37C00414625 /* Info.plist */,
+				EE7732E425D106AE00414625 /* StreamZipStructures.swift */,
+				EE7732E025D0FF4100414625 /* StreamZipArchive.swift */,
+				EE7732DC25D0F98000414625 /* StreamZipEntry.swift */,
 			);
 			path = StreamZip;
 			sourceTree = "<group>";
@@ -147,6 +156,7 @@
 				TargetAttributes = {
 					EE7732BF25D0D37C00414625 = {
 						CreatedOnToolsVersion = 12.4;
+						LastSwiftMigration = 1240;
 					};
 					EE7732C825D0D37C00414625 = {
 						CreatedOnToolsVersion = 12.4;
@@ -194,6 +204,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */,
+				EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */,
+				EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +353,7 @@
 		EE7732D525D0D37C00414625 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
@@ -357,6 +371,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.djhan.StreamZip;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -364,6 +379,7 @@
 		EE7732D625D0D37C00414625 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
@@ -388,6 +404,7 @@
 		EE7732D825D0D37C00414625 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = E7829W88M3;
@@ -406,6 +423,7 @@
 		EE7732D925D0D37C00414625 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = E7829W88M3;
