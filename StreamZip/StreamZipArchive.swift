@@ -122,6 +122,7 @@ class StreamZipArchive {
             return completion(0, nil, StreamZip.Error.contentsIsEmpty)
         }
         
+        // 마지막 지점에서 -4096 바이트부터 마지막 지점까지 범위 지정
         let range = self.fileLength - 4096 ... self.fileLength - 1
         // 해당 범위만큼 데이터를 전송받는다
         delegate.request(at: url, range: range) { [weak self] (data, length, error) in
@@ -138,25 +139,7 @@ class StreamZipArchive {
                 return completion(0, nil, StreamZip.Error.contentsIsEmpty)
             }
             
-            // https://stackoverflow.com/questions/31821709/nsdata-to-uint8-in-swift
-             var byteData = [UInt8](repeating:0, count: data.count)
-             data.copyBytes(to: &byteData, count: data.count)
             
-            // https://stackoverflow.com/questions/50285026/swift-convert-data-to-unsafemutablepointerint8
-            // https://stackoverflow.com/questions/60869370/unsafemutablepointer-warning-with-swift-5
-            // var cptr = UnsafeMutablePointer<UInt8>.allocate(capacity: byteData.count)
-            // cptr.initialize(from: &byteData, count: byteData.count)
-
-            // https://stackoverflow.com/questions/39737082/find-if-sequence-of-elements-exists-in-array
-            
-            var centralDirectorylocation = NSNotFound
-            for index in 0 ..< byteData.count - 4  {
-                if EndOfCentralDirectorySignature == [byteData[index], byteData[index + 1], byteData[index + 2], byteData[index + 3],] {
-                    print("StreamZipArchive>findCentralDirectory(_:completion:): End of Central Directory = \(index)")
-                    centralDirectorylocation = index
-                    break
-                }
-            }
         }
     }
 }
