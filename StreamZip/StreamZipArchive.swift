@@ -35,7 +35,7 @@ protocol StreamZipTransferConvertible: class {
 // MARK: - Typealiases -
 
 /// Request 완료 핸들러
-typealias StreamZipRequestCompletion = (_ cptr: UnsafePointer<CChar>, _ length: UInt, _ error: Error?) -> Void
+typealias StreamZipRequestCompletion = (_ data: Data?, _ length: UInt, _ error: Error?) -> Void
 
 /**
  FileLength 완료 핸들러
@@ -111,7 +111,7 @@ class StreamZipArchive {
         - url: `URL`
         - completion: `StreamZipArchiveCompletion`
      */
-    private func findCentralDirectory(_ url: URL, completion: StreamZipArchiveCompletion) {
+    func findCentralDirectory(_ url: URL, completion: StreamZipArchiveCompletion) {
         // 파일 길이가 0인 경우 종료 처리
         guard self.fileLength > 0 else {
             print("StreamZipArchive>findCentralDirectory(_:completion:): file length가 0")
@@ -124,7 +124,7 @@ class StreamZipArchive {
         
         let range = self.fileLength - 4096 ... self.fileLength - 1
         // 해당 범위만큼 데이터를 전송받는다
-        delegate.request(at: url, range: range) { [weak self] (cptr, length, error) in
+        delegate.request(at: url, range: range) { [weak self] (data, length, error) in
             guard let strongSelf = self else {
                 print("StreamZipArchive>findCentralDirectory(_:completion:): self가 nil!")
                 return completion(0, nil, error)
@@ -133,27 +133,30 @@ class StreamZipArchive {
                 print("StreamZipArchive>findCentralDirectory(_:completion:): 데이터 전송중 에러 발생 = \(error.localizedDescription)")
                 return completion(0, nil, error)
             }
+            guard let data = data else {
+                print("StreamZipArchive>findCentralDirectory(_:completion:): 데이터 길이가 0")
+                return completion(0, nil, StreamZip.Error.contentsIsEmpty)
+            }
             
-            // length를 가변 변수로 대입
-            var length = length
-            // found 포인터
-            var found: UnsafeMutablePointer<CChar>?
+            // https://stackoverflow.com/questions/31821709/nsdata-to-uint8-in-swift
+             var byteData = [UInt8](repeating:0, count: data.count)
+             data.copyBytes(to: &byteData, count: data.count)
             
-            // 반복문 실행
-            repeat {
-                guard let fptr = memchr(cptr, 0x50, Int(length))?.bindMemory(to: CChar.self, capacity: Int(length)) else {
+            // https://stackoverflow.com/questions/50285026/swift-convert-data-to-unsafemutablepointerint8
+            // https://stackoverflow.com/questions/60869370/unsafemutablepointer-warning-with-swift-5
+            // var cptr = UnsafeMutablePointer<UInt8>.allocate(capacity: byteData.count)
+            // cptr.initialize(from: &byteData, count: byteData.count)
+
+            // https://stackoverflow.com/questions/39737082/find-if-sequence-of-elements-exists-in-array
+            
+            var centralDirectorylocation = NSNotFound
+            for index in 0 ..< byteData.count - 4  {
+                if EndOfCentralDirectorySignature == [byteData[index], byteData[index + 1], byteData[index + 2], byteData[index + 3],] {
+                    print("StreamZipArchive>findCentralDirectory(_:completion:): End of Central Directory = \(index)")
+                    centralDirectorylocation = index
                     break
                 }
-                
-                if memcmp(EndOfCentralDirectorySignature, fptr, 4) == 0 {
-                    found = fptr
-                }
-                
-                // 문제 발생
-                
-                
-            } while (true)
-
+            }
         }
     }
 }

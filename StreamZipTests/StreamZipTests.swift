@@ -8,6 +8,7 @@
 import XCTest
 @testable import StreamZip
 
+
 class StreamZipTests: XCTestCase {
 
     override func setUpWithError() throws {
@@ -29,5 +30,4 @@ class StreamZipTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-
 }

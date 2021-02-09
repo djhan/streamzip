@@ -41,7 +41,7 @@ enum StreamZip {
 let StreamZipEntryErrorDoman = "streamzip.entry.error"
 
 /// Central Directory 마지막 부분 signature
-let EndOfCentralDirectorySignature: Array<CChar> = [0x50, 0x4b, 0x05, 0x06]
+let EndOfCentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x05, 0x06]
 
 
 // MARK: - Stream Zip Entry Class -
