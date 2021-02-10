@@ -13,6 +13,7 @@
 		EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732DC25D0F98000414625 /* StreamZipEntry.swift */; };
 		EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E025D0FF4100414625 /* StreamZipArchive.swift */; };
 		EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E425D106AE00414625 /* StreamZipStructures.swift */; };
+		EE77337725D3ACE600414625 /* SizeOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE77337625D3ACE600414625 /* SizeOf.swift */; };
 		EE8443FF25D2A89B005EA4B6 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 		EE7732DC25D0F98000414625 /* StreamZipEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipEntry.swift; sourceTree = "<group>"; };
 		EE7732E025D0FF4100414625 /* StreamZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipArchive.swift; sourceTree = "<group>"; };
 		EE7732E425D106AE00414625 /* StreamZipStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipStructures.swift; sourceTree = "<group>"; };
+		EE77337625D3ACE600414625 /* SizeOf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SizeOf.swift; sourceTree = "<group>"; };
 		EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,6 +87,7 @@
 				EE7732E025D0FF4100414625 /* StreamZipArchive.swift */,
 				EE7732DC25D0F98000414625 /* StreamZipEntry.swift */,
 				EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */,
+				EE77337625D3ACE600414625 /* SizeOf.swift */,
 			);
 			path = StreamZip;
 			sourceTree = "<group>";
@@ -210,6 +213,7 @@
 				EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */,
 				EE8443FF25D2A89B005EA4B6 /* DataExtension.swift in Sources */,
 				EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */,
+				EE77337725D3ACE600414625 /* SizeOf.swift in Sources */,
 				EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

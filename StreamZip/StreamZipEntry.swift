@@ -40,8 +40,10 @@ enum StreamZip {
 /// 에러 도메인
 let StreamZipEntryErrorDoman = "streamzip.entry.error"
 
-/// Central Directory 마지막 부분 signature
+/// End of Central Directory signature
 let EndOfCentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x05, 0x06]
+/// 개별 Central Directory signature
+let CentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x01, 0x02]
 
 
 // MARK: - Stream Zip Entry Class -
