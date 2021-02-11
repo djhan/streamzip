@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6449E925D5297E008FA69E /* GetValue.swift */; };
 		EE7732CA25D0D37C00414625 /* StreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7732C025D0D37C00414625 /* StreamZip.framework */; };
 		EE7732CF25D0D37C00414625 /* StreamZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732CE25D0D37C00414625 /* StreamZipTests.swift */; };
 		EE7732D125D0D37C00414625 /* StreamZip.h in Headers */ = {isa = PBXBuildFile; fileRef = EE7732C325D0D37C00414625 /* StreamZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EE6449E925D5297E008FA69E /* GetValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetValue.swift; sourceTree = "<group>"; };
 		EE7732C025D0D37C00414625 /* StreamZip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamZip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE7732C325D0D37C00414625 /* StreamZip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StreamZip.h; sourceTree = "<group>"; };
 		EE7732C425D0D37C00414625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				EE7732DC25D0F98000414625 /* StreamZipEntry.swift */,
 				EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */,
 				EE77337625D3ACE600414625 /* SizeOf.swift */,
+				EE6449E925D5297E008FA69E /* GetValue.swift */,
 			);
 			path = StreamZip;
 			sourceTree = "<group>";
@@ -210,6 +213,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */,
 				EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */,
 				EE8443FF25D2A89B005EA4B6 /* DataExtension.swift in Sources */,
 				EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */,

@@ -10,6 +10,7 @@ import Cocoa
 
 // MARK: - Zip Information Protocol -
 protocol ZipInformationConvertible {
+    /*
     /**
      Data 기반으로 Zip 정보 구조체 배열 생성후 반환
      */
@@ -18,6 +19,7 @@ protocol ZipInformationConvertible {
      Data 기반으로 특정 인코딩 정보로 Zip 정보 구조체 배열 생성후 반환
      */
     static func makeRecords(from data: Data, encoding: String.Encoding) -> [Self]?
+     */
     /**
      Data 기반으로 Zip 정보 구조체 생성후 반환
      - 인코딩은 utf-8을 사용
@@ -91,7 +93,7 @@ extension ZipInformationConvertible {
 // MARK: - End of Central Directory Struct -
 /// Zip End Record 구조체
 struct ZipEndRecord: ZipInformationConvertible {
-    //var endOfCentralDirectorySignature: UInt32
+    var endOfCentralDirectorySignature: UInt32
     var numberOfThisDisk: UInt16
     var diskWhereCentralDirectoryStarts: UInt16
     var numberOfCentralDirectoryRecordsOnThisDisk: UInt16
@@ -139,7 +141,8 @@ struct ZipEndRecord: ZipInformationConvertible {
             comment = String.init(data: commentData, encoding: encoding)
         }
         
-        return Self.init(numberOfThisDisk: numberOfThisDisk,
+        return Self.init(endOfCentralDirectorySignature: endOfCentralDirectorySignature,
+                         numberOfThisDisk: numberOfThisDisk,
                          diskWhereCentralDirectoryStarts: diskWhereCentralDirectoryStarts,
                          numberOfCentralDirectoryRecordsOnThisDisk: numberOfCentralDirectoryRecordsOnThisDisk,
                          totalNumberOfCentralDirectoryRecords: totalNumberOfCentralDirectoryRecords,
@@ -160,17 +163,15 @@ struct ZipEndRecord: ZipInformationConvertible {
      */
     static func makeRecords(from data: Data, encoding: String.Encoding) -> [Self]? { return nil }
 }
-
+/*
 // MARK: - Central Directory Struct -
 /// Zip Directory Record 구조체
 struct ZipDirectoryRecord: ZipInformationConvertible {
-    //var centralDirectoryFileHeaderSignature: UInt32
+    var centralDirectoryFileHeaderSignature: UInt32
     var versionMadeBy: UInt16
     var versionNeededToExtract: UInt16
     var generalPurposeBitFlag: UInt16
     var compressionMethod: UInt16
-    //var fileLastModificationTime: UInt16
-    //var fileLastModificationDate: UInt16
     var crc32: UInt32
     var compressedSize: UInt32
     var uncompressedSize: UInt32
@@ -178,9 +179,9 @@ struct ZipDirectoryRecord: ZipInformationConvertible {
     var extraFieldLength: UInt16
     var fileCommentLength: UInt16
     var diskNumberWhereFileStarts: UInt16
-    //var internalFileAttributes: UInt16
-    //var externalFileAttributes: UInt32
-    //var relativeOffsetOfLocalFileHeader: UInt32
+    var internalFileAttributes: UInt16
+    var externalFileAttributes: UInt32
+    var relativeOffsetOfLocalFileHeader: UInt32
     
     var fileName: String?
     var extraField: String?
@@ -215,10 +216,8 @@ struct ZipDirectoryRecord: ZipInformationConvertible {
             guard let versionNeededToExtract: UInt16 = self.getValue(from: data, offset: &offset) else { break }
             guard let generalPurposeBitFlag: UInt16 = self.getValue(from: data, offset: &offset) else { break }
             guard let compressionMethod: UInt16 = self.getValue(from: data, offset: &offset) else { break }
-            //guard let fileLastModificationTime: UInt16 = self.getValue(from: data, offset: &offset) else { break }
-            //guard let fileLastModificationDate: UInt16 = self.getValue(from: data, offset: &offset) else { break }
-            guard let fileLastModificationTimeData = self.getData(from: data, offset: &offset, length: sizeof(UInt16.self)) else { break }
-            guard let fileLastModificationDateData = self.getData(from: data, offset: &offset, length: sizeof(UInt16.self)) else { break }
+            guard let fileLastModificationTime: UInt16 = self.getValue(from: data, offset: &offset) else { break }
+            guard let fileLastModificationDate: UInt16 = self.getValue(from: data, offset: &offset) else { break }
             guard let crc32: UInt32 = self.getValue(from: data, offset: &offset) else { break }
             guard let compressedSize: UInt32 = self.getValue(from: data, offset: &offset) else { break }
             guard let uncompressedSize: UInt32 = self.getValue(from: data, offset: &offset) else { break }
@@ -230,10 +229,6 @@ struct ZipDirectoryRecord: ZipInformationConvertible {
             guard let externalFileAttributes: UInt32 = self.getValue(from: data, offset: &offset) else { break }
             guard let relativeOffsetOfLocalFileHeader: UInt32 = self.getValue(from: data, offset: &offset) else { break }
             guard let fileNameData = self.getData(from: data, offset: &offset, length: Int(fileNameLength)) else { break }
-
-            // 순서대로 UInt8 배열이 되기 때문에, little Endian으로 바꾸려면 역순환이 필요하다
-            let modificatoinTimeArray = [UInt8](fileLastModificationTimeData)
-            let modificatoinDateArray = [UInt8](fileLastModificationDateData)
 
             // 파일명 생성
             let fileName = String.init(data: fileNameData, encoding: encoding)
@@ -247,8 +242,11 @@ struct ZipDirectoryRecord: ZipInformationConvertible {
             if let fileCommentData = self.getData(from: data, offset: &offset, length: Int(fileCommentLength)) {
                 fileComment = String.init(data: fileCommentData, encoding: encoding)
             }
+            // 최종 수정일 생성
+            let modificationDate = getDate(fromTime: fileLastModificationTime, fromDate: fileLastModificationDate)
 
-            let record = Self.init(versionMadeBy: versionMadeBy,
+            let record = Self.init(centralDirectoryFileHeaderSignature: centralDirectoryFileHeaderSignature,
+                                   versionMadeBy: versionMadeBy,
                                    versionNeededToExtract: versionNeededToExtract,
                                    generalPurposeBitFlag: generalPurposeBitFlag,
                                    compressionMethod: compressionMethod,
@@ -259,10 +257,13 @@ struct ZipDirectoryRecord: ZipInformationConvertible {
                                    extraFieldLength: extraFieldLength,
                                    fileCommentLength: fileCommentLength,
                                    diskNumberWhereFileStarts: diskNumberWhereFileStarts,
+                                   internalFileAttributes: internalFileAttributes,
+                                   externalFileAttributes: externalFileAttributes,
+                                   relativeOffsetOfLocalFileHeader: relativeOffsetOfLocalFileHeader,
                                    fileName: fileName ,
                                    extraField: extraField,
                                    fileComment: fileComment,
-                                   modificationDate: nil,
+                                   modificationDate: modificationDate,
                                    length: offset)
 
             if records == nil { records = [Self]() }
@@ -283,7 +284,7 @@ struct ZipDirectoryRecord: ZipInformationConvertible {
      */
     static func make(from data: Data, encoding: String.Encoding) -> Self? { return nil }
 }
-
+*/
 // MARK: - File Header Struct -
 /// Zip File Header 구조체
 struct ZipFileHeader {
@@ -298,56 +299,4 @@ struct ZipFileHeader {
     var uncompressedSize: UInt32
     var fileNameLength: UInt16
     var extraFieldLength: UInt16
-}
-
-/**
- Data 형 Time과 Date 을 Date로 변환해서 반환
- */
-private func GetDate(fromTime timeData: Data, fromDate dateData: Data) -> Date? {
-    guard let timeArray = GetSeparate(timeData: timeData),
-          let dateArray = GetSeparate(dateData: dateData) else { return nil }
-    var dateComponents = DateComponents.init()
-    dateComponents.year     = dateArray[0]
-    dateComponents.month    = dateArray[1]
-    dateComponents.day      = dateArray[2]
-    dateComponents.hour     = timeArray[0]
-    dateComponents.minute   = timeArray[1]
-    dateComponents.second   = timeArray[2]
-    return dateComponents.date
-}
-/**
- Data 형 Time 을 `[Int]` 배열로 변환해서 반환
- - ZIP 파일은 [참고 사이트](https://jmoon.co.kr/48) 에서 설명한 것처럼 A2BC(little endian)의 값을 2진법 표시 후, 자리씩 묶어서 10진법으로 바꾼 것이 각각 시간/분/초(연/월/일)에 대응한다
- */
-private func GetSeparate(timeData: Data) -> [Int]? {
-    let timeArray = [UInt8](timeData)
-    // little Endian이므로 뒷쪽부터 차례로 2진법으로 변환
-    let timeBinary = timeArray.reversed().reduce("") { (firstString, second) -> String in
-        return firstString + String(second, radix: 2)
-    }
-    let hourRange = timeBinary.startIndex ... timeBinary.index(timeBinary.startIndex, offsetBy: 5)
-    let minRange = hourRange.upperBound ... timeBinary.index(hourRange.upperBound, offsetBy: 6)
-    let secRange = minRange.upperBound ... timeBinary.endIndex
-    guard let hour = Int(timeBinary[hourRange]),
-          let minute = Int(timeBinary[minRange]),
-          let second = Int(timeBinary[secRange])  else { return nil }
-    return [hour, minute, second * 2]
-}
-/**
- Data 형 Date 을 `[Int]` 배열로 변환해서 반환
- - ZIP 파일은 [참고 사이트](https://jmoon.co.kr/48) 에서 설명한 것처럼 A2BC(little endian)의 값을 2진법 표시 후, 자리씩 묶어서 10진법으로 바꾼 것이 각각 시간/분/초(연/월/일)에 대응한다
- */
-private func GetSeparate(dateData: Data) -> [Int]? {
-    let dateArray = [UInt8](dateData)
-    // little Endian이므로 뒷쪽부터 차례로 2진법으로 변환
-    let dateBinary = dateArray.reversed().reduce("") { (firstString, second) -> String in
-        return firstString + String(second, radix: 2)
-    }
-    let yearRange = dateBinary.startIndex ... dateBinary.index(dateBinary.startIndex, offsetBy: 6)
-    let monthRange = yearRange.upperBound ... dateBinary.index(yearRange.upperBound, offsetBy: 4)
-    let dayRange = monthRange.upperBound ... dateBinary.endIndex
-    guard let year = Int(dateBinary[yearRange]),
-          let month = Int(dateBinary[monthRange]),
-          let day = Int(dateBinary[dayRange])  else { return nil }
-    return [year + 1980, month, day]
 }
