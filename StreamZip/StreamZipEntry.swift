@@ -27,6 +27,12 @@ enum StreamZip {
         case localFileHeaderIsFailed
         /// 미지원 압축 해제 방식
         case unsupportedCompressMethod
+        
+        /// 압축 해제 도중 에러 발생
+        case deflationIsFailed
+        /// CRC32 체크섬 통과 실패
+        case checksumIsDifferent
+        
         /// 알 수 없는 에러
         case unknown
         
@@ -41,6 +47,8 @@ enum StreamZip {
             case .centralDirectoryIsFailed: return "Central Directory is not existed, or failed to read"
             case .localFileHeaderIsFailed: return "Local File Header is not existed, or failed to read"
             case .unsupportedCompressMethod: return "This compressed method is not supported"
+            case .deflationIsFailed: return "Data deflation is failed"
+            case .checksumIsDifferent: return "Checksum is different"
             default: return "Unknown error was occurred"
             }
         }

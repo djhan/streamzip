@@ -16,7 +16,9 @@
 		EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E025D0FF4100414625 /* StreamZipArchive.swift */; };
 		EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E425D106AE00414625 /* StreamZipStructures.swift */; };
 		EE77337725D3ACE600414625 /* SizeOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE77337625D3ACE600414625 /* SizeOf.swift */; };
-		EE8443FF25D2A89B005EA4B6 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */; };
+		EE7EFFB425D8108E00EA59A1 /* CRC32.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7EFFB325D8108E00EA59A1 /* CRC32.swift */; };
+		EE83CBC725D815890095A058 /* DataDecompressionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */; };
+		EE8443FF25D2A89B005EA4B6 /* DataTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,7 +44,9 @@
 		EE7732E025D0FF4100414625 /* StreamZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipArchive.swift; sourceTree = "<group>"; };
 		EE7732E425D106AE00414625 /* StreamZipStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipStructures.swift; sourceTree = "<group>"; };
 		EE77337625D3ACE600414625 /* SizeOf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SizeOf.swift; sourceTree = "<group>"; };
-		EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
+		EE7EFFB325D8108E00EA59A1 /* CRC32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC32.swift; sourceTree = "<group>"; };
+		EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDecompressionExtension.swift; sourceTree = "<group>"; };
+		EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTransformExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,14 +99,15 @@
 		EE7732C225D0D37C00414625 /* StreamZip */ = {
 			isa = PBXGroup;
 			children = (
+				EE83CBCC25D815BC0095A058 /* Extensions */,
 				EE7732C325D0D37C00414625 /* StreamZip.h */,
 				EE7732C425D0D37C00414625 /* Info.plist */,
 				EE7732E425D106AE00414625 /* StreamZipStructures.swift */,
 				EE7732E025D0FF4100414625 /* StreamZipArchive.swift */,
 				EE7732DC25D0F98000414625 /* StreamZipEntry.swift */,
-				EE8443FE25D2A89B005EA4B6 /* DataExtension.swift */,
 				EE77337625D3ACE600414625 /* SizeOf.swift */,
 				EE6449E925D5297E008FA69E /* GetValue.swift */,
+				EE7EFFB325D8108E00EA59A1 /* CRC32.swift */,
 			);
 			path = StreamZip;
 			sourceTree = "<group>";
@@ -114,6 +119,15 @@
 				EE7732D025D0D37C00414625 /* Info.plist */,
 			);
 			path = StreamZipTests;
+			sourceTree = "<group>";
+		};
+		EE83CBCC25D815BC0095A058 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */,
+				EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -226,10 +240,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */,
+				EE83CBC725D815890095A058 /* DataDecompressionExtension.swift in Sources */,
 				EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */,
-				EE8443FF25D2A89B005EA4B6 /* DataExtension.swift in Sources */,
+				EE8443FF25D2A89B005EA4B6 /* DataTransformExtension.swift in Sources */,
 				EE7732E125D0FF4100414625 /* StreamZipArchive.swift in Sources */,
 				EE77337725D3ACE600414625 /* SizeOf.swift in Sources */,
+				EE7EFFB425D8108E00EA59A1 /* CRC32.swift in Sources */,
 				EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

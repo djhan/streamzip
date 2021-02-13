@@ -1,5 +1,5 @@
 //
-//  DataExtension.swift
+//  DataTransformExtension.swift
 //  StreamZip
 //
 //  Created by DJ.HAN on 2021/02/09.
@@ -45,7 +45,7 @@ extension Data: IntegerTransform {}
 /// FixedWidthInteger Array를 IntegerTransform 프로토콜로 확장
 extension Array: IntegerTransform where Element: FixedWidthInteger {}
 
-// MARK: - Extension for DATA -
+// MARK: - Extension for Data Transform -
 public extension Data {
     /**
      특정 offset에서 일정 length의 데이터를 FixedWidthInteger 값으로 반환

@@ -240,49 +240,16 @@ class StreamZipArchive {
             switch entry.method {
             // Defalte 방식인 경우
             case Z_DEFLATED:
-                var zstream = z_stream()
-                zstream.total_out = 0
-                
-                var status = inflateInit2_(&zstream, -MAX_WBITS, ZLIB_VERSION, ZIP_STREAM_SIZE)
-                guard status == Z_OK else {
-                    // 알 수 없는 에러 발생으로 종료 처리
-                    return completion(entry, StreamZip.Error.unknown)
+                do {
+                    // 성공 처리
+                    let decompressData = try data.unzip(offset:offset, compressedSize: entry.sizeCompressed, crc32: entry.crc32)
+                    entry.data = decompressData
+                    return completion(entry, nil)
                 }
-
-                zstream.avail_in = uInt(entry.sizeCompressed)
-                
-                data.withUnsafeBytes({ (bytes) in
-                    let base = bytes.baseAddress?.advanced(by: offset)
-                    guard let sourcePointer = base else {
-                        return
-                    }
-                    let mutablePointer = UnsafeMutablePointer<UInt8>(mutating: sourcePointer.bindMemory(to: UInt8.self, capacity: entry.sizeUncompressed))
-                    zstream.next_in = mutablePointer
-                    return
-                })
-                
-                var decompressed = Data(capacity: entry.sizeUncompressed)
-                zstream.avail_out = uInt(entry.sizeUncompressed)
-                decompressed.withUnsafeMutableBytes { (bytes) in
-                    let base = bytes.baseAddress
-                    guard let sourcePointer = base else {
-                        return
-                    }
-                    let mutablePointer = UnsafeMutablePointer<UInt8>(mutating: sourcePointer.bindMemory(to: UInt8.self, capacity: Int(entry.sizeUncompressed)))
-                    zstream.next_out = mutablePointer
+                catch {
+                    print("StreamZipArchive>fetchFile(_:completion:): 해제 도중 에러 발생 = \(error.localizedDescription)")
+                    return completion(entry, error)
                 }
-
-                status = inflate(&zstream, Z_SYNC_FLUSH)
-                
-                guard status == Z_OK else {
-                    print("StreamZipArchive>fetchFile(_:completion:): 압축 해제 에러 발생...")
-                    return completion(entry, StreamZip.Error.unknown)
-                }
-                
-                // 성공 처리
-                entry.data = decompressed
-                return completion(entry, nil)
-                
                 
             // 비압축시
             case 0:
