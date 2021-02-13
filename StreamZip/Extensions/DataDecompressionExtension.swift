@@ -34,12 +34,17 @@ extension Data {
         case lz4
     }
 
-    /// CRC32 체크섬 계산
+    /// CRC32 계산값 반환
+    internal func crc32() -> UInt {
+        return UInt(self.checkCrc32().checksum)
+    }
+    
+    /// CRC32 구조체 생성, 반환
     /// - returns: CRC32 구조체 반환
-    func crc32() -> CRC32 {
-        var checksum = CRC32()
-        checksum.advance(withChunk: self)
-        return checksum
+    private func checkCrc32() -> CRC32 {
+        var checkCrc32 = CRC32()
+        checkCrc32.advance(withChunk: self)
+        return checkCrc32
     }
     
     /**
@@ -50,7 +55,7 @@ extension Data {
         - crc32: `UInt`로 CRC 값 지정. CRC32 체크시 해당 값을 입력. nil로 지정하는 경우, CRC 체크를 건너뛴다
      - Returns: 압축 해제된 Data 반환. 실패시 에러값 반환
      */
-    func unzip(offset: Int, compressedSize: Int, crc32: UInt?) throws -> Data {
+    internal func unzip(offset: Int, compressedSize: Int, crc32: UInt?) throws -> Data {
         let result: Data? = try self.withUnsafeBytes { (bytes) -> Data? in
             let source = bytes.baseAddress?.advanced(by: offset)
             guard let sourcePointer = source?.bindMemory(to: UInt8.self, capacity: compressedSize) else {
@@ -69,9 +74,7 @@ extension Data {
 
         // crc32 값이 입력된 경우, 체크섬 확인 진행
         if let inputCrc32 = crc32 {
-            var checkCrc32 = CRC32()
-            checkCrc32.advance(withChunk: deflated)
-            let outputCrc32 = UInt(checkCrc32.checksum)
+            let outputCrc32 = deflated.crc32()
             guard inputCrc32 == outputCrc32 else {
                 print("StreamZip>DataDecompressionExtension>unzip(): 원본 CRC = \(inputCrc32) || 계산값 = \(outputCrc32) 이 일치하지 않는다")
                 // checksum 불일치 에러를 반환한다
