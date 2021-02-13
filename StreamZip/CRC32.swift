@@ -11,7 +11,7 @@ import Foundation
  CRC32 구조체
  - CustomStringConvertible을 상속한다
  */
-public struct CRC32: CustomStringConvertible {
+internal struct CRC32: CustomStringConvertible {
     private static let zLibCrc32: ZLibCrc32FuncPtr? = loadCrc32fromZLib()
     
     public init() {}

@@ -16,7 +16,7 @@ let CentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x01, 0x02]
 let LocalFileHeaderSignature: Array<UInt8> = [0x50, 0x4b, 0x03, 0x04]
 
 // MARK: - Zip Information Protocol -
-protocol ZipInformationConvertible {
+internal protocol ZipInformationConvertible {
     /// 자기 자신의 길이
     var length: Int { get set }
     
@@ -111,7 +111,7 @@ extension ZipInformationConvertible {
 
 // MARK: - End of Central Directory Struct -
 /// Zip End Record 구조체
-struct ZipEndRecord: ZipInformationConvertible {
+internal struct ZipEndRecord: ZipInformationConvertible {
     
     var length: Int
     
@@ -183,7 +183,7 @@ struct ZipEndRecord: ZipInformationConvertible {
 
 // MARK: - File Header Struct -
 /// Zip File Header 구조체
-struct ZipFileHeader: ZipInformationConvertible {
+internal struct ZipFileHeader: ZipInformationConvertible {
     
     var length: Int
 

@@ -14,12 +14,12 @@ import Foundation
 /**
  특정 정수의 사이즈 반환
  */
-public func sizeof<T: FixedWidthInteger>(_ int: T) -> Int {
+internal func sizeof<T: FixedWidthInteger>(_ int: T) -> Int {
     return int.bitWidth/UInt8.bitWidth
 }
 /**
  특정 정수형의 사이즈 반환
  */
-public func sizeof<T: FixedWidthInteger>(_ intType: T.Type) -> Int {
+internal func sizeof<T: FixedWidthInteger>(_ intType: T.Type) -> Int {
     return intType.bitWidth/UInt8.bitWidth
 }

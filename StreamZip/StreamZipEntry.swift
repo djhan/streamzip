@@ -65,7 +65,7 @@ let StreamZipEntryErrorDoman = "streamzip.entry.error"
 /**
  StreamZipEntry 클래스
  */
-class StreamZipEntry: Codable {
+open class StreamZipEntry: Codable {
     
     // MARK: - Properties
     /// 상위 URL
@@ -100,7 +100,7 @@ class StreamZipEntry: Codable {
     
     // MARK: - Static Methods
     
-    static func makeEntries(_ url: URL, from data: Data, encoding: String.Encoding) -> [StreamZipEntry]? {
+    internal static func makeEntries(_ url: URL, from data: Data, encoding: String.Encoding) -> [StreamZipEntry]? {
         var offset = 0
         var entries: [StreamZipEntry]?
         

@@ -10,12 +10,40 @@ import Cocoa
 
 import zlib
 
+// MARK: - Typealiases -
+
+/// Request 완료 핸들러
+public typealias StreamZipRequestCompletion = (_ data: Data?, _ length: UInt, _ error: Error?) -> Void
+
+/**
+ FileLength 완료 핸들러
+ - Parameters:
+    - fileLength: 파일 길이. `UInt`
+    - error: 에러. 옵셔널
+ */
+public typealias StreamZipFileLengthCompletion = (_ fileLength: UInt, _ error: Error?) -> Void
+/**
+ Archive 해제 완료 핸들러
+ - Parameters:
+    - fileLength: 파일 길이. `UInt`
+    - entries: `StreamZipEntry` 배열. 옵셔널
+    - error: 에러. 옵셔널
+ */
+typealias StreamZipArchiveCompletion = (_ fileLength: UInt, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
+/**
+ Entry 생성 완료 핸들러
+ - Parameters:
+    - entry: `StreamZipEntry`
+    - error: 에러. 옵셔널
+ */
+typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
+
 
 // MARK: - Protocol -
 /**
  StreamZip에서 데이터를 전송받기 위해 사용하는 프로토콜
  */
-protocol StreamZipTransferConvertible: class {
+public protocol StreamZipTransferConvertible: class {
     /**
      특정 URL의 FileLength를 구하는 메쏘드
      - 완료 핸들러로 FileLength를 반환
@@ -35,39 +63,9 @@ protocol StreamZipTransferConvertible: class {
     func request(at url: URL, range: Range<UInt>, completion: StreamZipRequestCompletion)
 }
 
-/// ZIP Stream Size
-private let ZIP_STREAM_SIZE: Int32 = Int32(MemoryLayout<z_stream>.size)
-
-// MARK: - Typealiases -
-
-/// Request 완료 핸들러
-typealias StreamZipRequestCompletion = (_ data: Data?, _ length: UInt, _ error: Error?) -> Void
-
-/**
- FileLength 완료 핸들러
- - Parameters:
-    - fileLength: 파일 길이. `UInt`
-    - error: 에러. 옵셔널
- */
-typealias StreamZipFileLengthCompletion = (_ fileLength: UInt, _ error: Error?) -> Void
-/**
- Archive 해제 완료 핸들러
- - Parameters:
-    - fileLength: 파일 길이. `UInt`
-    - entries: `StreamZipEntry` 배열. 옵셔널
-    - error: 에러. 옵셔널
- */
-typealias StreamZipArchiveCompletion = (_ fileLength: UInt, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
-/**
- Entry 생성 완료 핸들러
- - Parameters:
-    - entry: `StreamZipEntry`
-    - error: 에러. 옵셔널
- */
-typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
 
 // MARK: - Stream Zip Archive Class -
-class StreamZipArchive {
+open class StreamZipArchive {
     
     // MARK: - Properties
 
@@ -77,7 +75,7 @@ class StreamZipArchive {
     weak var delegate: StreamZipTransferConvertible?
     
     /// 파일 길이
-    var fileLength: UInt = 0
+    private var fileLength: UInt = 0
     /**
      Stream Zip Entry 배열
      */
