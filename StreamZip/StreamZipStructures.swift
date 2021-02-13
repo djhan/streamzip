@@ -8,8 +8,18 @@
 import Foundation
 import Cocoa
 
+/// End of Central Directory signature
+let EndOfCentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x05, 0x06]
+/// 개별 Central Directory signature
+let CentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x01, 0x02]
+/// 개별 Local File Header signature
+let LocalFileHeaderSignature: Array<UInt8> = [0x50, 0x4b, 0x03, 0x04]
+
 // MARK: - Zip Information Protocol -
 protocol ZipInformationConvertible {
+    /// 자기 자신의 길이
+    var length: Int { get set }
+    
     /**
      Data 기반으로 Zip 정보 구조체 생성후 반환
      - 인코딩은 utf-8을 사용
@@ -51,6 +61,25 @@ protocol ZipInformationConvertible {
     static func getData(from data: Data, offset: inout Int, length: Int) -> Data?
 }
 extension ZipInformationConvertible {
+    /**
+     Data 기반으로 Zip 정보 구조체 생성후 반환
+     - 인코딩은 utf-8을 사용
+     - Parameters:
+        - data: `Data`
+     - Returns: 자기 자신의 struct를 반환. 실패시 nil 반환
+     */
+    static func make(from data: Data) -> Self? {
+        return self.make(from: data, encoding: .utf8)
+    }
+
+    /**
+     data로부터 데이터를 잘라내서 Generi으로 반환
+     - offset를 inout 패러미터로 지정
+     - Parameters:
+        - data: `Data`
+        - offset: inout로 시작 지점 지정. 성공시 가져온 length 만큼 추가된다
+     - Returns: `FixedWidthInteger`형의 Generic으로 반환. 실패시 nil 반환
+     */
     @discardableResult
     static func getValue<T: FixedWidthInteger>(from data: Data, offset: inout Int) -> T? {
         // 가져올 길이를 property의 타입 기준으로 구한다
@@ -62,7 +91,7 @@ extension ZipInformationConvertible {
         return property
     }
     /**
-     data로부터 데이터를 잘라내서 반환
+     data로부터 데이터를 잘라내서 Data로 반환
      - offset를 inout 패러미터로 지정
      - Parameters:
         - data: `Data`
@@ -83,6 +112,9 @@ extension ZipInformationConvertible {
 // MARK: - End of Central Directory Struct -
 /// Zip End Record 구조체
 struct ZipEndRecord: ZipInformationConvertible {
+    
+    var length: Int
+    
     var endOfCentralDirectorySignature: UInt32
     var numberOfThisDisk: UInt16
     var diskWhereCentralDirectoryStarts: UInt16
@@ -93,12 +125,6 @@ struct ZipEndRecord: ZipInformationConvertible {
     var zipFileCommentLength: UInt16
     var comment: String?
     
-    /**
-     Data 기반으로 Zip 정보 구조체 생성후 반환
-     */
-    static func make(from data: Data) -> Self? {
-        self.make(from: data, encoding: .utf8)
-    }
     /**
      Data 기반으로 특정 인코딩 정보로 Zip 정보 구조체 생성후 반환
      */
@@ -131,7 +157,8 @@ struct ZipEndRecord: ZipInformationConvertible {
             comment = String.init(data: commentData, encoding: encoding)
         }
         
-        return Self.init(endOfCentralDirectorySignature: endOfCentralDirectorySignature,
+        return Self.init(length: offset,
+                         endOfCentralDirectorySignature: endOfCentralDirectorySignature,
                          numberOfThisDisk: numberOfThisDisk,
                          diskWhereCentralDirectoryStarts: diskWhereCentralDirectoryStarts,
                          numberOfCentralDirectoryRecordsOnThisDisk: numberOfCentralDirectoryRecordsOnThisDisk,
@@ -156,7 +183,10 @@ struct ZipEndRecord: ZipInformationConvertible {
 
 // MARK: - File Header Struct -
 /// Zip File Header 구조체
-struct ZipFileHeader {
+struct ZipFileHeader: ZipInformationConvertible {
+    
+    var length: Int
+
     var localFileHeaderSignature: UInt32
     var versionNeededToExtract: UInt16
     var generalPurposeBitFlag: UInt16
@@ -168,4 +198,40 @@ struct ZipFileHeader {
     var uncompressedSize: UInt32
     var fileNameLength: UInt16
     var extraFieldLength: UInt16
+
+    /**
+     특정 데이터에서 Zip File Header 구조체 생성후 반환
+     */
+    static func make(from data: Data, encoding: String.Encoding) -> ZipFileHeader? {
+        var offset = 0
+        var signature = [UInt8].init(repeating: 0, count: 4)
+        // local file header signature 여부를 확인한다
+        data[0 ..< 4].copyBytes(to: &signature, count: 4)
+        guard signature == LocalFileHeaderSignature else { return nil }
+
+        guard let localFileHeaderSignature: UInt32 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let versionNeededToExtract: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let generalPurposeBitFlag: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let compressionMethod: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let fileLastModificationTime: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let fileLastModificationDate: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let crc32: UInt32 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let compressedSize: UInt32 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let uncompressedSize: UInt32 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let fileNameLength: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+        guard let extraFieldLength: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
+
+        return Self.init(length: offset,
+                         localFileHeaderSignature: localFileHeaderSignature,
+                         versionNeededToExtract: versionNeededToExtract,
+                         generalPurposeBitFlag: generalPurposeBitFlag,
+                         compressionMethod: compressionMethod,
+                         fileLastModificationTime: fileLastModificationTime,
+                         fileLastModificationDate: fileLastModificationDate,
+                         crc32: crc32,
+                         compressedSize: compressedSize,
+                         uncompressedSize: uncompressedSize,
+                         fileNameLength: fileNameLength,
+                         extraFieldLength: extraFieldLength)
+    }
 }

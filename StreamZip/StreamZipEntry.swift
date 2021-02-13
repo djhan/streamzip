@@ -19,6 +19,14 @@ enum StreamZip {
         case responseIsEmpty
         /// 컨텐츠가 없는 경우
         case contentsIsEmpty
+        /// End of Central Directory 미발견 또는 생성 실패시
+        case endOfCentralDirectoryIsFailed
+        /// Central Directory 배열 생성 실패시
+        case centralDirectoryIsFailed
+        /// Local File Header 생성 실패시
+        case localFileHeaderIsFailed
+        /// 미지원 압축 해제 방식
+        case unsupportedCompressMethod
         /// 알 수 없는 에러
         case unknown
         
@@ -29,6 +37,10 @@ enum StreamZip {
             switch self {
             case .responseIsEmpty: return "No reponse"
             case .contentsIsEmpty: return "Contents is empty"
+            case .endOfCentralDirectoryIsFailed: return "End of Central Directory is not existed, or failed to read"
+            case .centralDirectoryIsFailed: return "Central Directory is not existed, or failed to read"
+            case .localFileHeaderIsFailed: return "Local File Header is not existed, or failed to read"
+            case .unsupportedCompressMethod: return "This compressed method is not supported"
             default: return "Unknown error was occurred"
             }
         }
@@ -39,11 +51,6 @@ enum StreamZip {
 
 /// 에러 도메인
 let StreamZipEntryErrorDoman = "streamzip.entry.error"
-
-/// End of Central Directory signature
-let EndOfCentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x05, 0x06]
-/// 개별 Central Directory signature
-let CentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x01, 0x02]
 
 
 // MARK: - Stream Zip Entry Class -
@@ -58,18 +65,23 @@ class StreamZipEntry: Codable {
     /// 파일 경로 (파일명)
     var filePath: String
     /// offset
+    /// - File Header를 찾기 위한 offset 값으로 `relativeOffsetOfLocalFileHeader` 를 대입
     var offset: Int
     /// method
-    var method: Int
+    var method: Int32
     /// 압축 크기
     var sizeCompressed: Int
     /// 비압축 크기
     var sizeUncompressed: Int
+    /// 파일명 길이
+    var filenameLength: Int
+    /// extra field 길이
+    var extraFieldLength: Int
     /// crc32
     var crc32: UInt
+
     /// 최종 수정날짜
     var modificationDate: Date
-    
     /// extraField
     var extraField: String?
     /// comment
@@ -103,9 +115,11 @@ class StreamZipEntry: Codable {
             guard let fileNameLength: UInt16 = getValue(from: data, offset: &offset) else { break }
             guard let extraFieldLength: UInt16 = getValue(from: data, offset: &offset) else { break }
             guard let fileCommentLength: UInt16 = getValue(from: data, offset: &offset) else { break }
-            // diskNumberWhereFileStarts / internalFileAttributes / externalFileAttributes / relativeOffsetOfLocalFileHeader만큼 offset 이동
+            // diskNumberWhereFileStarts / internalFileAttributes 만큼 offset 이동 (UInt16 2개)
             offset += sizeof(UInt16.self) * 2
-            offset += sizeof(UInt32.self) * 2
+            // externalFileAttributes 만큼 offset 이동 (UInt32 1개)
+            offset += sizeof(UInt32.self)
+            guard let relativeOffsetOfLocalFileHeader: UInt32 = getValue(from: data, offset: &offset) else { break }
             guard let fileNameData = getData(from: data, offset: &offset, length: Int(fileNameLength)) else { break }
 
             // 파일명 생성
@@ -125,10 +139,12 @@ class StreamZipEntry: Codable {
 
             let entry = StreamZipEntry.init(url,
                                             filePath: fileName,
-                                            offset: offset,
-                                            method: Int(compressionMethod),
+                                            offset: Int(relativeOffsetOfLocalFileHeader),
+                                            method: Int32(compressionMethod),
                                             sizeCompressed: Int(compressedSize),
                                             sizeUncompressed: Int(uncompressedSize),
+                                            filenameLength: Int(fileNameLength),
+                                            extraFieldLength: Int(extraFieldLength),
                                             crc32: UInt(crc32),
                                             modificationDate: modificationDate,
                                             extraField: extraField,
@@ -145,9 +161,11 @@ class StreamZipEntry: Codable {
     init(_ url: URL,
          filePath: String,
          offset: Int,
-         method: Int,
+         method: Int32,
          sizeCompressed: Int,
          sizeUncompressed: Int,
+         filenameLength: Int,
+         extraFieldLength: Int,
          crc32: UInt,
          modificationDate: Date,
          extraField: String?,
@@ -159,6 +177,8 @@ class StreamZipEntry: Codable {
         self.method = method
         self.sizeCompressed = sizeCompressed
         self.sizeUncompressed = sizeUncompressed
+        self.filenameLength = filenameLength
+        self.extraFieldLength = extraFieldLength
         self.crc32 = crc32
         self.modificationDate = modificationDate
         self.extraField = extraField
@@ -169,9 +189,11 @@ class StreamZipEntry: Codable {
     convenience init(_ url: URL,
                      filePath: String,
                      offset: Int,
-                     method: Int,
+                     method: Int32,
                      sizeCompressed: Int,
                      sizeUncompressed: Int,
+                     filenameLength: Int,
+                     extraFieldLength: Int,
                      crc32: UInt,
                      modificationDate: Date,
                      extraField: String?,
@@ -182,6 +204,8 @@ class StreamZipEntry: Codable {
                   method: method,
                   sizeCompressed: sizeCompressed,
                   sizeUncompressed: sizeUncompressed,
+                  filenameLength: filenameLength,
+                  extraFieldLength: extraFieldLength,
                   crc32: crc32,
                   modificationDate: modificationDate,
                   extraField: extraField,

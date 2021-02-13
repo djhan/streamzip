@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6449E925D5297E008FA69E /* GetValue.swift */; };
+		EE644A0625D6198D008FA69E /* libz.1.2.11.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = EE644A0525D6198D008FA69E /* libz.1.2.11.tbd */; };
 		EE7732CA25D0D37C00414625 /* StreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7732C025D0D37C00414625 /* StreamZip.framework */; };
 		EE7732CF25D0D37C00414625 /* StreamZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732CE25D0D37C00414625 /* StreamZipTests.swift */; };
 		EE7732D125D0D37C00414625 /* StreamZip.h in Headers */ = {isa = PBXBuildFile; fileRef = EE7732C325D0D37C00414625 /* StreamZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		EE6449E925D5297E008FA69E /* GetValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetValue.swift; sourceTree = "<group>"; };
+		EE644A0525D6198D008FA69E /* libz.1.2.11.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.11.tbd; path = usr/lib/libz.1.2.11.tbd; sourceTree = SDKROOT; };
 		EE7732C025D0D37C00414625 /* StreamZip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamZip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE7732C325D0D37C00414625 /* StreamZip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StreamZip.h; sourceTree = "<group>"; };
 		EE7732C425D0D37C00414625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -48,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE644A0625D6198D008FA69E /* libz.1.2.11.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,12 +65,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EE6449F625D55DB3008FA69E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EE644A0525D6198D008FA69E /* libz.1.2.11.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		EE7732B625D0D37C00414625 = {
 			isa = PBXGroup;
 			children = (
 				EE7732C225D0D37C00414625 /* StreamZip */,
 				EE7732CD25D0D37C00414625 /* StreamZipTests */,
 				EE7732C125D0D37C00414625 /* Products */,
+				EE6449F625D55DB3008FA69E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -384,6 +396,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.djhan.StreamZip;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -411,6 +424,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.djhan.StreamZip;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
