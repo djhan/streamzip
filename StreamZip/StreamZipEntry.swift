@@ -11,10 +11,20 @@ import Cocoa
 // MARK: - Stream Zip Enumerations -
 
 /// StreamZip 열거형
-enum StreamZip {
-    
+public enum StreamZip {
+    /// 접속 종류
+    public enum Connection: String {
+        case ftp = "ftp"
+        case ftps = "ftps"
+        case sftp = "sftp"
+        case http = "http"
+        case unknown = "unknown"
+    }
+
     /// 에러
-    enum Error: LocalizedError {
+    public enum Error: LocalizedError {
+        /// 미지원 연결 형식
+        case unsupportedConnection
         /// 반응이 없는 경우
         case responseIsEmpty
         /// 컨텐츠가 없는 경우
@@ -41,6 +51,7 @@ enum StreamZip {
          */
         public var errorDescription: String? {
             switch self {
+            case .unsupportedConnection: return "This connection type is not supported"
             case .responseIsEmpty: return "No reponse"
             case .contentsIsEmpty: return "Contents is empty"
             case .endOfCentralDirectoryIsFailed: return "End of Central Directory is not existed, or failed to read"
@@ -55,12 +66,6 @@ enum StreamZip {
     }
 }
 
-// MARK: - Stream Zip Static Properties -
-
-/// 에러 도메인
-let StreamZipEntryErrorDoman = "streamzip.entry.error"
-
-
 // MARK: - Stream Zip Entry Class -
 /**
  StreamZipEntry 클래스
@@ -68,19 +73,17 @@ let StreamZipEntryErrorDoman = "streamzip.entry.error"
 open class StreamZipEntry: Codable {
     
     // MARK: - Properties
-    /// 상위 URL
-    var url: URL
     /// 파일 경로 (파일명)
-    var filePath: String
+    public var filePath: String
     /// offset
     /// - File Header를 찾기 위한 offset 값으로 `relativeOffsetOfLocalFileHeader` 를 대입
     var offset: Int
     /// method
     var method: Int32
     /// 압축 크기
-    var sizeCompressed: Int
+    public var sizeCompressed: Int
     /// 비압축 크기
-    var sizeUncompressed: Int
+    public var sizeUncompressed: Int
     /// 파일명 길이
     var filenameLength: Int
     /// extra field 길이
@@ -89,18 +92,18 @@ open class StreamZipEntry: Codable {
     var crc32: UInt
 
     /// 최종 수정날짜
-    var modificationDate: Date
+    public var modificationDate: Date
     /// extraField
     var extraField: String?
     /// comment
     var comment: String?
     
     /// 데이터
-    var data: Data?
+    public var data: Data?
     
     // MARK: - Static Methods
     
-    internal static func makeEntries(_ url: URL, from data: Data, encoding: String.Encoding) -> [StreamZipEntry]? {
+    internal static func makeEntries(from data: Data, encoding: String.Encoding) -> [StreamZipEntry]? {
         var offset = 0
         var entries: [StreamZipEntry]?
         
@@ -145,8 +148,7 @@ open class StreamZipEntry: Codable {
                 fileComment = String.init(data: fileCommentData, encoding: encoding)
             }
 
-            let entry = StreamZipEntry.init(url,
-                                            filePath: fileName,
+            let entry = StreamZipEntry.init(filePath: fileName,
                                             offset: Int(relativeOffsetOfLocalFileHeader),
                                             method: Int32(compressionMethod),
                                             sizeCompressed: Int(compressedSize),
@@ -166,8 +168,7 @@ open class StreamZipEntry: Codable {
     
     // MARK: - Initialization
     /// 기본 초기화
-    init(_ url: URL,
-         filePath: String,
+    init(filePath: String,
          offset: Int,
          method: Int32,
          sizeCompressed: Int,
@@ -179,7 +180,6 @@ open class StreamZipEntry: Codable {
          extraField: String?,
          comment: String?,
          data: Data?) {
-        self.url = url
         self.filePath = filePath
         self.offset = offset
         self.method = method
@@ -194,8 +194,7 @@ open class StreamZipEntry: Codable {
         self.data = data
     }
     /// 초기화(data 제외)
-    convenience init(_ url: URL,
-                     filePath: String,
+    convenience init(filePath: String,
                      offset: Int,
                      method: Int32,
                      sizeCompressed: Int,
@@ -206,8 +205,7 @@ open class StreamZipEntry: Codable {
                      modificationDate: Date,
                      extraField: String?,
                      comment: String?) {
-        self.init(url,
-                  filePath:filePath,
+        self.init(filePath:filePath,
                   offset:offset,
                   method: method,
                   sizeCompressed: sizeCompressed,
