@@ -9,12 +9,27 @@ import Foundation
 import Cocoa
 
 import FilesProvider
+import CommonLibrary
+import Detector
 import zlib
 
 // MARK: - Typealiases -
 
-/// Request 완료 핸들러
-public typealias StreamZipRequestCompletion = (_ data: Data?, _ error: Error?) -> Void
+/**
+ Data Request 완료 핸들러
+ - Parameters:
+    - data: `Data`. 미발견시 nil 반환
+    - error: 에러. 옵셔널
+ */
+public typealias StreamZipDataRequestCompletion = (_ data: Data?, _ error: Error?) -> Void
+/**
+ Image Request 완료 핸들러
+ - Parameters:
+    - image: `NSImage`. 미발견시 nil 반환
+    - filePath: `String`. 미발견시 nil 반환
+    - error: 에러. 옵셔널
+ */
+public typealias StreamZipImageRequestCompletion = (_ image: NSImage?, _ filepath: String?, _ error: Error?) -> Void
 
 /**
  FileLength 완료 핸들러
@@ -272,6 +287,62 @@ open class StreamZipArchiver {
         }
     }
     
+    // MARK: Image
+    /**
+     아카이브 중 최초 이미지를 반환
+     - 인코딩된 파일명 순서로만 정렬 처리
+     */
+    
+    public func firstImage(encoding: String.Encoding, completion: @escaping StreamZipImageRequestCompletion) {
+        self.fetchArchive(encoding: encoding) { [weak self] (fileLength, entries, error) in
+            guard let strongSelf = self else {
+                print("StreamZipArchive>getFirstImage(encoding:completion:): self가 nil!")
+                return completion(nil, nil, StreamZip.Error.unknown)
+            }
+            // 에러 발생시
+            if let error = error {
+                print("StreamZipArchive>getFirstImage(encoding:completion:): 에러 발생 = \(error.localizedDescription)")
+                return completion(nil, nil, error)
+            }
+            guard var entries = entries else {
+                print("StreamZipArchive>getFirstImage(encoding:completion:): entry가 0개")
+                return completion(nil, nil, StreamZip.Error.contentsIsEmpty)
+            }
+            
+            // entry를 이름순으로 정렬
+            entries.sort { $0.filePath < $1.filePath }
+                
+            var targetEntry: StreamZipEntry?
+            for entry in entries {
+                guard let utiString = entry.filePath.utiString else { continue }
+                if Detector.shared.detectImageFormat(utiString) == .unknown { continue }
+                // 이미지 entry 발견시, 대입
+                targetEntry = entry
+                break
+            }
+            
+            guard let entry = targetEntry else {
+                print("StreamZipArchive>getFirstImage(encoding:completion:): 이미지 파일이 없음")
+                return completion(nil, nil, StreamZip.Error.contentsIsEmpty)
+            }
+            
+            strongSelf.fetchFile(entry, encoding: encoding) { (resultEntry, error) in
+                // 에러 발생시
+                if let error = error {
+                    print("StreamZipArchive>getFirstImage(encoding:completion:): \(resultEntry.filePath) >> 전송중 에러 발생 = \(error.localizedDescription)")
+                    return completion(nil, nil, error)
+                }
+                guard let data = resultEntry.data,
+                      let image = NSImage.init(data: data) else {
+                    print("StreamZipArchive>getFirstImage(encoding:completion:): data가 nil, 또는 image가 아님")
+                    return completion(nil, nil, StreamZip.Error.contentsIsEmpty)
+                }
+
+                return completion(image, resultEntry.filePath, nil)
+            }
+        }
+    }
+    
     // MARK: Download Data
     
     /**
@@ -327,7 +398,7 @@ open class StreamZipArchiver {
         - range: 데이터를 가져올 범위
         - completion: `StreamZipRequestCompletion` 완료 핸들러
      */
-    private func request(range: Range<UInt>, completion: @escaping StreamZipRequestCompletion) {
+    private func request(range: Range<UInt>, completion: @escaping StreamZipDataRequestCompletion) {
         switch self.connection {
         // FTP인 경우
         case .ftp: self.requestFromFTP(range: range, completion: completion)
@@ -344,7 +415,7 @@ open class StreamZipArchiver {
         - range: 데이터를 가져올 범위
         - completion: `StreamZipRequestCompletion` 완료 핸들러
      */
-    private func requestFromFTP(range: Range<UInt>, completion: @escaping StreamZipRequestCompletion) {
+    private func requestFromFTP(range: Range<UInt>, completion: @escaping StreamZipDataRequestCompletion) {
         guard let ftpProvider = self.ftpProvider,
               let subPath = self.subPath else {
             return completion(nil, StreamZip.Error.unknown)
