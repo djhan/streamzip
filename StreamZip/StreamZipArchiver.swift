@@ -30,6 +30,14 @@ public typealias StreamZipDataRequestCompletion = (_ data: Data?, _ error: Error
     - error: 에러. 옵셔널
  */
 public typealias StreamZipImageRequestCompletion = (_ image: NSImage?, _ filepath: String?, _ error: Error?) -> Void
+/**
+ Thumbnail Image Request 완료 핸들러
+ - Parameters:
+    - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
+    - filePath: `String`. 미발견시 nil 반환
+    - error: 에러. 옵셔널
+ */
+public typealias StreamZipThumbnailRequestCompletion = (_ thumbnail: CGImage?, _ filepath: String?, _ error: Error?) -> Void
 
 /**
  FileLength 완료 핸들러
@@ -54,6 +62,9 @@ public typealias StreamZipArchiveCompletion = (_ fileLength: UInt, _ entries: [S
  */
 public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
 
+/// 최대 썸네일 사이즈
+let MaximumThumbnailSize = NSMakeSize(512, 512)
+
 
 // MARK: - Stream Zip Archiver Class -
 /**
@@ -71,6 +82,8 @@ open class StreamZipArchiver {
     
     /// 진행상황
     public var progress: Progress?
+    /// 중지 여부
+    private var isAbort = false
         
     /// Stream Zip Entry 배열
     public lazy var entries = [StreamZipEntry]()
@@ -122,6 +135,14 @@ open class StreamZipArchiver {
     }
 
     // MARK: - Methods
+    /**
+     중지 처리
+     */
+    public func abort() {
+        // progress 중지 처리
+        self.progress?.cancel()
+        self.isAbort = true
+    }
     
     /**
      delegate의 zip 파일에 접근, Entries 배열 생성
@@ -130,6 +151,9 @@ open class StreamZipArchiver {
         - completion: `StreamZipArchiveCompletion` 완료 핸들러
      */
     public func fetchArchive(encoding: String.Encoding, completion: @escaping StreamZipArchiveCompletion) {
+        // 중지 여부를 false로 초기화
+        self.isAbort = false
+
         // 기본 파일 길이를 0으로 리셋
         self.fileLength = 0
         // 파일 길이를 구해온다
@@ -229,7 +253,9 @@ open class StreamZipArchiver {
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
      */
     public func fetchFile(_ entry: StreamZipEntry, encoding: String.Encoding, completion: @escaping StreamZipFileCompletion) {
-        
+        // 중지 여부를 false로 초기화
+        self.isAbort = false
+
         // 이미 data가 있는 경우 nil 처리
         entry.data = nil
     
@@ -290,9 +316,11 @@ open class StreamZipArchiver {
     // MARK: Image
     /**
      아카이브 중 최초 이미지를 반환
-     - 인코딩된 파일명 순서로만 정렬 처리
+     - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
+     - Parameters:
+        - encoding: 파일명 인코딩 지정
+        - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
      */
-    
     public func firstImage(encoding: String.Encoding, completion: @escaping StreamZipImageRequestCompletion) {
         self.fetchArchive(encoding: encoding) { [weak self] (fileLength, entries, error) in
             guard let strongSelf = self else {
@@ -342,6 +370,108 @@ open class StreamZipArchiver {
             }
         }
     }
+    /**
+     압축 파일 썸네일 이미지 반환
+     - 그룹 환경설정에서 배너 표시가 지정된 경우 배너까지 추가
+     - 최대 512 x 512 크기로 썸네일 생성, CGImage 타입으로 완료 핸들러로 반환한다
+     
+     - Parameters:
+        - completion: `StreamZipThumbnailRequestCompletion` 타입. CGImage, filePath, error 를 반환한다.
+     */
+    public func thumbnail(completion: @escaping StreamZipThumbnailRequestCompletion) {
+        self.firstImage(encoding: .utf8) { (image, filePath, error) in
+            // 에러 발생시
+            if let error = error {
+                print("StreamZipArchive>thumbnail(completion:): 에러 발생 = \(error.localizedDescription)")
+                return completion(nil, nil, error)
+            }
+            
+            let preference = GroupPreference.shared
+            
+            // 512 x 512 기준으로 canvasFrame / targetFrame을 구한다
+            guard let image = image,
+                  let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil),
+                  let targetFrameRects = getThumbnailTargetRects(image,
+                                                                 minCroppingRatio: preference.minCroppingRatio,
+                                                                 maxCroppingRatio: preference.maxCroppingRatio,
+                                                                 maximumSize: MaximumThumbnailSize) else {
+                print("StreamZipArchive>thumbnail(completion:): cgimage로 변환하는데 실패한 것으로 추정됨")
+                return completion(nil, nil, StreamZip.Error.unknown)
+            }
+            
+            guard let cgcontext = self.offscreenCGContext(with: targetFrameRects.canvasFrame.size, buffer: nil) else {
+                print("StreamZipArchive>thumbnail(completion:): cgcontext 생성에 실패")
+                return completion(nil, nil, StreamZip.Error.unknown)
+            }
+            
+            let canvasFrame = targetFrameRects.canvasFrame
+            let targetFrame = targetFrameRects.targetFrame
+            
+            // 배경을 흰색으로 채운다
+            cgcontext.setFillColor(NSColor.white.cgColor)
+            cgcontext.fill(canvasFrame)
+            
+            // 이미지를 드로잉
+            cgcontext.draw(cgImage, in: targetFrame)
+            // 배너 필요시 드로잉
+            if preference.showExtensionBanner == true {
+                let banner = self.url.pathExtension
+                drawBannerInCGContext(banner,
+                                      bannerHeightRatio: preference.bannerHeightRatio,
+                                      maximumSize: MaximumThumbnailSize,
+                                      inContext: cgcontext,
+                                      inCanvas: canvasFrame)
+            }
+            
+            // 외곽선 드로잉
+            cgcontext.setStrokeColor(NSColor.lightGray.cgColor)
+            cgcontext.stroke(canvasFrame, width: 0.5)
+
+            // cgImage를 생성
+            guard let thumbnailCGImage = cgcontext.makeImage() else {
+                print("StreamZipArchive>thumbnail(completion:): cgImage 생성에 실패")
+                return completion(nil, nil, StreamZip.Error.unknown)
+            }
+            
+            // CGImage 반환 처리
+            return completion(thumbnailCGImage, filePath, nil)
+        }
+    }
+    
+    /**
+     오프스크린 컨텍스트를 생성, 반환
+     - Parameters:
+        - size: CGSize
+        - buffer: 이미지 버퍼. `UnsafeMutableRawPointer`. 보통 nil로 지정
+    - Returns: CGContext. 생성 실패시 nil 반환
+     */
+    private func offscreenCGContext(with size: CGSize, buffer: UnsafeMutableRawPointer?) -> CGContext? {
+        return autoreleasepool { () -> CGContext? in
+            
+            let width: Int  = Int(size.width)
+            let height: Int = Int(size.height)
+
+            var colorSpace: CGColorSpace?
+            var bitmapInfo: UInt32?
+
+            // 컬러 컨텍스트를 반환한다
+            colorSpace = CGColorSpaceCreateDeviceRGB()
+            bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
+
+            // rgba(4)를 곱해서 bytesPerRaw를 구한다
+            let bytesPerRow = width * 4
+            let context = CGContext.init(data: buffer,
+                                         width: width,
+                                         height: height,
+                                         bitsPerComponent: 8,
+                                         bytesPerRow: bytesPerRow,
+                                         // 강제 옵셔널 벗기기 적용
+                                         space: colorSpace!,
+                                         bitmapInfo: bitmapInfo!)
+            return context
+        }
+    }
+
     
     // MARK: Download Data
     
