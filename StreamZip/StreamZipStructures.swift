@@ -15,6 +15,18 @@ let CentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x01, 0x02]
 /// 개별 Local File Header signature
 let LocalFileHeaderSignature: Array<UInt8> = [0x50, 0x4b, 0x03, 0x04]
 
+// MARK: - Content of Directory Struct -
+/// 디렉토리 하위 Content 구조체
+/// - 파일 경로와 길이 등 최소한의 정보만 격납한다
+internal struct ContentOfDirectory {
+    /// 경로
+    var path: String
+    /// 디렉토리 여부
+    var isDirectory: Bool
+    /// 파일 크기
+    var size: UInt
+}
+
 // MARK: - Zip Information Protocol -
 internal protocol ZipInformationConvertible {
     /// 자기 자신의 길이

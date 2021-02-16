@@ -14,11 +14,11 @@ import Cocoa
 public enum StreamZip {
     /// 접속 종류
     public enum Connection: String {
-        case ftp = "ftp"
-        case ftps = "ftps"
-        case sftp = "sftp"
-        case http = "http"
-        case unknown = "unknown"
+        case ftp        = "ftp"
+        case ftps       = "ftps"
+        case sftp       = "sftp"
+        case http       = "http"
+        case unknown    = "unknown"
     }
 
     /// 에러
@@ -43,6 +43,8 @@ public enum StreamZip {
         /// CRC32 체크섬 통과 실패
         case checksumIsDifferent
         
+        /// 사용자 중지
+        case aborted
         /// 알 수 없는 에러
         case unknown
         
@@ -60,6 +62,7 @@ public enum StreamZip {
             case .unsupportedCompressMethod: return "This compressed method is not supported"
             case .deflationIsFailed: return "Data deflation is failed"
             case .checksumIsDifferent: return "Checksum is different"
+            case .aborted: return "Aborted by user"
             default: return "Unknown error was occurred"
             }
         }
