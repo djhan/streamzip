@@ -42,18 +42,27 @@ public typealias StreamZipThumbnailRequestCompletion = (_ thumbnail: CGImage?, _
 /**
  FileLength 완료 핸들러
  - Parameters:
-    - fileLength: 파일 길이. `UInt`
+    - fileLength: 파일 길이. `UInt64`
     - error: 에러. 옵셔널
  */
-public typealias StreamZipFileLengthCompletion = (_ fileLength: UInt, _ error: Error?) -> Void
+internal typealias StreamZipFileLengthCompletion = (_ fileLength: UInt64, _ error: Error?) -> Void
+
+/**
+ Contents of Directory 완료 핸들러
+ - Parameters:
+    - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
+    - error: 에러. 옵셔널
+ */
+internal typealias ContentsOfDirectoryCompletion = (_ contentsOfDirectory: [ContentOfDirectory]?, _ error: Error?) -> Void
+
 /**
  Archive 해제 완료 핸들러
  - Parameters:
-    - fileLength: 파일 길이. `UInt`
+    - fileLength: 파일 길이. `UInt64`
     - entries: `StreamZipEntry` 배열. 옵셔널
     - error: 에러. 옵셔널
  */
-public typealias StreamZipArchiveCompletion = (_ fileLength: UInt, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
+public typealias StreamZipArchiveCompletion = (_ fileLength: UInt64, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
 /**
  Entry 생성 완료 핸들러
  - Parameters:
@@ -72,13 +81,8 @@ open class StreamZipArchiver {
     
     // MARK: - Properties
 
-    /// URL
-    var url: URL
-    /// 파일 길이
-    private var fileLength: UInt = 0
-    
-    /// Stream Zip Entry 배열
-    public lazy var entries = [StreamZipEntry]()
+    /// Base URL
+    var baseUrl: URL
     
     /// SyncQueue
     private let syncQueue = DispatchQueue(label: "djhan.StreamZipArchiver", attributes: .concurrent)
@@ -86,11 +90,6 @@ open class StreamZipArchiver {
     // MARK: FTP Properties
     /// FTP File Provider
     weak var ftpProvider: FTPFileProvider?
-    /// 실제 파일이 속한 상위폴더의 경로
-    var mainPath: String?
-    
-    /// mainPath의 컨텐츠 목록
-    private var contentsOfDirectory: [ContentOfDirectory]?
     
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
@@ -99,10 +98,10 @@ open class StreamZipArchiver {
     /**
      URL로 초기화
      - Parameters:
-        - url: `URL` 타입 지정
+        - baseUrl: `URL` 타입 지정
      */
-    public init(_ url: URL) {
-        self.url = url
+    public init(_ baseUrl: URL) {
+        self.baseUrl = baseUrl
         // 연결 방식 확인
         self.detectConnection()
     }
@@ -112,16 +111,16 @@ open class StreamZipArchiver {
         - ftpProvider: FTPFileProvider
      */
     public init?(ftpProvider: FTPFileProvider) {
-        guard let url = ftpProvider.baseURL else { return nil }
+        guard let baseUrl = ftpProvider.baseURL else { return nil }
         self.ftpProvider = ftpProvider
-        self.url = url
+        self.baseUrl = baseUrl
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .ftp
     }
     
     /// 연결 타입 확인
     private func detectConnection() {
-        switch self.url.scheme {
+        switch self.baseUrl.scheme {
         case StreamZip.Connection.ftp.rawValue: self.connection = .ftp
         case StreamZip.Connection.ftps.rawValue: self.connection = .ftps
         case StreamZip.Connection.sftp.rawValue: self.connection = .sftp
@@ -136,67 +135,81 @@ open class StreamZipArchiver {
      특정 경로의 zip 파일에 접근, Entries 배열 생성
      - Parameters:
         - path: 파일 경로 지정
-        - encoding: `String.Encoding` 형으로 파일명 인코딩 지정
+        - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+        - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
         - completion: `StreamZipArchiveCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func fetchArchive(at path: String, encoding: String.Encoding, completion: @escaping StreamZipArchiveCompletion) -> Progress? {
-        // Progress 선언
-        var progress: Progress?
-        
-        // 기본 파일 길이를 0으로 리셋
-        self.fileLength = 0
-        
-        // 파일 길이를 구해온다
-        progress = self.getFileLength(at: path) { [weak self] (fileLength, error) in
-            guard let strongSelf = self else {
-                return completion(0, nil, error)
-            }
-            // 에러 발생시 종료 처리
-            if let error = error {
-                print("StreamZipArchive>fetchArchive(encoding:completion:): file length가 0")
-                return completion(0, nil, error)
-            }
+    public func fetchArchive(at path: String,
+                             fileLength: UInt64? = nil,
+                             encoding: String.Encoding? = nil,
+                             completion: @escaping StreamZipArchiveCompletion) -> Progress? {
+        // fileLength가 주어졌는지 확인
+        guard let fileLength = fileLength else {
+            // 없는 경우
             
-            strongSelf.fileLength = fileLength
+            // Progress 선언
+            var progress: Progress?
             
-            // 파일 길이가 0인 경우 종료 처리
-            guard strongSelf.fileLength > 0 else {
-                return completion(0, nil, StreamZip.Error.contentsIsEmpty)
-            }
+            // 기본 파일 길이를 0으로 리셋
+            var fileLength: UInt64 = 0
             
-            if progress?.isCancelled == true {
-                print("StreamZipArchive>fetchArchive(encoding:completion:): 작업 중지")
-                return completion(0, nil, StreamZip.Error.aborted)
-            }
+            // 파일 길이를 구해온다
+            progress = self.getFileLength(at: path) { [weak self] (currentFileLength, error) in
+                guard let strongSelf = self else {
+                    return completion(0, nil, error)
+                }
+                // 에러 발생시 종료 처리
+                if let error = error {
+                    print("StreamZipArchive>fetchArchive(encoding:completion:): file length가 0")
+                    return completion(0, nil, error)
+                }
                 
-            // Central Directory 정보를 찾고 entry 배열 생성
-            if let subProgress = strongSelf.makeEntries(at: path, encoding: encoding, completion: completion) {
-                // 하위 progress로 추가
-                progress?.addChild(subProgress, withPendingUnitCount: 1)
+                fileLength = currentFileLength > 0 ? currentFileLength : 0
+                
+                // 파일 길이가 0인 경우 종료 처리
+                guard fileLength > 0 else {
+                    return completion(0, nil, StreamZip.Error.contentsIsEmpty)
+                }
+                
+                if progress?.isCancelled == true {
+                    print("StreamZipArchive>fetchArchive(encoding:completion:): 작업 중지")
+                    return completion(0, nil, StreamZip.Error.aborted)
+                }
+                
+                // Central Directory 정보를 찾고 entry 배열 생성
+                if let subProgress = strongSelf.makeEntries(at: path, fileLength: fileLength, encoding: encoding, completion: completion) {
+                    // 하위 progress로 추가
+                    progress?.addChild(subProgress, withPendingUnitCount: 1)
+                }
             }
+            return progress
         }
+        
+        // FileLength가 주어진 경우
+        let progress = self.makeEntries(at: path, fileLength: fileLength, encoding: encoding, completion: completion)
         return progress
     }
-    
+
     /**
      Central Directory 정보를 찾아 Entry 배열을 생성하는 내부 메쏘드
      - Parameters:
         - path: 파일 경로 지정
-        - encoding: `String.Encoding`
+        - fileLength: `UInt64`. 파일 길이 지정
+        - encoding: `String.Encoding`. 미지정시 자동 인코딩
         - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    private func makeEntries(at path: String, encoding: String.Encoding, completion: @escaping StreamZipArchiveCompletion) -> Progress? {
+    private func makeEntries(at path: String, fileLength: UInt64, encoding: String.Encoding? = nil, completion: @escaping StreamZipArchiveCompletion) -> Progress? {
         // 파일 길이가 0인 경우 종료 처리
-        guard self.fileLength > 0 else {
+        guard fileLength > 0 else {
             print("StreamZipArchive>makeEntries(_:completion:): file length가 0")
             completion(0, nil, StreamZip.Error.contentsIsEmpty)
             return nil
         }
         
         // 마지막 지점에서 -4096 바이트부터 마지막 지점까지 범위 지정
-        let range = self.fileLength - 4096 ..< self.fileLength
+        let range = fileLength - 4096 ..< fileLength
         
         // Progress 선언
         var progress: Progress?
@@ -223,8 +236,8 @@ open class StreamZipArchiver {
             }
             
             // Central Directory 시작 offset과 size을 가져온다
-            let offsetOfCentralDirectory = UInt(zipEndRecord.offsetOfStartOfCentralDirectory)
-            let sizeOfCentralDirectory = UInt(zipEndRecord.sizeOfCentralDirectory)
+            let offsetOfCentralDirectory = UInt64(zipEndRecord.offsetOfStartOfCentralDirectory)
+            let sizeOfCentralDirectory = UInt64(zipEndRecord.sizeOfCentralDirectory)
             let centralDirectoryRange = offsetOfCentralDirectory ..< offsetOfCentralDirectory + sizeOfCentralDirectory
                     
             // 작업 중지시 중지 처리
@@ -234,11 +247,7 @@ open class StreamZipArchiver {
             }
 
             // Central Directory data 를 가져온다
-            let subProgress = strongSelf.request(at: path, range: centralDirectoryRange) { [weak self] (data, error) in
-                guard let strongSelf = self else {
-                    print("StreamZipArchive>makeEntries(_:completion:): self가 nil!")
-                    return completion(0, nil, error)
-                }
+            let subProgress = strongSelf.request(at: path, range: centralDirectoryRange) { (data, error) in
                 if let error = error {
                     print("StreamZipArchive>makeEntries(_:completion:): central directory data 전송중 에러 발생 = \(error.localizedDescription)")
                     return completion(0, nil, error)
@@ -253,11 +262,8 @@ open class StreamZipArchiver {
                     return completion(0, nil, StreamZip.Error.centralDirectoryIsFailed)
                 }
                 
-                // self.entries 프로퍼티에 생성된 entries를 대입
-                strongSelf.entries = entries
-                
                 // 완료 처리
-                completion(strongSelf.fileLength, strongSelf.entries, nil)
+                completion(fileLength, entries, nil)
             }
             
             if subProgress != nil {
@@ -274,22 +280,27 @@ open class StreamZipArchiver {
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
      - Parameters:
         - path: 파일 경로 지정
+        - fileLength: `UInt64`. 파일 길이 지정
         - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
-        - encoding: `String.Encoding`
+        - encoding: `String.Encoding`. 미지정시 자동 인코딩
         - completion: `StreamZipFileCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func fetchFile(at path: String, entry: StreamZipEntry, encoding: String.Encoding, completion: @escaping StreamZipFileCompletion) -> Progress? {
+    public func fetchFile(at path: String,
+                          fileLength: UInt64,
+                          entry: StreamZipEntry,
+                          encoding: String.Encoding? = nil,
+                          completion: @escaping StreamZipFileCompletion) -> Progress? {
         // 이미 data가 있는 경우 nil 처리
         entry.data = nil
     
-        let lowerBound = UInt(entry.offset)
+        let lowerBound = UInt64(entry.offset)
         // 16 바이트를 추가로 다운로드 받는다
         // Central Directory / FileEntry Header 가 포함됐을 수도 있기 때문이다
         // 길이 = zip file header (32바이트) + 압축되어 있는 크기 + 파일명 길이 + extraFieldLength + 추가 16 바이트
-        let length = UInt(MemoryLayout<ZipFileHeader>.size + entry.sizeCompressed + entry.filenameLength + entry.extraFieldLength + 16)
+        let length = UInt64(MemoryLayout<ZipFileHeader>.size + entry.sizeCompressed + entry.filenameLength + entry.extraFieldLength + 16)
         // 추가 16바이트를 더한 값이 전체 파일 길이를 넘어서지 않도록 조절한다
-        let uppderbound = lowerBound + length > self.fileLength ? self.fileLength : lowerBound + length
+        let uppderbound = lowerBound + length > fileLength ? fileLength : lowerBound + length
         // 다운로드 범위를 구한다
         let range = lowerBound ..< uppderbound
         // 해당 범위의 데이터를 받아온다
@@ -344,15 +355,19 @@ open class StreamZipArchiver {
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
      - Parameters:
         - path: 파일 경로 지정
-        - encoding: 파일명 인코딩 지정
+        - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+        - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
         - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func firstImage(at path: String, encoding: String.Encoding, completion: @escaping StreamZipImageRequestCompletion) -> Progress? {
+    public func firstImage(at path: String,
+                           fileLength: UInt64? = nil,
+                           encoding: String.Encoding? = nil,
+                           completion: @escaping StreamZipImageRequestCompletion) -> Progress? {
         // Progress 선언
         var progress: Progress?
         
-        progress = self.fetchArchive(at: path, encoding: encoding) { [weak self] (fileLength, entries, error) in
+        progress = self.fetchArchive(at: path, fileLength: fileLength, encoding: encoding) { [weak self] (fileLength, entries, error) in
             guard let strongSelf = self else {
                 print("StreamZipArchive>getFirstImage(encoding:completion:): self가 nil!")
                 return completion(nil, nil, StreamZip.Error.unknown)
@@ -390,7 +405,7 @@ open class StreamZipArchiver {
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
 
-            let subProgress = strongSelf.fetchFile(at: path, entry: entry, encoding: encoding) { (resultEntry, error) in
+            let subProgress = strongSelf.fetchFile(at: path, fileLength: fileLength, entry: entry, encoding: encoding) { (resultEntry, error) in
                 // 에러 발생시
                 if let error = error {
                     print("StreamZipArchive>getFirstImage(encoding:completion:): \(resultEntry.filePath) >> 전송중 에러 발생 = \(error.localizedDescription)")
@@ -418,16 +433,20 @@ open class StreamZipArchiver {
      
      - Parameters:
         - path: 파일 경로 지정
+        - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
         - size: 최대 크기 지정
         - completion: `StreamZipThumbnailRequestCompletion` 타입. CGImage, filePath, error 를 반환한다.
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func thumbnail(at path: String, size: NSSize, completion: @escaping StreamZipThumbnailRequestCompletion) -> Progress? {
+    public func thumbnail(at path: String,
+                          fileLength: UInt64? = nil,
+                          size: NSSize,
+                          completion: @escaping StreamZipThumbnailRequestCompletion) -> Progress? {
         // Progress 선언
         var progress: Progress?
         
         print("StreamZipArchive>thumbnail(completion:): \(path) >> 썸네일 이미지를 가져온다")
-        progress = self.firstImage(at: path, encoding: .utf8) { [weak self] (image, filePath, error) in
+        progress = self.firstImage(at: path, fileLength: fileLength, encoding: nil) { [weak self] (image, filePath, error) in
             guard let strongSelf = self else {
                 print("StreamZipArchive>thumbnail(completion:): self가 nil!")
                 return completion(nil, nil, StreamZip.Error.unknown)
@@ -478,13 +497,15 @@ open class StreamZipArchiver {
             cgcontext.draw(cgImage, in: targetFrame)
             // 배너 필요시 드로잉
             if preference.showExtensionBanner == true {
-                let banner = strongSelf.url.pathExtension
-                drawBanner(banner,
-                           bannerHeightRatio: preference.bannerHeightRatio,
-                           maximumSize: size,
-                           inContext: cgcontext,
-                           isActiveContext: false,
-                           inCanvas: canvasFrame)
+                let banner = (path as NSString).pathExtension
+                if banner.length > 0 {
+                    drawBanner(banner,
+                               bannerHeightRatio: preference.bannerHeightRatio,
+                               maximumSize: size,
+                               inContext: cgcontext,
+                               isActiveContext: false,
+                               inCanvas: canvasFrame)
+                }
             }
             
             // 외곽선 드로잉
@@ -579,7 +600,7 @@ open class StreamZipArchiver {
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getFileLengthFromFTP(at path: String, completion: @escaping StreamZipFileLengthCompletion) -> Progress? {
-        //-------------------------------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------//
         /// 작업 종료용 내부 메쏘드
         func complete(_ contentsOfDirectory: [ContentOfDirectory]) {
             // 이미 컨텐츠 목록이 있는 경우
@@ -589,81 +610,50 @@ open class StreamZipArchiver {
                 return completion(0, StreamZip.Error.contentsIsEmpty)
             }
             // 찾아낸 아이템의 크기 반환
-            return completion(UInt(foundItem.size), nil)
+            return completion(UInt64(foundItem.size), nil)
         }
-        //-------------------------------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------//
 
         // path의 parent 경로를 구한다
         let parentPath = (path as NSString).deletingLastPathComponent
 
-        // mainPath가 parent 경로와 동일한 경우
-        // 이미 contentsOfDirectory가 있는 경우
-        if self.mainPath == parentPath,
-           let contentsOfDirectory = self.contentsOfDirectory {
-            // 종료 처리 진행
-            complete(contentsOfDirectory)
-            return nil
-        }
- 
-        // parentPath를 지정
-        self.mainPath = parentPath
-        
         // 컨텐츠 목록 생성 실행
         print("StreamZipArchive>getFileLengthFromFTP(completion:): \(path) >> 디렉토리 목록을 가져온다")
         // progress 지정
         var progress: Progress?
-        progress = self.makeContentsOfDirectory(at: self.mainPath!) { (success, error) in
-            if success == false || error != nil {
+        progress = self.getContentsOfDirectory(at: parentPath) { (contentsOfDirectory, error) in
+            if let error = error {
                 print("StreamZipArchive>getFileLengthFromFTP(completion:): \(path) >> 에러 발생...")
                 return completion(0, error)
             }
             
-            if let contentsOfDirectory = self.contentsOfDirectory {
-                complete(contentsOfDirectory)
-            }
-            else {
+            guard let contentsOfDirectory = contentsOfDirectory else {
                 print("StreamZipArchive>getFileLengthFromFTP(completion:): \(path) >> 디렉토리 목록 작성 실패!")
-                completion(0, StreamZip.Error.contentsIsEmpty)
+                return completion(0, StreamZip.Error.contentsIsEmpty)
             }
+            
+            // 종료 처리
+            complete(contentsOfDirectory)
         }
         return progress
     }
     
     /**
-     mainPath 대입 후, contents of directory 배열 생성
+     contents of directory 배열 생성후 완료 핸들러로 반환
      - Parameters:
-        - mainPath: 상위 경로
-        - completion: 성공 여부 및 에러값을 완료 핸들러로 반환
+        - mainPath: contents 목록을 만들려고 하는 경로
+        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func makeContentsOfDirectory(at mainPath: String, completion: @escaping (_ success: Bool, _ error: Error?) -> Void) -> Progress? {
+    private func getContentsOfDirectory(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         switch self.connection {
         // FTP인 경우
         case .ftp:
-            return setupContentsOfDirectoryInFTP(at: mainPath, isUpdate: false, completion: completion)
+            return getContentsOfDirectoryInFTP(at: mainPath, completion: completion)
 
         // 그 외: 미지원으로 실패 처리
         default:
-            completion(false, StreamZip.Error.unsupportedConnection)
-            return nil
-        }
-    }
-    /**
-     mainPath 대입 후, contents of directory 배열 업데이트
-     - Parameters:
-        - mainPath: 상위 경로
-        - completion: 성공 여부 및 에러값을 완료 핸들러로 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
-    public func updateContentsOfDirectory(at mainPath: String, completion: @escaping (_ success: Bool, _ error: Error?) -> Void) -> Progress? {
-        switch self.connection {
-        // FTP인 경우
-        case .ftp:
-            return setupContentsOfDirectoryInFTP(at: mainPath, isUpdate: true, completion: completion)
-
-        // 그 외: 미지원으로 실패 처리
-        default:
-            completion(false, StreamZip.Error.unsupportedConnection)
+            completion(nil, StreamZip.Error.unsupportedConnection)
             return nil
         }
     }
@@ -671,37 +661,18 @@ open class StreamZipArchiver {
     /**
      FTP에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-        - mainPath: 상위 경로
-        - isUpdate: 업데이트 여부. true인 경우에는 기존의 contentsOfDirectory 를 제거하고 새로 생성한다
-        - completion: 성공 여부 및 에러값을 완료 핸들러로 반환
+        - mainPath: contents 목록을 만들려고 하는 경로
+        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    private func setupContentsOfDirectoryInFTP(at mainPath: String, isUpdate: Bool, completion: @escaping (_ success: Bool, _ error: Error?) -> Void) -> Progress? {
-        // mainPath가 주어진 mainPath와 다른 경우인지 확인
-        if self.mainPath != mainPath {
-            self.mainPath = mainPath
-        }
-        // 동일한 경우
-        else {
-            // 업데이트가 아닌 경우
-            // contentsOfDirectory 가 이미 생성된 경우, 중지 처리
-            if isUpdate == false,
-               self.contentsOfDirectory != nil {
-                // 성공 종료 처리
-                completion(true, nil)
-                return nil
-            }
-        }
+    private func getContentsOfDirectoryInFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
  
         guard let ftpProvider = self.ftpProvider else {
             print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): ftpProvider가 nil!")
-            completion(false, StreamZip.Error.unknown)
+            completion(nil, StreamZip.Error.unknown)
             return nil
         }
  
-        // 컨텐츠 목록 제거
-        self.contentsOfDirectory = nil
-
         // 컨텐츠 목록 생성 실행
         print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): \(mainPath) >> 디렉토리 목록을 가져온다")
         // progress 지정
@@ -711,14 +682,14 @@ open class StreamZipArchiver {
             // 에러 발생시 중지
             if let error = error {
                 print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): error 발생 = \(error.localizedDescription)")
-                return completion(false, error)
+                return completion(nil, error)
             }
             
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
             
             // contents of directory 배열에 아이템 대입
-            self.contentsOfDirectory = ftpItems.map({ (ftpItem) -> ContentOfDirectory in
+            let contentsOfDirectory = ftpItems.map({ (ftpItem) -> ContentOfDirectory in
                 // ftpProvider는 디렉토리인 경우 사이즈를 -1로 반환하기 때문에, 0으로 맞춘다
                 let size = ftpItem.size > 0 ? ftpItem.size : 0
                 return ContentOfDirectory.init(path: ftpItem.path, isDirectory: ftpItem.isDirectory, size: UInt(size))
@@ -728,7 +699,7 @@ open class StreamZipArchiver {
             progress?.completedUnitCount += 1
             
             // 완료 처리
-            return completion(true, nil)
+            return completion(contentsOfDirectory, nil)
         }
         return progress
     }
@@ -741,7 +712,7 @@ open class StreamZipArchiver {
         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    private func request(at path: String, range: Range<UInt>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
+    private func request(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         switch self.connection {
         // FTP인 경우
         case .ftp: return self.requestFromFTP(at: path, range: range, completion: completion)
@@ -761,7 +732,7 @@ open class StreamZipArchiver {
         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    private func requestFromFTP(at path: String, range: Range<UInt>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
+    private func requestFromFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         guard let ftpProvider = self.ftpProvider else {
             completion(nil, StreamZip.Error.unknown)
             return nil

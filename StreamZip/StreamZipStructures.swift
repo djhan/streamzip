@@ -44,10 +44,10 @@ internal protocol ZipInformationConvertible {
      Data 기반으로 특정 인코딩 정보로 Zip 정보 구조체 생성후 반환
      - Parameters:
         - data: `Data`
-        - encoding: `String.Encoding`
+        - encoding: `String.Encoding`. 미지정시 자동 인코딩
      - Returns: 자기 자신의 struct를 반환. 실패시 nil 반환
      */
-    static func make(from data: Data, encoding: String.Encoding) -> Self?
+    static func make(from data: Data, encoding: String.Encoding?) -> Self?
 
     /**
      data로부터 특정 프로퍼티 값 반환
@@ -140,7 +140,7 @@ internal struct ZipEndRecord: ZipInformationConvertible {
     /**
      Data 기반으로 특정 인코딩 정보로 Zip 정보 구조체 생성후 반환
      */
-    static func make(from data: Data, encoding: String.Encoding) -> Self? {
+    static func make(from data: Data, encoding: String.Encoding?) -> Self? {
         var offset = NSNotFound
         var signature = [UInt8].init(repeating: 0, count: 4)
         // 0번째부터 순환하며 end of central directory signature를 찾는다
@@ -166,9 +166,17 @@ internal struct ZipEndRecord: ZipInformationConvertible {
         if zipFileCommentLength > 0 {
             // commentData를 구한다
             let commentData = data[offset ..< offset + Int(zipFileCommentLength)]
-            comment = String.init(data: commentData, encoding: encoding)
+            // 인코딩이 nil 인 경우, 자동 추정 실행
+            if encoding == nil {
+                comment = commentData.autoDetectEncodingString()
+            }
+            // encoding이 주어졌거나, 자동 인코딩 추정에 실패한 경우
+            if comment == nil {
+                let finalEncoding = encoding != nil ? encoding! : .utf8
+                comment = String.init(data: commentData, encoding: finalEncoding)
+            }
         }
-        
+
         return Self.init(length: offset,
                          endOfCentralDirectorySignature: endOfCentralDirectorySignature,
                          numberOfThisDisk: numberOfThisDisk,
@@ -214,7 +222,7 @@ internal struct ZipFileHeader: ZipInformationConvertible {
     /**
      특정 데이터에서 Zip File Header 구조체 생성후 반환
      */
-    static func make(from data: Data, encoding: String.Encoding) -> ZipFileHeader? {
+    static func make(from data: Data, encoding: String.Encoding?) -> ZipFileHeader? {
         var offset = 0
         var signature = [UInt8].init(repeating: 0, count: 4)
         // local file header signature 여부를 확인한다

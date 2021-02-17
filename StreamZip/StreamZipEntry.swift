@@ -106,7 +106,13 @@ open class StreamZipEntry: Codable {
     
     // MARK: - Static Methods
     
-    internal static func makeEntries(from data: Data, encoding: String.Encoding) -> [StreamZipEntry]? {
+    /**
+     Entry 배열 생성
+     - Parameters:
+        - data: 원본 Central Directory Data
+        - encoding: `String.Encoding`. nil 지정시 자동 추정 실행
+     */
+    internal static func makeEntries(from data: Data, encoding: String.Encoding?) -> [StreamZipEntry]? {
         var offset = 0
         var entries: [StreamZipEntry]?
         
@@ -136,22 +142,45 @@ open class StreamZipEntry: Codable {
             guard let relativeOffsetOfLocalFileHeader: UInt32 = getValue(from: data, offset: &offset) else { break }
             guard let fileNameData = getData(from: data, offset: &offset, length: Int(fileNameLength)) else { break }
 
+            // 최종 인코딩 지정
+            let finalEncoding = encoding != nil ? encoding! : .utf8
+
             // 파일명 생성
-            guard let fileName = String.init(data: fileNameData, encoding: encoding) else { break }
+            // 인코딩이 nil 인 경우, 자동 추정 실행
+            var fileName: String?
+            if encoding == nil {
+                fileName = fileNameData.autoDetectEncodingString()
+            }
+            if fileName == nil {
+                fileName = String.init(data: fileNameData, encoding: finalEncoding)
+            }
+            guard fileName != nil else { break }
+
             // 최종 수정일 생성
             guard let modificationDate = getDate(fromTime: fileLastModificationTime, fromDate: fileLastModificationDate) else { break }
+
             // extra field 생성
             var extraField: String?
             if let extraFieldData = getData(from: data, offset: &offset, length: Int(extraFieldLength)) {
-                extraField = String.init(data: extraFieldData, encoding: encoding)
+                if encoding == nil {
+                    extraField = extraFieldData.autoDetectEncodingString()
+                }
+                if extraField == nil {
+                    extraField = String.init(data: extraFieldData, encoding: finalEncoding)
+                }
             }
             // comment 생성
             var fileComment: String?
             if let fileCommentData = getData(from: data, offset: &offset, length: Int(fileCommentLength)) {
-                fileComment = String.init(data: fileCommentData, encoding: encoding)
+                if encoding == nil {
+                    fileComment = fileCommentData.autoDetectEncodingString()
+                }
+                if fileComment == nil {
+                    fileComment = String.init(data: fileCommentData, encoding: finalEncoding)
+                }
             }
 
-            let entry = StreamZipEntry.init(filePath: fileName,
+            let entry = StreamZipEntry.init(filePath: fileName!,
                                             offset: Int(relativeOffsetOfLocalFileHeader),
                                             method: Int32(compressionMethod),
                                             sizeCompressed: Int(compressedSize),
