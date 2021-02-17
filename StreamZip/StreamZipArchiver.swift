@@ -224,8 +224,14 @@ open class StreamZipArchiver {
                 print("StreamZipArchive>makeEntries(_:completion:): 최초 마지막 4096 바이트 데이터 전송중 에러 발생 = \(error.localizedDescription)")
                 return completion(0, nil, error)
             }
-            guard let data = data else {
-                print("StreamZipArchive>makeEntries(_:completion:): 에러가 없는데 데이터 크기가 0. End of Central Directory가 없는 것일 수 있음")
+            // 작업 중지시 중지 처리
+            if progress?.isCancelled == true {
+                print("StreamZipArchive>makeEntries(_:completion:): 사용자 중지 발생")
+                return completion(0, nil, StreamZip.Error.aborted)
+            }
+            guard let data = data,
+                  data.count > 4 else {
+                print("StreamZipArchive>makeEntries(_:completion:): 에러가 없는데 데이터 크기가 4바이트 이하. End of Central Directory가 없는 것일 수 있음")
                 return completion(0, nil, StreamZip.Error.endOfCentralDirectoryIsFailed)
             }
             
@@ -684,7 +690,11 @@ open class StreamZipArchiver {
                 print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): error 발생 = \(error.localizedDescription)")
                 return completion(nil, error)
             }
-            
+            if progress?.isCancelled == true {
+                print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): 사용자 취소 발생")
+                return completion(nil, StreamZip.Error.aborted)
+            }
+
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
             
@@ -738,10 +748,15 @@ open class StreamZipArchiver {
             return nil
         }
 
-        return ftpProvider.contents(path: path,
-                                    offset: Int64(range.lowerBound),
-                                    length: range.count) { (data, error) in
-
+        var progress: Progress?
+        progress = ftpProvider.contents(path: path,
+                                        offset: Int64(range.lowerBound),
+                                        length: range.count) { (data, error) in
+            // 작업 중지시 중지 처리
+            if progress?.isCancelled == true {
+                print("StreamZipArchive>requestFromFTP(range:completion:): 사용자 중지 발생")
+                return completion(nil, StreamZip.Error.aborted)
+            }
             if let error = error {
                 print("StreamZipArchive>requestFromFTP(range:completion:): error 발생 = \(error.localizedDescription)")
                 return completion(nil, error)
@@ -753,6 +768,7 @@ open class StreamZipArchiver {
             
             return completion(data, nil)
         }
+        return progress
     }
 }
 
