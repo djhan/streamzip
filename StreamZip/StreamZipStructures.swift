@@ -143,6 +143,12 @@ internal struct ZipEndRecord: ZipInformationConvertible {
     static func make(from data: Data, encoding: String.Encoding?) -> Self? {
         var offset = NSNotFound
         var signature = [UInt8].init(repeating: 0, count: 4)
+        
+        guard data.count > 4 else {
+            print("StreamZip>StreamZipStructures>make(from:encoding:): Data 길이가 4 바이트를 넘지 않는다")
+            return nil
+        }
+        
         // 0번째부터 순환하며 end of central directory signature를 찾는다
         for index in 0 ..< data.count - 4  {
             data[index ..< index + 4].copyBytes(to: &signature, count: 4)
