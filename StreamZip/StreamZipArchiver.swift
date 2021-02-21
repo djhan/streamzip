@@ -75,7 +75,9 @@ public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Er
 // MARK: - Stream Zip Archiver Class -
 /**
  StreamZipArchiver 클래스
+ 
  - FTP / FTPS 등 네트웍 상의 zip 파일 압축 해제 처리를 전담한다
+ 
  */
 open class StreamZipArchiver {
     
@@ -192,7 +194,7 @@ open class StreamZipArchiver {
     }
 
     /**
-     Central Directory 정보를 찾아 Entry 배열을 생성하는 내부 메쏘드
+     Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
      - Parameters:
         - path: 파일 경로 지정
         - fileLength: `UInt64`. 파일 길이 지정
@@ -200,7 +202,10 @@ open class StreamZipArchiver {
         - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    private func makeEntries(at path: String, fileLength: UInt64, encoding: String.Encoding? = nil, completion: @escaping StreamZipArchiveCompletion) -> Progress? {
+    private func makeEntries(at path: String,
+                             fileLength: UInt64,
+                             encoding: String.Encoding? = nil,
+                             completion: @escaping StreamZipArchiveCompletion) -> Progress? {
         // 파일 길이가 0인 경우 종료 처리
         guard fileLength > 0 else {
             print("StreamZipArchive>makeEntries(_:completion:): file length가 0")
@@ -327,13 +332,20 @@ open class StreamZipArchiver {
             }
             
             let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
-            
+            /*
+            print("StreamZipArchive>fetchFile(_:completion:): offset = \(zipFileHeader.length)")
+            print("StreamZipArchive>fetchFile(_:completion:): filename length = \(zipFileHeader.fileNameLength)")
+            print("StreamZipArchive>fetchFile(_:completion:): extraField length = \(zipFileHeader.extraFieldLength)")
+            print("StreamZipArchive>fetchFile(_:completion:): uncompressed size = \(zipFileHeader.uncompressedSize)")
+             */
             switch entry.method {
             // Defalte 방식인 경우
             case Z_DEFLATED:
                 do {
                     // 성공 처리
-                    let decompressData = try data.unzip(offset:offset, compressedSize: entry.sizeCompressed, crc32: entry.crc32)
+                    let decompressData = try data.unzip(offset: offset,
+                                                        compressedSize: entry.sizeCompressed,
+                                                        crc32: entry.crc32)
                     entry.data = decompressData
                     return completion(entry, nil)
                 }
@@ -344,7 +356,11 @@ open class StreamZipArchiver {
                 
             // 비압축시
             case 0:
-                entry.data = data[offset ..< offset + entry.sizeUncompressed]
+                // upperBound가 현재 데이터 길이를 초과하지 않도록 조절한다
+                // 이상하지만, uncompressedSize를 더한 값이 데이터 길이를 초과하는 경우가 있다
+                // 아마도 잘못 만들어진 zip 파일인 것으로 추정된다
+                let upperBound = offset + entry.sizeUncompressed > data.count ? data.count : offset + entry.sizeUncompressed
+                entry.data = data[offset ..< upperBound]
                 return completion(entry, nil)
 
             // 그 외의 경우
@@ -616,7 +632,7 @@ open class StreamZipArchiver {
                 return completion(0, StreamZip.Error.contentsIsEmpty)
             }
             // 찾아낸 아이템의 크기 반환
-            return completion(UInt64(foundItem.size), nil)
+            return completion(foundItem.fileSize, nil)
         }
         //----------------------------------------------------------------------------------------------//
 
@@ -699,11 +715,13 @@ open class StreamZipArchiver {
             progress?.totalUnitCount += 1
             
             // contents of directory 배열에 아이템 대입
-            let contentsOfDirectory = ftpItems.map({ (ftpItem) -> ContentOfDirectory in
+            let contentsOfDirectory = ftpItems.map { (ftpItem) -> ContentOfDirectory in
                 // ftpProvider는 디렉토리인 경우 사이즈를 -1로 반환하기 때문에, 0으로 맞춘다
                 let size = ftpItem.size > 0 ? ftpItem.size : 0
-                return ContentOfDirectory.init(path: ftpItem.path, isDirectory: ftpItem.isDirectory, size: UInt(size))
-            })
+                return ContentOfDirectory.init(path: ftpItem.path,
+                                               isDirectory: ftpItem.isDirectory,
+                                               fileSize: UInt64(size))
+            }
 
             // progress 처리 개수 1 증가
             progress?.completedUnitCount += 1

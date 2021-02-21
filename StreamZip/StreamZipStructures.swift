@@ -8,6 +8,17 @@
 import Foundation
 import Cocoa
 
+/**
+ 
+ # Zip 파일의 해석 및 압축 해제 순서
+ 
+ 1) 파일의 끝 부분에서 End of Central Directory 를 찾아서 ZipEndRecord 를 생성
+ 2) offsetOfStartOfCentralDirectory 를 구한다
+ 3) 파일을 처음부터 순환하며 CentralDirectorySignature 위치를 확인, CentralDirectory를 가져와서 StreamZipEntry 구조체를 생성한다
+ 4) 특정 파일의 압축 해제가 필요한 경우, 해당 StreamZipEntry의 LocalFileHeader를 확인, 압축 방식과 압축 데이터 길이를 확인해 압축을 해제한다
+ 
+ */
+
 /// End of Central Directory signature
 let EndOfCentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x05, 0x06]
 /// 개별 Central Directory signature
@@ -21,10 +32,25 @@ let LocalFileHeaderSignature: Array<UInt8> = [0x50, 0x4b, 0x03, 0x04]
 internal struct ContentOfDirectory {
     /// 경로
     var path: String
+    /// 파일명 반환
+    var fileName: String {
+        return (self.path as NSString).lastPathComponent
+    }
     /// 디렉토리 여부
     var isDirectory: Bool
+    /// leaf 노드 여부
+    var isLeaf: Bool {
+        return !isDirectory
+    }
     /// 파일 크기
-    var size: UInt
+    var fileSize: UInt64
+    /// 생성일
+    // var creationDate: Date?
+    /// 수정일
+    // var modificationDate: Date?
+    
+    /// 하위 아이템 갯수
+    // var count: Int?
 }
 
 // MARK: - Zip Information Protocol -

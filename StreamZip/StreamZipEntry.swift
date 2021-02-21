@@ -12,6 +12,7 @@ import Cocoa
 
 /// StreamZip 열거형
 public enum StreamZip {
+    
     /// 접속 종류
     public enum Connection: String {
         case ftp        = "ftp"
