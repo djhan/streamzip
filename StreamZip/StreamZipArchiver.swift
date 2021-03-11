@@ -179,6 +179,9 @@ open class StreamZipArchiver {
                     return completion(0, nil, StreamZip.Error.aborted)
                 }
                 
+                // Progress 전체 개수 증가
+                progress?.totalUnitCount += 1
+                
                 // Central Directory 정보를 찾고 entry 배열 생성
                 if let subProgress = strongSelf.makeEntries(at: path, fileLength: fileLength, encoding: encoding, completion: completion) {
                     // 하위 progress로 추가
@@ -256,6 +259,9 @@ open class StreamZipArchiver {
                 print("StreamZipArchive>makeEntries(_:completion:): 이미지 파일이 없음")
                 return completion(0, nil, StreamZip.Error.aborted)
             }
+
+            // Progress 전체 개수 증가
+            progress?.totalUnitCount += 1
 
             // Central Directory data 를 가져온다
             let subProgress = strongSelf.request(at: path, range: centralDirectoryRange) { (data, error) in
@@ -427,6 +433,9 @@ open class StreamZipArchiver {
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
 
+            // Progress 전체 개수 증가
+            progress?.totalUnitCount += 1
+
             let subProgress = strongSelf.fetchFile(at: path, fileLength: fileLength, entry: entry, encoding: encoding) { (resultEntry, error) in
                 // 에러 발생시
                 if let error = error {
@@ -448,6 +457,12 @@ open class StreamZipArchiver {
         
         return progress
     }
+    
+    #if DEBUG
+    /// progress 값 관찰자
+    private var progressObserver: NSKeyValueObservation?
+    #endif
+    
     /**
      압축 파일 썸네일 이미지 반환
      - 그룹 환경설정에서 배너 표시가 지정된 경우 배너까지 추가
@@ -552,6 +567,12 @@ open class StreamZipArchiver {
             // CGImage 반환 처리
             return completion(thumbnailCGImage, filePath, nil)
         }
+        
+        #if DEBUG
+        self.progressObserver = progress?.observe(\.fractionCompleted, changeHandler: { (progress, value) in
+            print("StreamZipArchive>thumbnail(completion:): 진행상황 = \(progress.fractionCompleted)")
+        })
+        #endif
         
         return progress
     }
@@ -770,20 +791,24 @@ open class StreamZipArchiver {
         progress = ftpProvider.contents(path: path,
                                         offset: Int64(range.lowerBound),
                                         length: range.count) { (data, error) in
+            // 에러 여부를 먼저 확인
+            // 이유: progress?.isCancelled 를 먼저 확인하는 경우, error 가 발생했는데도 사용자 취소로 처리해 버리는 경우가 있기 때문이다
+            if let error = error {
+                print("StreamZipArchive>requestFromFTP(range:completion:): error 발생 = \(error.localizedDescription)")
+                return completion(nil, error)
+            }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
                 print("StreamZipArchive>requestFromFTP(range:completion:): 사용자 중지 발생")
                 return completion(nil, StreamZip.Error.aborted)
-            }
-            if let error = error {
-                print("StreamZipArchive>requestFromFTP(range:completion:): error 발생 = \(error.localizedDescription)")
-                return completion(nil, error)
             }
             guard let data = data else {
                 print("StreamZipArchive>requestFromFTP(range:completion:): data가 없음")
                 return completion(nil, StreamZip.Error.contentsIsEmpty)
             }
             
+            //print("StreamZipArchive>requestFromFTP(range:completion:): 데이터 전송 progress 결과 = \(progress?.fractionCompleted ?? 0)")
+
             return completion(data, nil)
         }
         return progress
