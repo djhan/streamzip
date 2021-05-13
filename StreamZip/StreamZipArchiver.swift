@@ -457,12 +457,7 @@ open class StreamZipArchiver {
         
         return progress
     }
-    
-    #if DEBUG
-    /// progress 값 관찰자
-    private var progressObserver: NSKeyValueObservation?
-    #endif
-    
+
     /**
      압축 파일 썸네일 이미지 반환
      - 그룹 환경설정에서 배너 표시가 지정된 경우 배너까지 추가
@@ -567,12 +562,6 @@ open class StreamZipArchiver {
             // CGImage 반환 처리
             return completion(thumbnailCGImage, filePath, nil)
         }
-        
-        #if DEBUG
-        self.progressObserver = progress?.observe(\.fractionCompleted, changeHandler: { (progress, value) in
-            print("StreamZipArchive>thumbnail(completion:): 진행상황 = \(progress.fractionCompleted)")
-        })
-        #endif
         
         return progress
     }

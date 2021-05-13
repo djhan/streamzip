@@ -255,6 +255,9 @@ internal struct ZipFileHeader: ZipInformationConvertible {
      특정 데이터에서 Zip File Header 구조체 생성후 반환
      */
     static func make(from data: Data, encoding: String.Encoding?) -> ZipFileHeader? {
+        // 도중에 파일이 제거되는 경우를 대비, 0바이트 이상인지 확인한다
+        guard data.count > 0 else { return nil }
+        
         var offset = 0
         var signature = [UInt8].init(repeating: 0, count: 4)
         // local file header signature 여부를 확인한다
