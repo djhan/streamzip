@@ -19,6 +19,7 @@ public enum StreamZip {
         case ftps       = "ftps"
         case sftp       = "sftp"
         case http       = "http"
+        case local      = "file"
         case unknown    = "unknown"
     }
 
