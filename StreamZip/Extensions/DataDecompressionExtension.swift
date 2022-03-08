@@ -56,6 +56,10 @@ extension Data {
      - Returns: 압축 해제된 Data 반환. 실패시 에러값 반환
      */
     internal func unzip(offset: Int, compressedSize: Int, crc32: UInt?) throws -> Data {
+        guard self.count >= offset + compressedSize else {
+            print("StreamZip>DataDecompressionExtension>unzip(): offset + compressedSize가 현재 데이터 길이를 초과, 해제 불가능")
+            throw StreamZip.Error.excessDataLength
+        }
         let result: Data? = try self.withUnsafeBytes { (bytes) -> Data? in
             let source = bytes.baseAddress?.advanced(by: offset)
             guard let sourcePointer = source?.bindMemory(to: UInt8.self, capacity: compressedSize) else {

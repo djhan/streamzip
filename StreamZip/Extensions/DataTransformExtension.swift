@@ -14,6 +14,7 @@ public enum Endian {
     case little
 }
 
+
 // MARK: - Protocol for Integer Transform -
 /**
  정수 변환 프로토콜
@@ -59,8 +60,14 @@ public extension Data {
         - length: `Int` 형으로 길이 지정
     - Returns: `FixedWidthInteger`
      */
-    func getValue<T: FixedWidthInteger>(from offset: Int, length: Int) -> T {
-        return self.getValue(from: offset, length: length, endian: .little)
+    func getValue<T: FixedWidthInteger>(from offset: Int, length: Int) throws -> T {
+        do {
+            let value: T = try self.getValue(from: offset, length: length, endian: .little)
+            return value
+        }
+        catch {
+            throw error
+        }
     }
     /**
      특정 offset에서 일정 length의 데이터를 특정 Endian으로 변환, FixedWidthInteger 값으로 반환
@@ -74,7 +81,10 @@ public extension Data {
         - endian: `Endian`
      - Returns: `FixedWidthInteger`
      */
-    func getValue<T: FixedWidthInteger>(from offset: Int, length: Int, endian: Endian) -> T {
+    func getValue<T: FixedWidthInteger>(from offset: Int, length: Int, endian: Endian) throws -> T {
+        guard self.count >= offset + length else {
+            throw StreamZip.Error.excessDataLength
+        }
         let data = self[offset ..<  offset + length]
         let value: T = data.toInteger(endian: endian)
         return value

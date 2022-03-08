@@ -167,6 +167,7 @@ open class StreamZipArchiver {
             // 기본 파일 길이를 0으로 리셋
             var fileLength: UInt64 = 0
             
+            print("StreamZipArchive>fetchArchive(encoding:completion:): file 길이를 구한다")
             // 파일 길이를 구해온다
             progress = self.getFileLength(at: path) { [weak self] (currentFileLength, error) in
                 guard let strongSelf = self else {
@@ -202,6 +203,7 @@ open class StreamZipArchiver {
             return progress
         }
         
+         print("StreamZipArchive>fetchArchive(encoding:completion:): file 길이 = \(fileLength)")
         // FileLength가 주어진 경우
         let progress = self.makeEntries(at: path, fileLength: fileLength, encoding: encoding, completion: completion)
         return progress
@@ -226,7 +228,14 @@ open class StreamZipArchiver {
             completion(0, nil, StreamZip.Error.contentsIsEmpty)
             return nil
         }
-        
+        // 4096 바이트보다 짧은 경우도 종료 처리
+        guard fileLength >= 4096 else {
+            print("StreamZipArchive>makeEntries(_:completion:): file length가 4096 바이트 미만!")
+            // 빈 파일로 간주한다
+            completion(0, nil, StreamZip.Error.contentsIsEmpty)
+            return nil
+        }
+
         // 마지막 지점에서 -4096 바이트부터 마지막 지점까지 범위 지정
         let range = fileLength - 4096 ..< fileLength
         
@@ -302,6 +311,7 @@ open class StreamZipArchiver {
         
         return progress
     }
+    /*
     /**
      Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 메쏘드
      - 현재 제대로 작동하지 않음
@@ -376,7 +386,7 @@ open class StreamZipArchiver {
             return nil
         }
     }
-    
+    */
     /**
      특정 Entry의 파일 다운로드 및 압축 해제
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
@@ -479,7 +489,7 @@ open class StreamZipArchiver {
                            completion: @escaping StreamZipImageRequestCompletion) -> Progress? {
         // Progress 선언
         var progress: Progress?
-        
+        print("StreamZipArchive>getFirstImage(encoding:completion:): 첫 번째 이미지를 가져오기 위한 시도...")
         progress = self.fetchArchive(at: path, fileLength: fileLength, encoding: encoding) { [weak self] (fileLength, entries, error) in
             guard let strongSelf = self else {
                 print("StreamZipArchive>getFirstImage(encoding:completion:): self가 nil!")

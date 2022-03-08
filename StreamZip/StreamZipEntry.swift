@@ -44,7 +44,10 @@ public enum StreamZip {
         case deflationIsFailed
         /// CRC32 체크섬 통과 실패
         case checksumIsDifferent
-        
+
+        /// 구해야 할 값이 실제 data 길이를 초과
+        case excessDataLength
+
         /// 사용자 중지
         case aborted
         /// 알 수 없는 에러
@@ -64,6 +67,7 @@ public enum StreamZip {
             case .unsupportedCompressMethod: return "This compressed method is not supported"
             case .deflationIsFailed: return "Data deflation is failed"
             case .checksumIsDifferent: return "Checksum is different"
+            case .excessDataLength: return "Values are excess data length"
             case .aborted: return "Aborted by user"
             default: return "Unknown error was occurred"
             }
@@ -121,6 +125,9 @@ open class StreamZipEntry: Codable {
         repeat {
             // 최초 4바이트가 CentralDirectorySignature에 해당되는지 확인. 아닌 경우 nil 반환
             var signature = [UInt8].init(repeating: 0, count: 4)
+            guard data.count >= offset + 4 else {
+                break
+            }
             data[offset ..< offset + 4].copyBytes(to: &signature, count: 4)
             guard signature == CentralDirectorySignature else { break }
 

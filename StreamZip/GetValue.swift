@@ -21,11 +21,18 @@ import Foundation
 internal func getValue<T: FixedWidthInteger>(from data: Data, offset: inout Int) -> T? {
     // 가져올 길이를 property의 타입 기준으로 구한다
     let length = T.bitWidth/UInt8.bitWidth
-    guard offset + length <= data.count else { return nil }
-    let property: T = data.getValue(from: offset, length: length, endian: .little)
-    // offset에 length를 추가한다
-    offset += length
-    return property
+    // getValue 메쏘드에서 data와 offset+length의 길이를 비교하므로 불필요
+    //guard offset + length <= data.count else { return nil }
+    do {
+        let property: T = try data.getValue(from: offset, length: length, endian: .little)
+        // offset에 length를 추가한다
+        offset += length
+        return property
+    }
+    catch {
+        print("GetValue>getValue(from:offset:): error = \(error.localizedDescription)")
+        return nil
+    }
 }
 /**
  data로부터 데이터를 잘라내서 반환

@@ -123,10 +123,16 @@ extension ZipInformationConvertible {
         // 가져올 길이를 property의 타입 기준으로 구한다
         let length = T.bitWidth/UInt8.bitWidth
         guard offset + length <= data.count else { return nil }
-        let property: T = data.getValue(from: offset, length: length, endian: .little)
-        // offset에 length를 추가한다
-        offset += length
-        return property
+        do {
+            let property: T = try data.getValue(from: offset, length: length, endian: .little)
+            // offset에 length를 추가한다
+            offset += length
+            return property
+        }
+        catch {
+            print("ZipInformationConvertible>getValue(from:offset:): error = \(error.localizedDescription)")
+            return nil
+        }
     }
     /**
      data로부터 데이터를 잘라내서 Data로 반환
@@ -177,6 +183,10 @@ internal struct ZipEndRecord: ZipInformationConvertible {
         
         // 0번째부터 순환하며 end of central directory signature를 찾는다
         for index in 0 ..< data.count - 4  {
+            guard data.count >= index + 4 else {
+                print("StreamZip>StreamZipStructures>make(from:encoding:): Data 길이 = \(data.count), index = \(index) 로, 4바이트를 넘는 값이 존재할 수 없는 상황, 중지")
+                break
+            }
             data[index ..< index + 4].copyBytes(to: &signature, count: 4)
             if signature == EndOfCentralDirectorySignature {
                 offset = index
@@ -195,7 +205,8 @@ internal struct ZipEndRecord: ZipInformationConvertible {
         guard let offsetOfStartOfCentralDirectory: UInt32 = self.getValue(from: data, offset: &offset) else { return nil }
         guard let zipFileCommentLength: UInt16 = self.getValue(from: data, offset: &offset) else { return nil }
         var comment: String?
-        if zipFileCommentLength > 0 {
+        if zipFileCommentLength > 0,
+           data.count >= offset + Int(zipFileCommentLength) {
             // commentData를 구한다
             let commentData = data[offset ..< offset + Int(zipFileCommentLength)]
             // 인코딩이 nil 인 경우, 자동 추정 실행
@@ -256,7 +267,8 @@ internal struct ZipFileHeader: ZipInformationConvertible {
      */
     static func make(from data: Data, encoding: String.Encoding?) -> ZipFileHeader? {
         // 도중에 파일이 제거되는 경우를 대비, 0바이트 이상인지 확인한다
-        guard data.count > 0 else { return nil }
+        guard data.count > 0,
+              data.count >= 4 else { return nil }
         
         var offset = 0
         var signature = [UInt8].init(repeating: 0, count: 4)
