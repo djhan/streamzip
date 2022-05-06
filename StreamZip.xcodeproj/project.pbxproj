@@ -11,6 +11,8 @@
 		EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F1625D8E7CE00D3C62B /* CommonLibrary.framework */; };
 		EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; };
 		EE283F2625D8E82100D3C62B /* Detector.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; };
+		EE3BCAA32823E2150064E218 /* SftpProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6449E925D5297E008FA69E /* GetValue.swift */; };
 		EE7732CA25D0D37C00414625 /* StreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7732C025D0D37C00414625 /* StreamZip.framework */; };
 		EE7732CF25D0D37C00414625 /* StreamZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732CE25D0D37C00414625 /* StreamZipTests.swift */; };
@@ -116,6 +118,27 @@
 			remoteGlobalIDString = EE57D90624DB821700029A62;
 			remoteInfo = Detector;
 		};
+		EE3BCAB02823E21D0064E218 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EE32CE5F27F4173700603177;
+			remoteInfo = SftpProvider;
+		};
+		EE3BCAB22823E21D0064E218 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EE32CE6927F4173700603177;
+			remoteInfo = SftpProviderTests;
+		};
+		EE3BCAB42823E2240064E218 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EE32CE5E27F4173700603177;
+			remoteInfo = SftpProvider;
+		};
 		EE7732CB25D0D37C00414625 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EE7732B725D0D37C00414625 /* Project object */;
@@ -132,6 +155,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				EE3BCAA32823E2150064E218 /* SftpProvider.framework in Embed Frameworks */,
 				EE283F2625D8E82100D3C62B /* Detector.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -145,6 +169,8 @@
 		EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FilesProvider.xcodeproj; path = ../FileProvider/FilesProvider.xcodeproj; sourceTree = "<group>"; };
 		EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommonLibrary.xcodeproj; path = ../CommonLibrary/CommonLibrary.xcodeproj; sourceTree = "<group>"; };
 		EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Detector.xcodeproj; path = ../Detector/Detector.xcodeproj; sourceTree = "<group>"; };
+		EE3BCAA12823E2150064E218 /* SftpProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SftpProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SftpProvider.xcodeproj; path = ../SftpProvider/SftpProvider.xcodeproj; sourceTree = "<group>"; };
 		EE6449E925D5297E008FA69E /* GetValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetValue.swift; sourceTree = "<group>"; };
 		EE7732C025D0D37C00414625 /* StreamZip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamZip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE7732C325D0D37C00414625 /* StreamZip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StreamZip.h; sourceTree = "<group>"; };
@@ -168,6 +194,7 @@
 			files = (
 				EE283EE125D8C45D00D3C62B /* FilesProvider.framework in Frameworks */,
 				EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */,
+				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
 				EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -186,6 +213,7 @@
 		EE283EA225D8B39700D3C62B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EE3BCAA12823E2150064E218 /* SftpProvider.framework */,
 				EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */,
 				EE283EA325D8B39700D3C62B /* FilesProvider.framework */,
 			);
@@ -230,6 +258,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EE3BCAAC2823E21D0064E218 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EE3BCAB12823E21D0064E218 /* SftpProvider.framework */,
+				EE3BCAB32823E21D0064E218 /* SftpProviderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		EE7732B625D0D37C00414625 = {
 			isa = PBXGroup;
 			children = (
@@ -237,6 +274,7 @@
 				EE7732CD25D0D37C00414625 /* StreamZipTests */,
 				EE7732C125D0D37C00414625 /* Products */,
 				EE283EA225D8B39700D3C62B /* Frameworks */,
+				EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */,
 				EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */,
 				EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */,
 				EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */,
@@ -313,6 +351,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EE3BCAB52823E2240064E218 /* PBXTargetDependency */,
 				EE283F2A25D8E82A00D3C62B /* PBXTargetDependency */,
 				EE283F1825D8E7D400D3C62B /* PBXTargetDependency */,
 				EE283EF725D8C47800D3C62B /* PBXTargetDependency */,
@@ -385,6 +424,10 @@
 				{
 					ProductGroup = EE283EA925D8B3AF00D3C62B /* Products */;
 					ProjectRef = EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */;
+				},
+				{
+					ProductGroup = EE3BCAAC2823E21D0064E218 /* Products */;
+					ProjectRef = EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -466,6 +509,20 @@
 			remoteRef = EE283F2325D8E81900D3C62B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		EE3BCAB12823E21D0064E218 /* SftpProvider.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SftpProvider.framework;
+			remoteRef = EE3BCAB02823E21D0064E218 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EE3BCAB32823E21D0064E218 /* SftpProviderTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SftpProviderTests.xctest;
+			remoteRef = EE3BCAB22823E21D0064E218 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -526,6 +583,11 @@
 			isa = PBXTargetDependency;
 			name = Detector;
 			targetProxy = EE283F2925D8E82A00D3C62B /* PBXContainerItemProxy */;
+		};
+		EE3BCAB52823E2240064E218 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SftpProvider;
+			targetProxy = EE3BCAB42823E2240064E218 /* PBXContainerItemProxy */;
 		};
 		EE7732CC25D0D37C00414625 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
