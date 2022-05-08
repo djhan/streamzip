@@ -434,6 +434,7 @@ open class StreamZipArchiver {
         let uppderbound = lowerBound + length > fileLength ? fileLength : lowerBound + length
         // 다운로드 범위를 구한다
         let range = lowerBound ..< uppderbound
+        print("StreamZipArchive>fetchFile(_:completion:): \(path) >> offset = \(lowerBound), length = \(length)")
         // 해당 범위의 데이터를 받아온다
         return self.request(at: path, range: range) { (data, error) in
             if let error = error {
@@ -452,12 +453,13 @@ open class StreamZipArchiver {
             }
             
             let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
-            /*
+
+            print("StreamZipArchive>fetchFile(_:completion:): \(path) >> data length = \(data.count)")
             print("StreamZipArchive>fetchFile(_:completion:): offset = \(zipFileHeader.length)")
             print("StreamZipArchive>fetchFile(_:completion:): filename length = \(zipFileHeader.fileNameLength)")
             print("StreamZipArchive>fetchFile(_:completion:): extraField length = \(zipFileHeader.extraFieldLength)")
             print("StreamZipArchive>fetchFile(_:completion:): uncompressed size = \(zipFileHeader.uncompressedSize)")
-             */
+
             switch entry.method {
             // Defalte 방식인 경우
             case Z_DEFLATED:
@@ -993,6 +995,7 @@ open class StreamZipArchiver {
         }
 
         var progress: Progress?
+        os_log("StreamZipArchive>%@ :: %@ >> offset = %li, length = %li", log: .fileInfo, type: .debug, #function, path, UInt64(range.lowerBound), UInt64(range.count))
         progress = sftpProvider.contents(at: path,
                                          offset: UInt64(range.lowerBound),
                                          length: UInt64(range.count)) { complete, success, data in
