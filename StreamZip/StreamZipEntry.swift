@@ -15,11 +15,13 @@ public enum StreamZip {
     
     /// 접속 종류
     public enum Connection: String {
-        case ftp        = "ftp"
-        case ftps       = "ftps"
-        case sftp       = "sftp"
-        case local      = "file"
-        case unknown    = "unknown"
+        case ftp            = "ftp"
+        case ftps           = "ftps"
+        case sftp           = "sftp"
+        case webdav         = "webDav"
+        case webdav_https   = "webDav(HTTPS)"
+        case local          = "file"
+        case unknown        = "unknown"
     }
 
     /// 에러

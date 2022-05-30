@@ -99,6 +99,9 @@ open class StreamZipArchiver {
     /// SFTP File Provider
     weak var sftpProvider: SftpFileProvider?
 
+    // MARK: WebDav Properties
+    weak var webDavProvider: WebDAVFileProvider?
+    
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
 
@@ -137,6 +140,21 @@ open class StreamZipArchiver {
         // 연결 방식 확인 불필요, SFTP 지정
         self.connection = .sftp
     }
+    /**
+     WebDav 아이템 초기화
+     - Parameters:
+        - webDavProvider: WebDAVFileProvider?
+     */
+    public init?(webDavProvider: WebDAVFileProvider) {
+        // 연결 방식 확인
+        guard let scheme = webDavProvider.baseURL?.scheme else { return nil }
+        switch scheme {
+        case StreamZip.Connection.webdav.rawValue: self.connection = .webdav
+        case StreamZip.Connection.webdav_https.rawValue: self.connection = .webdav_https
+        default: return nil
+        }
+        self.webDavProvider = webDavProvider
+    }
     /*
     /**
      로컬 아이템 초기화
@@ -148,18 +166,17 @@ open class StreamZipArchiver {
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .local
     }
-
     /// 연결 타입 확인
     private func detectConnection() {
         switch self.baseUrl.scheme {
         case StreamZip.Connection.ftp.rawValue: self.connection = .ftp
         case StreamZip.Connection.ftps.rawValue: self.connection = .ftps
         case StreamZip.Connection.sftp.rawValue: self.connection = .sftp
-        case StreamZip.Connection.http.rawValue: self.connection = .http
         case StreamZip.Connection.local.rawValue: self.connection = .local
         default: self.connection = .unknown
         }
-    }*/
+    }
+     */
 
     // MARK: - Methods
     
@@ -728,28 +745,6 @@ open class StreamZipArchiver {
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getFileLength(at path: String, completion: @escaping StreamZipFileLengthCompletion) -> Progress? {
-        /*
-        switch self.connection {
-        // FTP인 경우
-        case .ftp: return self.getFileLengthFromFTP(at: path, completion: completion)
-            
-        // 그 외의 경우
-        default:
-            // 미지원 연결 방식 에러 반환
-            completion(0, StreamZip.Error.unsupportedConnection)
-            return nil
-        }
-    }
-    /**
-     FTP로 현재 url의 FileLength를 구하는 메쏘드
-     - 완료 핸들러로 FileLength를 반환
-     - Parameters:
-        - path: 파일 경로
-        - completion: `StreamZipFileLengthCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
-    private func getFileLengthFromFTP(at path: String, completion: @escaping StreamZipFileLengthCompletion) -> Progress? {
-        */
         //----------------------------------------------------------------------------------------------//
         /// 작업 종료용 내부 메쏘드
         func complete(_ contentsOfDirectory: [ContentOfDirectory]) {
@@ -797,13 +792,11 @@ open class StreamZipArchiver {
     private func getContentsOfDirectory(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         switch self.connection {
         // FTP인 경우
-        case .ftp, .ftps:
-            return getContentsOfDirectoryInFTP(at: mainPath, completion: completion)
-            
+        case .ftp, .ftps: return self.getContentsOfDirectoryInFTP(at: mainPath, completion: completion)
         // SFTP인 경우
-        case .sftp:
-            return getContentsOfDirectoryInSFTP(at: mainPath, completion: completion)
-
+        case .sftp: return self.getContentsOfDirectoryInSFTP(at: mainPath, completion: completion)
+        // webDav인 경우
+        case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
         // 그 외: 미지원으로 실패 처리
         default:
             completion(nil, StreamZip.Error.unsupportedConnection)
@@ -811,6 +804,7 @@ open class StreamZipArchiver {
         }
     }
 
+    // MARK: Get Contents of Directory
     /**
      FTP에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
@@ -821,24 +815,22 @@ open class StreamZipArchiver {
     private func getContentsOfDirectoryInFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
  
         guard let ftpProvider = self.ftpProvider else {
-            print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): ftpProvider가 nil!")
+            os_log("StreamZipArchive>%@ :: ftpProvider가 nil!", log: .fileInfo, type: .debug, #function)
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
  
-        // 컨텐츠 목록 생성 실행
-        print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): \(mainPath) >> 디렉토리 목록을 가져온다")
         // progress 지정
         var progress: Progress?
         progress = ftpProvider.contentsOfDirectoryWithProgress(path: mainPath) { (ftpItems, error) in
-            print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): \(mainPath) >> 디렉토리 목록 작성 완료")
+            os_log("StreamZipArchive>%@ :: %@ >> 디렉토리 목록 작성 완료", log: .fileInfo, type: .debug, #function, mainPath)
             // 에러 발생시 중지
             if let error = error {
-                print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): error 발생 = \(error.localizedDescription)")
+                os_log("StreamZipArchive>%@ :: %@ >> 에러 발생 = %@", log: .fileInfo, type: .debug, #function, mainPath, error.localizedDescription)
                 return completion(nil, error)
             }
             if progress?.isCancelled == true {
-                print("StreamZipArchive>setupContentsOfDirectoryInFTP(at:completion:): 사용자 취소 발생")
+                os_log("StreamZipArchive>%@ :: %@ >> 사용자 취소 발생", log: .fileInfo, type: .debug, #function, mainPath)
                 return completion(nil, StreamZip.Error.aborted)
             }
 
@@ -917,6 +909,56 @@ open class StreamZipArchiver {
         return progress
     }
     /**
+     WebDav에서 mainPath 대입 후, contents of directory 배열 생성
+     - Parameters:
+        - mainPath: contents 목록을 만들려고 하는 경로
+        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+     - Returns: Progress 반환. 실패시 nil 반환
+     */
+    private func getContentsOfDirectoryInWebDav(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
+        guard let webDavProvider = self.webDavProvider else {
+            os_log("StreamZipArchive>%@ :: webDavProvider가 nil!", log: .fileInfo, type: .debug, #function)
+            completion(nil, StreamZip.Error.unknown)
+            return nil
+        }
+ 
+        // progress 지정
+        var progress: Progress?
+        progress = webDavProvider.contentsOfDirectoryWithProgress(path: mainPath) { (ftpItems, error) in
+            os_log("StreamZipArchive>%@ :: %@ >> 디렉토리 목록 작성 완료", log: .fileInfo, type: .debug, #function, mainPath)
+            // 에러 발생시 중지
+            if let error = error {
+                os_log("StreamZipArchive>%@ :: %@ >> 에러 발생 = %@", log: .fileInfo, type: .debug, #function, mainPath, error.localizedDescription)
+                return completion(nil, error)
+            }
+            if progress?.isCancelled == true {
+                os_log("StreamZipArchive>%@ :: %@ >> 사용자 취소 발생", log: .fileInfo, type: .debug, #function, mainPath)
+                return completion(nil, StreamZip.Error.aborted)
+            }
+
+            // progress 작업 개수 1 증가
+            progress?.totalUnitCount += 1
+            
+            // contents of directory 배열에 아이템 대입
+            let contentsOfDirectory = ftpItems.map { (ftpItem) -> ContentOfDirectory in
+                // ftpProvider는 디렉토리인 경우 사이즈를 -1로 반환하기 때문에, 0으로 맞춘다
+                let size = ftpItem.size > 0 ? ftpItem.size : 0
+                return ContentOfDirectory.init(path: ftpItem.path,
+                                               isDirectory: ftpItem.isDirectory,
+                                               fileSize: UInt64(size))
+            }
+
+            // progress 처리 개수 1 증가
+            progress?.completedUnitCount += 1
+            
+            // 완료 처리
+            return completion(contentsOfDirectory, nil)
+        }
+        return progress
+    }
+    
+    // MARK: Get Data
+    /**
      특정 범위 데이터를 가져오는 메쏘드
      - 네트웍에서 사용
      - Parameters:
@@ -928,13 +970,11 @@ open class StreamZipArchiver {
     private func request(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         switch self.connection {
         // FTP인 경우
-        case .ftp:
-            return self.requestFromFTP(at: path, range: range, completion: completion)
-            
+        case .ftp: return self.requestFromFTP(at: path, range: range, completion: completion)
         // SFTP인 경우
-        case .sftp:
-            return self.requestFromSFTP(at: path, range: range, completion: completion)
-            
+        case .sftp: return self.requestFromSFTP(at: path, range: range, completion: completion)
+        // WebDav인 경우
+        case .webdav, .webdav_https: return self.requestFromWebDav(at: path, range: range, completion: completion)
         // 그 외의 경우
         default:
             // 미지원 연결 방식 에러 반환
@@ -1008,6 +1048,44 @@ open class StreamZipArchiver {
             guard success == true else {
                 os_log("StreamZipArchive>%@ :: %@ >> 작업 실패", log: .fileInfo, type: .debug, #function, path)
                 return completion(nil, StreamZip.Error.unknown)
+            }
+            // 작업 중지시 중지 처리
+            if progress?.isCancelled == true {
+                os_log("StreamZipArchive>%@ :: %@ >> 사용자 중지 발생", log: .fileInfo, type: .debug, #function, path)
+                return completion(nil, StreamZip.Error.aborted)
+            }
+            guard let data = data else {
+                os_log("StreamZipArchive>%@ :: %@ >> 데이터가 없음", log: .fileInfo, type: .debug, #function, path)
+                return completion(nil, StreamZip.Error.contentsIsEmpty)
+            }
+
+            return completion(data, nil)
+        }
+        return progress
+    }
+    /**
+     WebDav로 특정 범위 데이터를 가져오는 메쏘드
+     - Parameters:
+        - path: 데이터를 가져올 경로
+        - range: 데이터를 가져올 범위
+        - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - Returns: Progress 반환. 실패시 nil 반환
+     */
+    private func requestFromWebDav(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
+        guard let webDavProvider = self.webDavProvider else {
+            completion(nil, StreamZip.Error.unknown)
+            return nil
+        }
+
+        var progress: Progress?
+        progress = webDavProvider.contents(path: path,
+                                           offset: Int64(range.lowerBound),
+                                           length: range.count) { (data, error) in
+            // 에러 여부를 먼저 확인
+            // 이유: progress?.isCancelled 를 먼저 확인하는 경우, error 가 발생했는데도 사용자 취소로 처리해 버리는 경우가 있기 때문이다
+            if let error = error {
+                os_log("StreamZipArchive>%@ :: %@ >> 에러 발생 = %@", log: .fileInfo, type: .debug, #function, path, error.localizedDescription)
+                return completion(nil, error)
             }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
