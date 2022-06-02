@@ -18,8 +18,8 @@ public enum StreamZip {
         case ftp            = "ftp"
         case ftps           = "ftps"
         case sftp           = "sftp"
-        case webdav         = "webDav"
-        case webdav_https   = "webDav(HTTPS)"
+        case webdav         = "http"
+        case webdav_https   = "https"
         case local          = "file"
         case unknown        = "unknown"
     }
