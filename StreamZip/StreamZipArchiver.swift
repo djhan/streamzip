@@ -149,8 +149,8 @@ open class StreamZipArchiver {
         // 연결 방식 확인
         guard let scheme = webDavProvider.baseURL?.scheme else { return nil }
         switch scheme {
-        case StreamZip.Connection.webdav.rawValue: self.connection = .webdav
-        case StreamZip.Connection.webdav_https.rawValue: self.connection = .webdav_https
+        case StreamZip.Connection.scheme(.webdav): self.connection = .webdav
+        case StreamZip.Connection.scheme(.webdav_https): self.connection = .webdav_https
         default: return nil
         }
         self.webDavProvider = webDavProvider
@@ -1095,6 +1095,10 @@ open class StreamZipArchiver {
             guard let data = data else {
                 os_log("StreamZipArchive>%@ :: %@ >> 데이터가 없음", log: .fileInfo, type: .debug, #function, path)
                 return completion(nil, StreamZip.Error.contentsIsEmpty)
+            }
+            guard data.count == range.count else {
+                os_log("StreamZipArchive>%@ :: %@ >> 데이터 길이가 다르다!", log: .fileInfo, type: .debug, #function, path)
+                return completion(nil, StreamZip.Error.unknown)
             }
 
             return completion(data, nil)

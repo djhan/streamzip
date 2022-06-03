@@ -18,10 +18,23 @@ public enum StreamZip {
         case ftp            = "ftp"
         case ftps           = "ftps"
         case sftp           = "sftp"
-        case webdav         = "http"
-        case webdav_https   = "https"
+        case webdav         = "webdav"
+        case webdav_https   = "webdav(https)"
         case local          = "file"
         case unknown        = "unknown"
+        
+        /// Scheme 반환 Static 메쏘드
+        static func scheme(_ connection: StreamZip.Connection) -> String? {
+            switch connection {
+            case .ftp: return "ftp"
+            case .ftps: return "ftps"
+            case .sftp: return "sftp"
+            case .webdav: return "http"
+            case .webdav_https: return "https"
+            case .local: return "file"
+            default: return nil
+            }
+        }
     }
 
     /// 에러
