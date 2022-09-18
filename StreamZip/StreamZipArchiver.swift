@@ -123,9 +123,7 @@ open class StreamZipArchiver {
         - ftpProvider: FTPFileProvider
      */
     public init?(ftpProvider: FTPFileProvider) {
-        //guard let baseUrl = ftpProvider.baseURL else { return nil }
         self.ftpProvider = ftpProvider
-        //self.baseUrl = baseUrl
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .ftp
     }
@@ -135,7 +133,6 @@ open class StreamZipArchiver {
         - sftpProvider: SftpFileProvider
      */
     public init?(sftpProvider: SftpFileProvider) {
-        //guard let baseUrl = sftpProvider.baseURL else { return nil }
         self.sftpProvider = sftpProvider
         // 연결 방식 확인 불필요, SFTP 지정
         self.connection = .sftp
