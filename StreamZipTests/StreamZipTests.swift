@@ -40,7 +40,7 @@ class StreamZipTests: XCTestCase {
         let archiver = StreamZipArchiver.init(fileURL: url)
 
         let expt = expectation(description: "Waiting done parsing...")
-        let progress = archiver?.makeEntriesAtLocal(completion: { fileLength, entries, error in
+        let progress = archiver?.makeEntriesFromLocal(completion: { fileLength, entries, error in
             if let error = error {
                 print("error = \(error.localizedDescription)")
             }
