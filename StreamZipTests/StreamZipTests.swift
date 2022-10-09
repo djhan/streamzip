@@ -40,20 +40,12 @@ class StreamZipTests: XCTestCase {
         let archiver = StreamZipArchiver.init(fileURL: url)
 
         let expt = expectation(description: "Waiting done parsing...")
-        let progress = archiver?.makeEntriesFromLocal(completion: { fileLength, entries, error in
-            if let error = error {
-                print("error = \(error.localizedDescription)")
-            }
-            guard let entries = entries else {
-                print("문제 발생!")
-                return
-            }
-            for entry in entries {
-                print("entry = \(entry.filePath)")
-            }
-            // 종료 처리
+        
+        let firstImage = archiver?.firstImage(completion: { image, filepath, error in
+            print("filePath = \(filepath), error = \(error?.localizedDescription ?? "unknown")")
             expt.fulfill()
         })
+        
         waitForExpectations(timeout: 3.0, handler: nil)
     }
 }

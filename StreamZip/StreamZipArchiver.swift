@@ -190,14 +190,21 @@ open class StreamZipArchiver {
         - completion: `StreamZipArchiveCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func fetchArchive(at path: String,
+    public func fetchArchive(at path: String? = nil,
                              fileLength: UInt64? = nil,
                              encoding: String.Encoding? = nil,
                              completion: @escaping StreamZipArchiveCompletion) -> Progress? {
 
-        guard self.fileURL == nil else {
+        if self.connection == .local,
+           let url = self.fileURL {
             // FileURL 이 주어진 로컬 파일인 경우
-            return self.makeEntriesFromLocal(at: path, encoding: encoding, completion: completion)
+            return self.makeEntriesFromLocal(at: url, encoding: encoding, completion: completion)
+        }
+        
+        guard let path = path else {
+            // 네트웍인데 하위 경로가 주어지지 않은 경우 에러 처리
+            completion(0, nil, StreamZip.Error.unknown)
+            return nil
         }
         
         // fileLength가 주어졌는지 확인
@@ -356,14 +363,14 @@ open class StreamZipArchiver {
      특정 Entry의 파일 다운로드 및 압축 해제
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
      - Parameters:
-        - path: 파일 경로 지정
+        - path: 네트웍 파일인 경우, 파일 경로 지정. 로컬 파일인 경우 미입력
         - fileLength: `UInt64`. 파일 길이 지정
         - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
         - encoding: `String.Encoding`. 미지정시 자동 인코딩
         - completion: `StreamZipFileCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func fetchFile(at path: String,
+    public func fetchFile(at path: String? = nil,
                           fileLength: UInt64,
                           entry: StreamZipEntry,
                           encoding: String.Encoding? = nil,
@@ -380,9 +387,9 @@ open class StreamZipArchiver {
         let uppderbound = lowerBound + length > fileLength ? fileLength : lowerBound + length
         // 다운로드 범위를 구한다
         let range = lowerBound ..< uppderbound
-        print("StreamZipArchive>fetchFile(_:completion:): \(path) >> offset = \(lowerBound), length = \(length)")
+        print("StreamZipArchive>fetchFile(_:completion:): offset = \(lowerBound), length = \(length)")
         // 해당 범위의 데이터를 받아온다
-        return self.request(path: path, range: range) { (data, error) in
+        return self.request(path: path, url: self.fileURL, range: range) { (data, error) in
             if let error = error {
                 print("StreamZipArchive>fetchFile(_:completion:): 데이터 전송중 에러 발생 = \(error.localizedDescription)")
                 return completion(entry, error)
@@ -400,7 +407,7 @@ open class StreamZipArchiver {
             
             let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
 
-            print("StreamZipArchive>fetchFile(_:completion:): \(path) >> data length = \(data.count)")
+            print("StreamZipArchive>fetchFile(_:completion:): data length = \(data.count)")
             print("StreamZipArchive>fetchFile(_:completion:): offset = \(zipFileHeader.length)")
             print("StreamZipArchive>fetchFile(_:completion:): filename length = \(zipFileHeader.fileNameLength)")
             print("StreamZipArchive>fetchFile(_:completion:): extraField length = \(zipFileHeader.extraFieldLength)")
@@ -440,27 +447,17 @@ open class StreamZipArchiver {
     }
     
     /**
-     Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 메쏘드
+     Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
      - Parameters:
-        - path: fileURL의 하위 경로. 기본값은 nil
         - encoding: `String.Encoding`. 미지정시 자동 인코딩
         - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func makeEntriesFromLocal(at path: String? = nil,
+    private func makeEntriesFromLocal(at url: URL,
                                      encoding: String.Encoding? = nil,
                                      completion: @escaping StreamZipArchiveCompletion) -> Progress? {
-        guard var fileURL = self.fileURL else {
-            // fileURL이 없음. 알 수 없는 에러
-            completion(0, nil, StreamZip.Error.unknown)
-            return nil
-        }
-        if let path = path {
-            fileURL = fileURL.appendingPathComponent(path)
-        }
-        
         // 파일 크기를 구한다
-        let fileLength = fileURL.fileSize
+        let fileLength = url.fileSize
         
         //----------------------------------------------------------------//
         /// 종료 처리 내부 메쏘드
@@ -488,7 +485,7 @@ open class StreamZipArchiver {
         let range = fileLength - 4096 ..< fileLength
         
         var progress: Progress?
-        progress = self.request(url: fileURL, range: range) { [weak self] data, error in
+        progress = self.request(url: url, range: range) { [weak self] data, error in
             guard let strongSelf = self else {
                 print("StreamZipArchive>makeEntriesFromLocal(_:completion:): self가 nil!")
                 return finish(nil, error)
@@ -521,7 +518,7 @@ open class StreamZipArchiver {
             let centralDirectoryRange = offsetOfCentralDirectory ..< offsetOfCentralDirectory + sizeOfCentralDirectory
             
             // Central Directory data 를 가져온다
-            let subProgress = strongSelf.request(url: fileURL, range: centralDirectoryRange) { (data, error) in
+            let subProgress = strongSelf.request(url: url, range: centralDirectoryRange) { (data, error) in
                 if let error = error {
                     print("StreamZipArchive>makeEntries(_:completion:): central directory data 전송중 에러 발생 = \(error.localizedDescription)")
                     return finish(nil, error)
@@ -623,13 +620,13 @@ open class StreamZipArchiver {
      아카이브 중 최초 이미지를 반환
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
      - Parameters:
-        - path: 파일 경로 지정
+        - path: 네트웍 파일인 경우, 파일 경로 지정
         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
         - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
         - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func firstImage(at path: String,
+    public func firstImage(at path: String? = nil,
                            fileLength: UInt64? = nil,
                            encoding: String.Encoding? = nil,
                            completion: @escaping StreamZipImageRequestCompletion) -> Progress? {
@@ -1107,7 +1104,7 @@ open class StreamZipArchiver {
             
            // local인 경우
         case .local:
-            guard let url = url else {
+            guard let url = self.fileURL else {
                 completion(nil, StreamZip.Error.unsupportedConnection)
                 return nil
             }
