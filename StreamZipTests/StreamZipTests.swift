@@ -41,8 +41,8 @@ class StreamZipTests: XCTestCase {
 
         let expt = expectation(description: "Waiting done parsing...")
         
-        let firstImage = archiver?.firstImage(completion: { image, filepath, error in
-            print("filePath = \(filepath), error = \(error?.localizedDescription ?? "unknown")")
+        let progress = archiver?.firstImage(completion: { image, filepath, error in
+            print("filePath = \(filepath), error = \(error?.localizedDescription ?? "no error")")
             expt.fulfill()
         })
         

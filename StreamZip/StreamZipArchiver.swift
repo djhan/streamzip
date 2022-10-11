@@ -364,14 +364,14 @@ open class StreamZipArchiver {
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
      - Parameters:
         - path: 네트웍 파일인 경우, 파일 경로 지정. 로컬 파일인 경우 미입력
-        - fileLength: `UInt64`. 파일 길이 지정
+        - fileLength: `UInt64`. 파일 길이 지정. 로컬 파일인 경우 미지정 가능
         - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
         - encoding: `String.Encoding`. 미지정시 자동 인코딩
         - completion: `StreamZipFileCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func fetchFile(at path: String? = nil,
-                          fileLength: UInt64,
+                          fileLength: UInt64? = nil,
                           entry: StreamZipEntry,
                           encoding: String.Encoding? = nil,
                           completion: @escaping StreamZipFileCompletion) -> Progress? {
@@ -384,10 +384,25 @@ open class StreamZipArchiver {
         // 길이 = zip file header (32바이트) + 압축되어 있는 크기 + 파일명 길이 + extraFieldLength + 추가 16 바이트
         let length = UInt64(MemoryLayout<ZipFileHeader>.size + entry.sizeCompressed + entry.filenameLength + entry.extraFieldLength + 16)
         // 추가 16바이트를 더한 값이 전체 파일 길이를 넘어서지 않도록 조절한다
-        let uppderbound = lowerBound + length > fileLength ? fileLength : lowerBound + length
+        var targetFileLength: UInt64
+        if fileLength != nil {
+            targetFileLength = fileLength!
+        }
+        else {
+            // 로컬 파일인지 확인
+            guard self.connection == .local,
+                  let fileURL = self.fileURL else {
+                // 알 수 없는 에러로 중지 처리
+                completion(entry, StreamZip.Error.unknown)
+                return nil
+            }
+            targetFileLength = fileURL.fileSize
+        }
+        
+        let uppderbound = lowerBound + length > targetFileLength ? targetFileLength : lowerBound + length
         // 다운로드 범위를 구한다
         let range = lowerBound ..< uppderbound
-        print("StreamZipArchive>fetchFile(_:completion:): offset = \(lowerBound), length = \(length)")
+        //print("StreamZipArchive>fetchFile(_:completion:): offset = \(lowerBound), length = \(length)")
         // 해당 범위의 데이터를 받아온다
         return self.request(path: path, url: self.fileURL, range: range) { (data, error) in
             if let error = error {
@@ -406,13 +421,13 @@ open class StreamZipArchiver {
             }
             
             let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
-
+            /*
             print("StreamZipArchive>fetchFile(_:completion:): data length = \(data.count)")
             print("StreamZipArchive>fetchFile(_:completion:): offset = \(zipFileHeader.length)")
             print("StreamZipArchive>fetchFile(_:completion:): filename length = \(zipFileHeader.fileNameLength)")
             print("StreamZipArchive>fetchFile(_:completion:): extraField length = \(zipFileHeader.extraFieldLength)")
             print("StreamZipArchive>fetchFile(_:completion:): uncompressed size = \(zipFileHeader.uncompressedSize)")
-
+             */
             switch entry.method {
             // Defalte 방식인 경우
             case Z_DEFLATED:
@@ -577,12 +592,12 @@ open class StreamZipArchiver {
         }
         
         let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
-
+        /*
         print("StreamZipArchive>fetchFile(_:completion:): offset = \(zipFileHeader.length)")
         print("StreamZipArchive>fetchFile(_:completion:): filename length = \(zipFileHeader.fileNameLength)")
         print("StreamZipArchive>fetchFile(_:completion:): extraField length = \(zipFileHeader.extraFieldLength)")
         print("StreamZipArchive>fetchFile(_:completion:): uncompressed size = \(zipFileHeader.uncompressedSize)")
-
+         */
         switch entry.method {
         // Defalte 방식인 경우
         case Z_DEFLATED:
