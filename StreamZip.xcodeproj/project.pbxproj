@@ -10,9 +10,7 @@
 		EE283EE125D8C45D00D3C62B /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EB225D8B3AF00D3C62B /* FilesProvider.framework */; };
 		EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F1625D8E7CE00D3C62B /* CommonLibrary.framework */; };
 		EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; };
-		EE283F2625D8E82100D3C62B /* Detector.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; };
-		EE3BCAA32823E2150064E218 /* SftpProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6449E925D5297E008FA69E /* GetValue.swift */; };
 		EE7732CA25D0D37C00414625 /* StreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7732C025D0D37C00414625 /* StreamZip.framework */; };
 		EE7732CF25D0D37C00414625 /* StreamZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732CE25D0D37C00414625 /* StreamZipTests.swift */; };
@@ -147,21 +145,6 @@
 			remoteInfo = StreamZip;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		EE283F2725D8E82100D3C62B /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				EE3BCAA32823E2150064E218 /* SftpProvider.framework in Embed Frameworks */,
-				EE283F2625D8E82100D3C62B /* Detector.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		EE283EA325D8B39700D3C62B /* FilesProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FilesProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -346,7 +329,6 @@
 				EE7732BC25D0D37C00414625 /* Sources */,
 				EE7732BD25D0D37C00414625 /* Frameworks */,
 				EE7732BE25D0D37C00414625 /* Resources */,
-				EE283F2725D8E82100D3C62B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
