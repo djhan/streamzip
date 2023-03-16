@@ -88,8 +88,16 @@ open class StreamZipArchiver {
     /// Base URL
     //var baseUrl: URL
     
-    /// SyncQueue
-    private let syncQueue = DispatchQueue(label: "djhan.StreamZipArchiver", attributes: .concurrent)
+    /// 동기화 큐
+    private let syncQueue = { let syncQueue = DispatchQueue(label: "djhan.EdgeView.StreamZipArchiver_" + UUID().uuidString,
+                                                            qos: .default,
+                                                            attributes: .concurrent,
+                                                            autoreleaseFrequency: .workItem,
+                                                            target: nil)
+        // 동일 큐 판별을 위해 등록 처리
+        DispatchQueue.registerDetection(of: syncQueue)
+        return syncQueue
+    }()
 
     // MARK: Local Properties
     /// 로컬 파일 URL
