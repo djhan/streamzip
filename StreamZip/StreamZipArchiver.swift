@@ -8,6 +8,7 @@
 import Foundation
 import Cocoa
 
+import EdgeFtpProvider
 import FilesProvider
 import SftpProvider
 import CommonLibrary
@@ -97,7 +98,8 @@ open class StreamZipArchiver {
     
     // MARK: FTP Properties
     /// FTP File Provider
-    weak var ftpProvider: FTPFileProvider?
+    weak var ftpProvider: FTPProvider?
+    //weak var ftpProvider: FTPFileProvider?
 
     // MARK: SFTP Properties
     /// SFTP File Provider
@@ -124,9 +126,10 @@ open class StreamZipArchiver {
     /**
      FTP 아이템 초기화
      - Parameters:
-        - ftpProvider: FTPFileProvider
+        - ftpProvider: FTPProvider
      */
-    public init?(ftpProvider: FTPFileProvider) {
+    public init?(ftpProvider: FTPProvider) {
+    //public init?(ftpProvider: FTPFileProvider) {
         self.ftpProvider = ftpProvider
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .ftp
@@ -941,7 +944,8 @@ open class StreamZipArchiver {
  
         // progress 지정
         var progress: Progress?
-        progress = ftpProvider.contentsOfDirectoryWithProgress(path: mainPath) { (ftpItems, error) in
+        progress = ftpProvider.contentsOfDirectory(at: mainPath) { ftpItems, error in
+        //progress = ftpProvider.contentsOfDirectoryWithProgress(path: mainPath) { (ftpItems, error) in
             os_log("StreamZipArchive>%@ :: %@ >> 디렉토리 목록 작성 완료", log: .fileInfo, type: .debug, #function, mainPath)
             // 에러 발생시 중지
             if let error = error {
@@ -952,18 +956,29 @@ open class StreamZipArchiver {
                 os_log("StreamZipArchive>%@ :: %@ >> 사용자 취소 발생", log: .fileInfo, type: .debug, #function, mainPath)
                 return completion(nil, StreamZip.Error.aborted)
             }
-
+            guard let ftpItems = ftpItems,
+                  ftpItems.count > 0 else {
+                os_log("StreamZipArchive>%@ :: %@ >> 아이템 개수가 0개", log: .fileInfo, type: .debug, #function, mainPath)
+                return completion(nil, nil)
+            }
+            
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
             
             // contents of directory 배열에 아이템 대입
             let contentsOfDirectory = ftpItems.map { (ftpItem) -> ContentOfDirectory in
-                // ftpProvider는 디렉토리인 경우 사이즈를 -1로 반환하기 때문에, 0으로 맞춘다
-                let size = ftpItem.size > 0 ? ftpItem.size : 0
+                let size = ftpItem.fileSize > 0 ? ftpItem.fileSize : 0
                 return ContentOfDirectory.init(path: ftpItem.path,
                                                isDirectory: ftpItem.isDirectory,
                                                fileSize: UInt64(size))
             }
+//            let contentsOfDirectory = ftpItems.map { (ftpItem) -> ContentOfDirectory in
+//                // ftpProvider는 디렉토리인 경우 사이즈를 -1로 반환하기 때문에, 0으로 맞춘다
+//                let size = ftpItem.size > 0 ? ftpItem.size : 0
+//                return ContentOfDirectory.init(path: ftpItem.path,
+//                                               isDirectory: ftpItem.isDirectory,
+//                                               fileSize: UInt64(size))
+//            }
 
             // progress 처리 개수 1 증가
             progress?.completedUnitCount += 1
@@ -1147,9 +1162,16 @@ open class StreamZipArchiver {
         }
 
         var progress: Progress?
-        progress = ftpProvider.contents(path: path,
-                                        offset: Int64(range.lowerBound),
-                                        length: range.count) { (data, error) in
+        progress = ftpProvider.contents(at: path,
+                                        offset: UInt64(range.lowerBound),
+                                        length: UInt64(range.count)) { complete, data, error in
+//        progress = ftpProvider.contents(path: path,
+//                                        offset: Int64(range.lowerBound),
+//                                        length: range.count) { (data, error) in
+            guard complete == true else {
+                os_log("StreamZipArchive>%@ :: %@ >> 미종료 상태", log: .fileInfo, type: .debug, #function, path)
+                return
+            }
             // 에러 여부를 먼저 확인
             // 이유: progress?.isCancelled 를 먼저 확인하는 경우, error 가 발생했는데도 사용자 취소로 처리해 버리는 경우가 있기 때문이다
             if let error = error {

@@ -22,6 +22,8 @@
 		EE7EFFB425D8108E00EA59A1 /* CRC32.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7EFFB325D8108E00EA59A1 /* CRC32.swift */; };
 		EE83CBC725D815890095A058 /* DataDecompressionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */; };
 		EE8443FF25D2A89B005EA4B6 /* DataTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */; };
+		EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */; };
+		EEA5415D29D16C1900C81239 /* EdgeFtpProvider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,7 +146,42 @@
 			remoteGlobalIDString = EE7732BF25D0D37C00414625;
 			remoteInfo = StreamZip;
 		};
+		EEA5415029D16C0E00C81239 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EE8FBAB629CE9FF80061779A;
+			remoteInfo = EdgeFtpProvider;
+		};
+		EEA5415229D16C0E00C81239 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EE8FBAC029CE9FF80061779A;
+			remoteInfo = EdgeFtpProviderTests;
+		};
+		EEA5415F29D16C2700C81239 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EE8FBAB529CE9FF80061779A;
+			remoteInfo = EdgeFtpProvider;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EEA5415E29D16C1900C81239 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				EEA5415D29D16C1900C81239 /* EdgeFtpProvider.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		EE283EA325D8B39700D3C62B /* FilesProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FilesProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -168,6 +205,7 @@
 		EE7EFFB325D8108E00EA59A1 /* CRC32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC32.swift; sourceTree = "<group>"; };
 		EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDecompressionExtension.swift; sourceTree = "<group>"; };
 		EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTransformExtension.swift; sourceTree = "<group>"; };
+		EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EdgeFtpProvider.xcodeproj; path = ../EdgeFtpProvider/EdgeFtpProvider.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +215,7 @@
 			files = (
 				EE283EE125D8C45D00D3C62B /* FilesProvider.framework in Frameworks */,
 				EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */,
+				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
 				EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */,
 			);
@@ -257,6 +296,7 @@
 				EE7732CD25D0D37C00414625 /* StreamZipTests */,
 				EE7732C125D0D37C00414625 /* Products */,
 				EE283EA225D8B39700D3C62B /* Frameworks */,
+				EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */,
 				EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */,
 				EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */,
 				EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */,
@@ -307,6 +347,15 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		EEA5414C29D16C0E00C81239 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */,
+				EEA5415329D16C0E00C81239 /* EdgeFtpProviderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -329,10 +378,12 @@
 				EE7732BC25D0D37C00414625 /* Sources */,
 				EE7732BD25D0D37C00414625 /* Frameworks */,
 				EE7732BE25D0D37C00414625 /* Resources */,
+				EEA5415E29D16C1900C81239 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EEA5416029D16C2700C81239 /* PBXTargetDependency */,
 				EE3BCAB52823E2240064E218 /* PBXTargetDependency */,
 				EE283F2A25D8E82A00D3C62B /* PBXTargetDependency */,
 				EE283F1825D8E7D400D3C62B /* PBXTargetDependency */,
@@ -398,6 +449,10 @@
 				{
 					ProductGroup = EE283F2025D8E81900D3C62B /* Products */;
 					ProjectRef = EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */;
+				},
+				{
+					ProductGroup = EEA5414C29D16C0E00C81239 /* Products */;
+					ProjectRef = EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */;
 				},
 				{
 					ProductGroup = EE283EE825D8C47000D3C62B /* Products */;
@@ -505,6 +560,20 @@
 			remoteRef = EE3BCAB22823E21D0064E218 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = EdgeFtpProvider.framework;
+			remoteRef = EEA5415029D16C0E00C81239 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EEA5415329D16C0E00C81239 /* EdgeFtpProviderTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = EdgeFtpProviderTests.xctest;
+			remoteRef = EEA5415229D16C0E00C81239 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -575,6 +644,11 @@
 			isa = PBXTargetDependency;
 			target = EE7732BF25D0D37C00414625 /* StreamZip */;
 			targetProxy = EE7732CB25D0D37C00414625 /* PBXContainerItemProxy */;
+		};
+		EEA5416029D16C2700C81239 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = EdgeFtpProvider;
+			targetProxy = EEA5415F29D16C2700C81239 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -722,7 +796,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.djhan.StreamZip;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -752,7 +826,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.djhan.StreamZip;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
