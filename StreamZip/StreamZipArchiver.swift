@@ -20,56 +20,56 @@ import zlib
 /**
  Data Request 완료 핸들러
  - Parameters:
-    - data: `Data`. 미발견시 nil 반환
-    - error: 에러. 옵셔널
+ - data: `Data`. 미발견시 nil 반환
+ - error: 에러. 옵셔널
  */
 public typealias StreamZipDataRequestCompletion = (_ data: Data?, _ error: Error?) -> Void
 /**
  Image Request 완료 핸들러
  - Parameters:
-    - image: `NSImage`. 미발견시 nil 반환
-    - filePath: `String`. 미발견시 nil 반환
-    - error: 에러. 옵셔널
+ - image: `NSImage`. 미발견시 nil 반환
+ - filePath: `String`. 미발견시 nil 반환
+ - error: 에러. 옵셔널
  */
 public typealias StreamZipImageRequestCompletion = (_ image: NSImage?, _ filepath: String?, _ error: Error?) -> Void
 /**
  Thumbnail Image Request 완료 핸들러
  - Parameters:
-    - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
-    - filePath: `String`. 미발견시 nil 반환
-    - error: 에러. 옵셔널
+ - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
+ - filePath: `String`. 미발견시 nil 반환
+ - error: 에러. 옵셔널
  */
 public typealias StreamZipThumbnailRequestCompletion = (_ thumbnail: CGImage?, _ filepath: String?, _ error: Error?) -> Void
 
 /**
  FileLength 완료 핸들러
  - Parameters:
-    - fileLength: 파일 길이. `UInt64`
-    - error: 에러. 옵셔널
+ - fileLength: 파일 길이. `UInt64`
+ - error: 에러. 옵셔널
  */
 internal typealias StreamZipFileLengthCompletion = (_ fileLength: UInt64, _ error: Error?) -> Void
 
 /**
  Contents of Directory 완료 핸들러
  - Parameters:
-    - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
-    - error: 에러. 옵셔널
+ - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
+ - error: 에러. 옵셔널
  */
 internal typealias ContentsOfDirectoryCompletion = (_ contentsOfDirectory: [ContentOfDirectory]?, _ error: Error?) -> Void
 
 /**
  Archive 해제 완료 핸들러
  - Parameters:
-    - fileLength: 파일 길이. `UInt64`
-    - entries: `StreamZipEntry` 배열. 옵셔널
-    - error: 에러. 옵셔널
+ - fileLength: 파일 길이. `UInt64`
+ - entries: `StreamZipEntry` 배열. 옵셔널
+ - error: 에러. 옵셔널
  */
 public typealias StreamZipArchiveCompletion = (_ fileLength: UInt64, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
 /**
  Entry 생성 완료 핸들러
  - Parameters:
-    - entry: `StreamZipEntry`
-    - error: 에러. 옵셔널
+ - entry: `StreamZipEntry`
+ - error: 에러. 옵셔널
  */
 public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
 
@@ -84,7 +84,7 @@ public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Er
 open class StreamZipArchiver {
     
     // MARK: - Properties
-
+    
     /// Base URL
     //var baseUrl: URL
     
@@ -98,7 +98,7 @@ open class StreamZipArchiver {
         DispatchQueue.registerDetection(of: syncQueue)
         return syncQueue
     }()
-
+    
     // MARK: Local Properties
     /// 로컬 파일 URL
     var fileURL: URL?
@@ -107,36 +107,25 @@ open class StreamZipArchiver {
     /// FTP File Provider
     weak var ftpProvider: FTPProvider?
     //weak var ftpProvider: FTPFileProvider?
-
+    
     // MARK: SFTP Properties
     /// SFTP File Provider
     weak var sftpProvider: SftpFileProvider?
-
+    
     // MARK: WebDav Properties
     weak var webDavProvider: WebDAVFileProvider?
     
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
-
+    
     // MARK: - Initialization
-    /*
-    /**
-     URL로 초기화
-     - Parameters:
-        - baseUrl: `URL` 타입 지정
-     */
-    public init(_ baseUrl: URL) {
-        self.baseUrl = baseUrl
-        // 연결 방식 확인
-        self.detectConnection()
-    }*/
+    
     /**
      FTP 아이템 초기화
      - Parameters:
-        - ftpProvider: FTPProvider
+     - ftpProvider: FTPProvider
      */
     public init?(ftpProvider: FTPProvider) {
-    //public init?(ftpProvider: FTPFileProvider) {
         self.ftpProvider = ftpProvider
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .ftp
@@ -144,7 +133,7 @@ open class StreamZipArchiver {
     /**
      SFTP 아이템 초기화
      - Parameters:
-        - sftpProvider: SftpFileProvider
+     - sftpProvider: SftpFileProvider
      */
     public init?(sftpProvider: SftpFileProvider) {
         self.sftpProvider = sftpProvider
@@ -154,7 +143,7 @@ open class StreamZipArchiver {
     /**
      WebDav 아이템 초기화
      - Parameters:
-        - webDavProvider: WebDAVFileProvider?
+     - webDavProvider: WebDAVFileProvider?
      */
     public init?(webDavProvider: WebDAVFileProvider) {
         // 연결 방식 확인
@@ -169,42 +158,30 @@ open class StreamZipArchiver {
     /**
      로컬 아이템 초기화
      - Parameters:
-        - fileURL: URL
+     - fileURL: URL
      */
     public init?(fileURL: URL) {
         self.fileURL = fileURL
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .local
     }
-    /*
-    /// 연결 타입 확인
-    private func detectConnection() {
-        switch self.baseUrl.scheme {
-        case StreamZip.Connection.ftp.rawValue: self.connection = .ftp
-        case StreamZip.Connection.ftps.rawValue: self.connection = .ftps
-        case StreamZip.Connection.sftp.rawValue: self.connection = .sftp
-        case StreamZip.Connection.local.rawValue: self.connection = .local
-        default: self.connection = .unknown
-        }
-    }
-     */
-
+    
     // MARK: - Methods
     
     /**
      특정 경로의 zip 파일에 접근, Entries 배열 생성
      - Parameters:
-        - path: 파일 경로 지정
-        - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-        - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
-        - completion: `StreamZipArchiveCompletion` 완료 핸들러
+     - path: 파일 경로 지정
+     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+     - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
+     - completion: `StreamZipArchiveCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func fetchArchive(at path: String? = nil,
                              fileLength: UInt64? = nil,
                              encoding: String.Encoding? = nil,
                              completion: @escaping StreamZipArchiveCompletion) -> Progress? {
-
+        
         if self.connection == .local,
            let url = self.fileURL {
             // FileURL 이 주어진 로컬 파일인 경우
@@ -227,7 +204,7 @@ open class StreamZipArchiver {
             // 기본 파일 길이를 0으로 리셋
             var fileLength: UInt64 = 0
             
-            EdgeLogger.shared.log(loggerMessage: "파일 크기 확인...", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >> File 길이 구하기 시작.")
             // 파일 길이를 구해온다
             progress = self.getFileLength(at: path) { [weak self] (currentFileLength, error) in
                 guard let strongSelf = self else {
@@ -235,7 +212,7 @@ open class StreamZipArchiver {
                 }
                 // 에러 발생시 종료 처리
                 if let error = error {
-                    EdgeLogger.shared.log(loggerMessage: "파일 크기가 0", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> File 길이가 0. 중지.")
                     return completion(0, nil, error)
                 }
                 
@@ -247,7 +224,7 @@ open class StreamZipArchiver {
                 }
                 
                 if progress?.isCancelled == true {
-                    EdgeLogger.shared.log(loggerMessage: "작업 중지", category: .archive, type: .debug, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 작업 중지.")
                     return completion(0, nil, StreamZip.Error.aborted)
                 }
                 
@@ -263,19 +240,19 @@ open class StreamZipArchiver {
             return progress
         }
         
-        EdgeLogger.shared.log(loggerMessage: "파일 크기 = \(fileLength)", category: .archive, type: .debug, function: #function)
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >> File 길이 = \(fileLength).")
         // FileLength가 주어진 경우
         let progress = self.makeEntries(at: path, fileLength: fileLength, encoding: encoding, completion: completion)
         return progress
     }
-
+    
     /**
      Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
      - Parameters:
-        - path: 파일 경로 지정
-        - fileLength: `UInt64`. 파일 길이 지정
-        - encoding: `String.Encoding`. 미지정시 자동 인코딩
-        - completion: `StreamZipArchiveCompletion`
+     - path: 파일 경로 지정
+     - fileLength: `UInt64`. 파일 길이 지정
+     - encoding: `String.Encoding`. 미지정시 자동 인코딩
+     - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func makeEntries(at path: String,
@@ -284,18 +261,18 @@ open class StreamZipArchiver {
                              completion: @escaping StreamZipArchiveCompletion) -> Progress? {
         // 파일 길이가 0인 경우 종료 처리
         guard fileLength > 0 else {
-            EdgeLogger.shared.log(loggerMessage: "파일 크기가 0", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >> File 길이가 0. 중지.")
             completion(0, nil, StreamZip.Error.contentsIsEmpty)
             return nil
         }
         // 4096 바이트보다 짧은 경우도 종료 처리
         guard fileLength >= 4096 else {
-            EdgeLogger.shared.log(loggerMessage: "파일 크기가 4096 바이트 미만, 중지.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >> File 길이가 4096 바이트 미만. 중지.")
             // 빈 파일로 간주한다
             completion(0, nil, StreamZip.Error.contentsIsEmpty)
             return nil
         }
-
+        
         // 마지막 지점에서 -4096 바이트부터 마지막 지점까지 범위 지정
         let range = fileLength - 4096 ..< fileLength
         
@@ -305,27 +282,27 @@ open class StreamZipArchiver {
         // 해당 범위만큼 데이터를 전송받는다
         progress = self.request(path: path, range: range) { [weak self] (data, error) in
             guard let strongSelf = self else {
-                EdgeLogger.shared.log(loggerMessage: "Self가 NIL", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(self?.fileURL?.filePath ?? "unknown") >> Self가 NIL.")
                 return completion(0, nil, error)
             }
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "마지막 4096 바이트 압축 파일 정보 데이터 전송중 에러 발생 = \(error.localizedDescription)", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 마지막 4096 바이트 데이터 전송중 에러 발생 = \(error.localizedDescription).")
                 return completion(0, nil, error)
             }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "사용자 중지 발생", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 사용자 중지 발생.")
                 return completion(0, nil, StreamZip.Error.aborted)
             }
             guard let data = data,
                   data.count > 4 else {
-                EdgeLogger.shared.log(loggerMessage: "에러가 없는데 데이터 크기가 4바이트 이하. End of Central Directory가 없는 것일 수 있음", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 에러가 없는데 데이터 크기가 4바이트 이하. End of Central Directory가 없는 것일 수 있음.")
                 return completion(0, nil, StreamZip.Error.endOfCentralDirectoryIsFailed)
             }
             
             // End of Central Directory 정보 레코드를 가져온다
             guard let zipEndRecord = ZipEndRecord.make(from: data, encoding: encoding) else {
-                EdgeLogger.shared.log(loggerMessage: "end of central directory 구조체 초기화 실패.", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> end of central directory 구조체 초기화 실패.")
                 return completion(0, nil, StreamZip.Error.endOfCentralDirectoryIsFailed)
             }
             
@@ -333,26 +310,26 @@ open class StreamZipArchiver {
             let offsetOfCentralDirectory = UInt64(zipEndRecord.offsetOfStartOfCentralDirectory)
             let sizeOfCentralDirectory = UInt64(zipEndRecord.sizeOfCentralDirectory)
             let centralDirectoryRange = offsetOfCentralDirectory ..< offsetOfCentralDirectory + sizeOfCentralDirectory
-                    
+            
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "이미지 파일이 없음", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 이미지 파일이 없음.")
                 return completion(0, nil, StreamZip.Error.aborted)
             }
-
+            
             // Central Directory data 를 가져온다
             let subProgress = strongSelf.request(path: path, range: centralDirectoryRange) { (data, error) in
                 if let error = error {
-                    EdgeLogger.shared.log(loggerMessage: "central directory data 전송중 에러 발생 = \(error.localizedDescription)", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> central directory data 전송중 에러  발생 = \(error.localizedDescription).")
                     return completion(0, nil, error)
                 }
                 guard let data = data else {
-                    EdgeLogger.shared.log(loggerMessage: "에러가 없는데 central directory data 크기가 0", category: .archive, type: .debug, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 에러가 없는데 central directory data 크기가 0.")
                     return completion(0, nil, StreamZip.Error.centralDirectoryIsFailed)
                 }
                 
                 guard let entries = StreamZipEntry.makeEntries(from: data, encoding: encoding) else {
-                    EdgeLogger.shared.log(loggerMessage: "Stream Zip Entries 생성에 실패", category: .archive, type: .debug, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> Stream Zip Entries 생성에 실패.")
                     return completion(0, nil, StreamZip.Error.centralDirectoryIsFailed)
                 }
                 
@@ -373,11 +350,11 @@ open class StreamZipArchiver {
      특정 Entry의 파일 다운로드 및 압축 해제
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
      - Parameters:
-        - path: 네트웍 파일인 경우, 파일 경로 지정. 로컬 파일인 경우 미입력
-        - fileLength: `UInt64`. 파일 길이 지정. 로컬 파일인 경우 미지정 가능
-        - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
-        - encoding: `String.Encoding`. 미지정시 자동 인코딩
-        - completion: `StreamZipFileCompletion`
+     - path: 네트웍 파일인 경우, 파일 경로 지정. 로컬 파일인 경우 미입력
+     - fileLength: `UInt64`. 파일 길이 지정. 로컬 파일인 경우 미지정 가능
+     - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
+     - encoding: `String.Encoding`. 미지정시 자동 인코딩
+     - completion: `StreamZipFileCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func fetchFile(at path: String? = nil,
@@ -387,7 +364,7 @@ open class StreamZipArchiver {
                           completion: @escaping StreamZipFileCompletion) -> Progress? {
         // 이미 data가 있는 경우 nil 처리
         entry.data = nil
-    
+        
         let lowerBound = UInt64(entry.offset)
         // 16 바이트를 추가로 다운로드 받는다
         // Central Directory / FileEntry Header 가 포함됐을 수도 있기 때문이다
@@ -412,34 +389,27 @@ open class StreamZipArchiver {
         let uppderbound = lowerBound + length > targetFileLength ? targetFileLength : lowerBound + length
         // 다운로드 범위를 구한다
         let range = lowerBound ..< uppderbound
-        //print("StreamZipArchive>fetchFile(_:completion:): offset = \(lowerBound), length = \(length)")
         // 해당 범위의 데이터를 받아온다
         return self.request(path: path, url: self.fileURL, range: range) { (data, error) in
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "데이터 전송중 에러 발생 = \(error.localizedDescription)", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(self.fileURL?.filePath ?? "unknown") >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
                 return completion(entry, error)
             }
             guard let data = data else {
-                EdgeLogger.shared.log(loggerMessage: "에러가 없는데 데이터 크기가 0", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(self.fileURL?.filePath ?? "unknown") >> 에러가 없는데 데이터 크기가 0.")
                 return completion(entry, StreamZip.Error.contentsIsEmpty)
             }
-
+            
             // Local Zip File Header 구조체 생성
             guard let zipFileHeader = ZipFileHeader.make(from: data, encoding: encoding) else {
-                EdgeLogger.shared.log(loggerMessage: "local file hedaer를 찾지 못함", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(self.fileURL?.filePath ?? "unknown") >> local file hedaer를 찾지 못함.")
                 return completion(entry, StreamZip.Error.localFileHeaderIsFailed)
             }
             
             let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
-            /*
-            print("StreamZipArchive>fetchFile(_:completion:): data length = \(data.count)")
-            print("StreamZipArchive>fetchFile(_:completion:): offset = \(zipFileHeader.length)")
-            print("StreamZipArchive>fetchFile(_:completion:): filename length = \(zipFileHeader.fileNameLength)")
-            print("StreamZipArchive>fetchFile(_:completion:): extraField length = \(zipFileHeader.extraFieldLength)")
-            print("StreamZipArchive>fetchFile(_:completion:): uncompressed size = \(zipFileHeader.uncompressedSize)")
-             */
+            
             switch entry.method {
-            // Defalte 방식인 경우
+                // Defalte 방식인 경우
             case Z_DEFLATED:
                 do {
                     // 성공 처리
@@ -450,11 +420,11 @@ open class StreamZipArchiver {
                     return completion(entry, nil)
                 }
                 catch {
-                    EdgeLogger.shared.log(loggerMessage: "해제 도중 에러 발생 = \(error.localizedDescription)", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(self.fileURL?.filePath ?? "unknown") >> 해제 도중 에러 발생 = \(error.localizedDescription).")
                     return completion(entry, error)
                 }
                 
-            // 비압축시
+                // 비압축시
             case 0:
                 // upperBound가 현재 데이터 길이를 초과하지 않도록 조절한다
                 // 이상하지만, uncompressedSize를 더한 값이 데이터 길이를 초과하는 경우가 있다
@@ -462,10 +432,10 @@ open class StreamZipArchiver {
                 let upperBound = offset + entry.sizeUncompressed > data.count ? data.count : offset + entry.sizeUncompressed
                 entry.data = data[offset ..< upperBound]
                 return completion(entry, nil)
-
-            // 그 외의 경우
+                
+                // 그 외의 경우
             default:
-                EdgeLogger.shared.log(loggerMessage: "미지원 압축 해제 방식. 데이터 해제 불가", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >>미지원 압축 해제 방식. 데이터 해제 불가.")
                 return completion(entry, StreamZip.Error.unsupportedCompressMethod)
             }
         }
@@ -474,13 +444,13 @@ open class StreamZipArchiver {
     /**
      Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
      - Parameters:
-        - encoding: `String.Encoding`. 미지정시 자동 인코딩
-        - completion: `StreamZipArchiveCompletion`
+     - encoding: `String.Encoding`. 미지정시 자동 인코딩
+     - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func makeEntriesFromLocal(at url: URL,
-                                     encoding: String.Encoding? = nil,
-                                     completion: @escaping StreamZipArchiveCompletion) -> Progress? {
+                                      encoding: String.Encoding? = nil,
+                                      completion: @escaping StreamZipArchiveCompletion) -> Progress? {
         // 파일 크기를 구한다
         let fileLength = url.fileSize
         
@@ -494,13 +464,13 @@ open class StreamZipArchiver {
         
         // 파일 길이가 0인 경우 종료 처리
         guard fileLength > 0 else {
-            EdgeLogger.shared.log(loggerMessage: "파일 크기가 0.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >> File 길이가 0. 중지.")
             finish(nil, StreamZip.Error.contentsIsEmpty)
             return nil
         }
         // 4096 바이트보다 짧은 경우도 종료 처리
         guard fileLength >= 4096 else {
-            EdgeLogger.shared.log(loggerMessage: "파일 크기가 4096 바이트 미만.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self.fileURL?.filePath ?? "unknown") >> File 길이가 4096 바이트 미만. 중지.")
             // 빈 파일로 간주한다
             finish(nil, StreamZip.Error.contentsIsEmpty)
             return nil
@@ -512,28 +482,28 @@ open class StreamZipArchiver {
         var progress: Progress?
         progress = self.request(url: url, range: range) { [weak self] data, error in
             guard let strongSelf = self else {
-                EdgeLogger.shared.log(loggerMessage: "Self가 NIL.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(self?.fileURL?.filePath ?? "unknown") >> Self가 NIL. 중지.")
                 return finish(nil, error)
             }
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "마지막 4096 바이트 데이터 전송중 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 마지막 4096 바이트 데이터 전송중 에러 발생 = \(error.localizedDescription).")
                 return finish(nil, error)
             }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "사용자 중지 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 사용자 중지 발생.")
                 return finish(nil, StreamZip.Error.aborted)
             }
             
             guard let data = data,
                   data.count > 4 else {
-                EdgeLogger.shared.log(loggerMessage: "에러가 없는데 데이터 크기가 4바이트 이하. End of Central Directory가 없는 것일 수 있음.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 에러가 없는데 데이터 크기가 4바이트 이하. End of Central Directory가 없는 것일 수 있음.")
                 return finish(nil, StreamZip.Error.endOfCentralDirectoryIsFailed)
             }
             
             // End of Central Directory 정보 레코드를 가져온다
             guard let zipEndRecord = ZipEndRecord.make(from: data, encoding: encoding) else {
-                EdgeLogger.shared.log(loggerMessage: "end of central directory 구조체 초기화 실패!.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> end of central directory 구조체 초기화 실패. 중지.")
                 return finish(nil, StreamZip.Error.endOfCentralDirectoryIsFailed)
             }
             
@@ -545,16 +515,16 @@ open class StreamZipArchiver {
             // Central Directory data 를 가져온다
             let subProgress = strongSelf.request(url: url, range: centralDirectoryRange) { (data, error) in
                 if let error = error {
-                    EdgeLogger.shared.log(loggerMessage: "central directory data 전송중 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(strongSelf.fileURL?.filePath ?? "unknown") >> central directory data 전송중 에러 발생 = \(error.localizedDescription).")
                     return finish(nil, error)
                 }
                 guard let data = data else {
-                    EdgeLogger.shared.log(loggerMessage: "에러가 없는데 central directory data 크기가 0.", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> 에러가 없는데 central directory data 크기가 0.")
                     return finish(nil, StreamZip.Error.centralDirectoryIsFailed)
                 }
                 
                 guard let entries = StreamZipEntry.makeEntries(from: data, encoding: encoding) else {
-                    EdgeLogger.shared.log(loggerMessage: "Stream Zip Entries 생성에 실패.", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(strongSelf.fileURL?.filePath ?? "unknown") >> Stream Zip Entries 생성에 실패.")
                     return finish(nil, StreamZip.Error.centralDirectoryIsFailed)
                 }
                 
@@ -575,11 +545,11 @@ open class StreamZipArchiver {
     /**
      Entry 데이터 처리 및 완료 처리
      - Parameters:
-        - entry: 데이터를 가져온 `StreamZipEntry`
-        - encoding:`String.Encoding`
-        - data: 가져온 Entry 데이터. 옵셔널
-        - error: 에러값. 옵셔널
-        - completion: 완료 핸들러
+     - entry: 데이터를 가져온 `StreamZipEntry`
+     - encoding:`String.Encoding`
+     - data: 가져온 Entry 데이터. 옵셔널
+     - error: 에러값. 옵셔널
+     - completion: 완료 핸들러
      */
     private func processEntryData(at entry: StreamZipEntry,
                                   encoding: String.Encoding? = nil,
@@ -587,24 +557,24 @@ open class StreamZipArchiver {
                                   error: Error?,
                                   completion: @escaping StreamZipFileCompletion) {
         if let error = error {
-            EdgeLogger.shared.log(loggerMessage: "데이터 전송중 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .error, "데이터 전송중 에러 발생 = \(error.localizedDescription).")
             return completion(entry, error)
         }
         guard let data = data else {
-            EdgeLogger.shared.log(loggerMessage: "에러가 없는데 데이터 크기가 0.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "에러가 없는데 데이터 크기가 0. 중지.")
             return completion(entry, StreamZip.Error.contentsIsEmpty)
         }
-
+        
         // Local Zip File Header 구조체 생성
         guard let zipFileHeader = ZipFileHeader.make(from: data, encoding: encoding) else {
-            EdgeLogger.shared.log(loggerMessage: "local file hedaer를 찾지 못함.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .error, "local file hedaer를 찾지 못함. 중지.")
             return completion(entry, StreamZip.Error.localFileHeaderIsFailed)
         }
         
         let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
-
+        
         switch entry.method {
-        // Defalte 방식인 경우
+            // Defalte 방식인 경우
         case Z_DEFLATED:
             do {
                 // 성공 처리
@@ -615,11 +585,11 @@ open class StreamZipArchiver {
                 return completion(entry, nil)
             }
             catch {
-                EdgeLogger.shared.log(loggerMessage: "해제 도중 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "해제 도중 에러 발생 = \(error.localizedDescription).")
                 return completion(entry, error)
             }
             
-        // 비압축시
+            // 비압축시
         case 0:
             // upperBound가 현재 데이터 길이를 초과하지 않도록 조절한다
             // 이상하지만, uncompressedSize를 더한 값이 데이터 길이를 초과하는 경우가 있다
@@ -627,10 +597,10 @@ open class StreamZipArchiver {
             let upperBound = offset + entry.sizeUncompressed > data.count ? data.count : offset + entry.sizeUncompressed
             entry.data = data[offset ..< upperBound]
             return completion(entry, nil)
-
-        // 그 외의 경우
+            
+            // 그 외의 경우
         default:
-            EdgeLogger.shared.log(loggerMessage: "미지원 압축 해제 방식. 데이터 해제 불가.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .error, "미지원 압축 해제 방식. 데이터 해제 불가.")
             return completion(entry, StreamZip.Error.unsupportedCompressMethod)
         }
     }
@@ -640,10 +610,10 @@ open class StreamZipArchiver {
      아카이브 중 최초 이미지를 반환
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
      - Parameters:
-        - path: 네트웍 파일인 경우, 파일 경로 지정
-        - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-        - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
-        - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
+     - path: 네트웍 파일인 경우, 파일 경로 지정
+     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+     - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+     - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func firstImage(at path: String? = nil,
@@ -652,26 +622,25 @@ open class StreamZipArchiver {
                            completion: @escaping StreamZipImageRequestCompletion) -> Progress? {
         // Progress 선언
         var progress: Progress?
-        let debugPath = path ?? "Unknown Path"
-        EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> 첫 번째 이미지를 가져오기 위한 시도...", category: .archive, type: .debug, function: #function)
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "첫 번째 이미지를 가져오기 위한 시도.")
         progress = self.fetchArchive(at: path, fileLength: fileLength, encoding: encoding) { [weak self] (fileLength, entries, error) in
             guard let strongSelf = self else {
-                EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> Self가 NIL", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "self가 nil. 중지")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             // 에러 발생시
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> 에러 발생 = \(error.localizedDescription)", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "에러 발생 = \(error.localizedDescription)")
                 return completion(nil, nil, error)
             }
             guard var entries = entries else {
-                EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> entry가 0개", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "entry가 0개")
                 return completion(nil, nil, StreamZip.Error.contentsIsEmpty)
             }
             
             // entry를 이름순으로 정렬
             entries.sort { $0.filePath < $1.filePath }
-                
+            
             var targetEntry: StreamZipEntry?
             for entry in entries {
                 guard let utiString = entry.filePath.utiString else { continue }
@@ -680,30 +649,30 @@ open class StreamZipArchiver {
                 targetEntry = entry
                 break
             }
-                        
+            
             guard let entry = targetEntry else {
-                EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> 이미지 파일이 없음.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "이미지 파일이 없음")
                 return completion(nil, nil, StreamZip.Error.contentsIsEmpty)
             }
             
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> 작업 중지 처리.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "작업 취소 처리.")
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
-
+            
             let subProgress = strongSelf.fetchFile(at: path, fileLength: fileLength, entry: entry, encoding: encoding) { (resultEntry, error) in
                 // 에러 발생시
                 if let error = error {
-                    EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> \(resultEntry.filePath) :: 전송중 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "전송 중 에러 발생 = \(error.localizedDescription)")
                     return completion(nil, nil, error)
                 }
                 guard let data = resultEntry.data,
                       let image = NSImage.init(data: data) else {
-                    EdgeLogger.shared.log(loggerMessage: "\(debugPath) >> data가 nil, 또는 image가 아님.", category: .archive, type: .debug, function: #function)
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "data가 nil, 또는 image가 아님.")
                     return completion(nil, nil, StreamZip.Error.contentsIsEmpty)
                 }
-
+                
                 return completion(image, resultEntry.filePath, nil)
             }
             if subProgress != nil {
@@ -715,17 +684,17 @@ open class StreamZipArchiver {
         
         return progress
     }
-
+    
     /**
      압축 파일 썸네일 이미지 반환
      - 그룹 환경설정에서 배너 표시가 지정된 경우 배너까지 추가
      - 지정된 크기로 썸네일 생성, CGImage 타입으로 완료 핸들러로 반환한다
      
      - Parameters:
-        - path: 파일 경로 지정
-        - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-        - size: 최대 크기 지정
-        - completion: `StreamZipThumbnailRequestCompletion` 타입. CGImage, filePath, error 를 반환한다.
+     - path: 파일 경로 지정
+     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+     - size: 최대 크기 지정
+     - completion: `StreamZipThumbnailRequestCompletion` 타입. CGImage, filePath, error 를 반환한다.
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func thumbnail(at path: String,
@@ -735,20 +704,20 @@ open class StreamZipArchiver {
         // Progress 선언
         var progress: Progress?
         
-        EdgeLogger.shared.log(loggerMessage: "\(path) >> 썸네일 이미지를 가져온다.", category: .archive, type: .debug, function: #function)
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 썸네일 이미지 획득 시도.")
         progress = self.firstImage(at: path, fileLength: fileLength, encoding: nil) { [weak self] (image, filePath, error) in
             guard let strongSelf = self else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> Self가 nil.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> SELF가 NIL.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             // 에러 발생시
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, nil, error)
             }
             
-            EdgeLogger.shared.log(loggerMessage: "\(path) >> 드로잉 개시.", category: .archive, type: .debug, function: #function)
-
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 드로잉 개시.")
+            
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
             
@@ -761,12 +730,12 @@ open class StreamZipArchiver {
                                                                  minCroppingRatio: preference.minCroppingRatio,
                                                                  maxCroppingRatio: preference.maxCroppingRatio,
                                                                  maximumSize: size) else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> cgimage로 변환하는데 실패한 것으로 추정됨.", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> cgimage로 변환하는데 실패한 것으로 추정.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             
             guard let cgcontext = strongSelf.offscreenCGContext(with: targetFrameRects.canvasFrame.size, buffer: nil) else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> cgcontext 생성에 실패.", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> cgcontext 생성에 실패.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             
@@ -779,7 +748,7 @@ open class StreamZipArchiver {
             
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 작업 중지.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 취소 처리 (1).")
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
             
@@ -801,19 +770,19 @@ open class StreamZipArchiver {
             // 외곽선 드로잉
             cgcontext.setStrokeColor(NSColor.lightGray.cgColor)
             cgcontext.stroke(canvasFrame, width: 0.5)
-
+            
             // cgImage를 생성
             guard let thumbnailCGImage = cgcontext.makeImage() else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> cgImage 생성에 실패.", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> cgImage 생성에 실패.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
-       
+            
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 작업 중지.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 취소 처리 (2).")
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
-
+            
             // progress 종료 처리
             progress?.completedUnitCount += 1
             
@@ -827,23 +796,23 @@ open class StreamZipArchiver {
     /**
      오프스크린 컨텍스트를 생성, 반환
      - Parameters:
-        - size: CGSize
-        - buffer: 이미지 버퍼. `UnsafeMutableRawPointer`. 보통 nil로 지정
-    - Returns: CGContext. 생성 실패시 nil 반환
+     - size: CGSize
+     - buffer: 이미지 버퍼. `UnsafeMutableRawPointer`. 보통 nil로 지정
+     - Returns: CGContext. 생성 실패시 nil 반환
      */
     private func offscreenCGContext(with size: CGSize, buffer: UnsafeMutableRawPointer?) -> CGContext? {
         return autoreleasepool { () -> CGContext? in
             
             let width: Int  = Int(size.width)
             let height: Int = Int(size.height)
-
+            
             var colorSpace: CGColorSpace?
             var bitmapInfo: UInt32?
-
+            
             // 컬러 컨텍스트를 반환한다
             colorSpace = CGColorSpaceCreateDeviceRGB()
             bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
-
+            
             // rgba(4)를 곱해서 bytesPerRaw를 구한다
             let bytesPerRow = width * 4
             let context = CGContext.init(data: buffer,
@@ -857,7 +826,7 @@ open class StreamZipArchiver {
             return context
         }
     }
-
+    
     
     // MARK: Download Data
     
@@ -865,8 +834,8 @@ open class StreamZipArchiver {
      특정 경로의 FileLength를 구하는 메쏘드
      - 완료 핸들러로 FileLength를 반환
      - Parameters:
-        - path: 파일 경로
-        - completion: `StreamZipFileLengthCompletion` 완료 핸들러
+     - path: 파일 경로
+     - completion: `StreamZipFileLengthCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getFileLength(at path: String, completion: @escaping StreamZipFileLengthCompletion) -> Progress? {
@@ -876,29 +845,29 @@ open class StreamZipArchiver {
             // 이미 컨텐츠 목록이 있는 경우
             let filtered = contentsOfDirectory.filter { $0.path.trimmedSlash() == path.trimmedSlash() }
             guard let foundItem = filtered.first else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> Contents 미발견.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> contents 미발견.")
                 return completion(0, StreamZip.Error.contentsIsEmpty)
             }
             // 찾아낸 아이템의 크기 반환
             return completion(foundItem.fileSize, nil)
         }
         //----------------------------------------------------------------------------------------------//
-
+        
         // path의 parent 경로를 구한다
         let parentPath = (path as NSString).deletingLastPathComponent
-
+        
         // 컨텐츠 목록 생성 실행
-        EdgeLogger.shared.log(loggerMessage: "\(path) >> 디렉토리 목록을 가져온다.", category: .archive, type: .debug, function: #function)
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 디렉토리 목록을 가져온다.")
         // progress 지정
         var progress: Progress?
         progress = self.getContentsOfDirectory(at: parentPath) { (contentsOfDirectory, error) in
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(0, error)
             }
             
             guard let contentsOfDirectory = contentsOfDirectory else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 디렉토리 목록 작성 실패.", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 디렉토리 목록 작성 실패.")
                 return completion(0, StreamZip.Error.contentsIsEmpty)
             }
             
@@ -910,58 +879,57 @@ open class StreamZipArchiver {
     /**
      contents of directory 배열 생성후 완료 핸들러로 반환
      - Parameters:
-        - mainPath: contents 목록을 만들려고 하는 경로
-        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+     - mainPath: contents 목록을 만들려고 하는 경로
+     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectory(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         switch self.connection {
-        // FTP인 경우
+            // FTP인 경우
         case .ftp, .ftps: return self.getContentsOfDirectoryInFTP(at: mainPath, completion: completion)
-        // SFTP인 경우
+            // SFTP인 경우
         case .sftp: return self.getContentsOfDirectoryInSFTP(at: mainPath, completion: completion)
-        // webDav인 경우
+            // webDav인 경우
         case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
-        // 그 외: 미지원으로 실패 처리
+            // 그 외: 미지원으로 실패 처리
         default:
             completion(nil, StreamZip.Error.unsupportedConnection)
             return nil
         }
     }
-
+    
     // MARK: Get Contents of Directory
     /**
      FTP에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-        - mainPath: contents 목록을 만들려고 하는 경로
-        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+     - mainPath: contents 목록을 만들려고 하는 경로
+     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectoryInFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
- 
+        
         guard let ftpProvider = self.ftpProvider else {
-            EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> ftpProvider가 nil.", category: .archive, type: .error, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> ftpProvider가 nil.")
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
- 
+        
         // progress 지정
         var progress: Progress?
         progress = ftpProvider.contentsOfDirectory(at: mainPath) { ftpItems, error in
-        //progress = ftpProvider.contentsOfDirectoryWithProgress(path: mainPath) { (ftpItems, error) in
-            EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 디렉토리 목록 작성 완료.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 디렉토리 목록 작성 완료.")
             // 에러 발생시 중지
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(mainPath) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, error)
             }
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 사용자 취소 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 작업 취소 처리.")
                 return completion(nil, StreamZip.Error.aborted)
             }
             guard let ftpItems = ftpItems,
                   ftpItems.count > 0 else {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 아이템 개수가 0개.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 아이템 개수가 0개.")
                 return completion(nil, nil)
             }
             
@@ -975,7 +943,7 @@ open class StreamZipArchiver {
                                                isDirectory: ftpItem.isDirectory,
                                                fileSize: UInt64(size))
             }
-
+            
             // progress 처리 개수 1 증가
             progress?.completedUnitCount += 1
             
@@ -987,38 +955,37 @@ open class StreamZipArchiver {
     /**
      SFTP에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-        - mainPath: contents 목록을 만들려고 하는 경로
-        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+     - mainPath: contents 목록을 만들려고 하는 경로
+     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectoryInSFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
- 
+        
         guard let sftpProvider = self.sftpProvider else {
-            EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> sftpProvider가 nil.", category: .archive, type: .error, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> sftpProvider가 nil.")
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
- 
+        
         // 컨텐츠 목록 생성 실행
-        EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 디렉토리 목록을 가져온다.", category: .archive, type: .debug, function: #function)
         // progress 지정
         var progress: Progress?
         progress = sftpProvider.contentsOfDirectory(at: mainPath) { sftpItems, error in
-            EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 디렉토리 목록 작성 완료.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 디렉토리 목록 작성 완료.")
             // 에러 발생시 중지
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(mainPath) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, error)
             }
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 사용자 취소 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 작업 취소 처리.")
                 return completion(nil, StreamZip.Error.aborted)
             }
             guard let sftpItems = sftpItems else {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 아이템 없음.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 아이템 없음.")
                 return completion(nil, StreamZip.Error.contentsIsEmpty)
             }
-
+            
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
             
@@ -1029,7 +996,7 @@ open class StreamZipArchiver {
                                                isDirectory: sftpItem.isDirectory,
                                                fileSize: UInt64(sftpItem.fileSize ?? 0))
             }
-
+            
             // progress 처리 개수 1 증가
             progress?.completedUnitCount += 1
             
@@ -1041,31 +1008,31 @@ open class StreamZipArchiver {
     /**
      WebDav에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-        - mainPath: contents 목록을 만들려고 하는 경로
-        - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+     - mainPath: contents 목록을 만들려고 하는 경로
+     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectoryInWebDav(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         guard let webDavProvider = self.webDavProvider else {
-            EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> webDavProvider가 nil.", category: .archive, type: .error, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> webDavProvider가 nil.")
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
- 
+        
         // progress 지정
         var progress: Progress?
         progress = webDavProvider.contentsOfDirectoryWithProgress(path: mainPath) { (ftpItems, error) in
-            EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 디렉토리 목록 작성 완료.", category: .archive, type: .debug, function: #function)
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 디렉토리 목록 작성 완료.")
             // 에러 발생시 중지
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(mainPath) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, error)
             }
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(mainPath) >> 사용자 취소 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(mainPath) >> 작업 취소 처리.")
                 return completion(nil, StreamZip.Error.aborted)
             }
-
+            
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
             
@@ -1077,7 +1044,7 @@ open class StreamZipArchiver {
                                                isDirectory: ftpItem.isDirectory,
                                                fileSize: UInt64(size))
             }
-
+            
             // progress 처리 개수 1 증가
             progress?.completedUnitCount += 1
             
@@ -1092,10 +1059,10 @@ open class StreamZipArchiver {
      특정 범위 데이터를 가져오는 메쏘드
      - 네트웍에서 사용
      - Parameters:
-        - path: 파일 경로. 네트웍 파일일 경우 지정
-        - url: 파일 경로. 로컬 파일일 경우 지정
-        - range: 데이터를 가져올 범위
-        - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - path: 파일 경로. 네트웍 파일일 경우 지정
+     - url: 파일 경로. 로컬 파일일 경우 지정
+     - range: 데이터를 가져올 범위
+     - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func request(path: String? = nil,
@@ -1111,7 +1078,7 @@ open class StreamZipArchiver {
                 return nil
             }
             return self.requestFromFTP(at: path, range: range, completion: completion)
-        
+            
             // SFTP인 경우
         case .sftp:
             guard let path = path else {
@@ -1119,7 +1086,7 @@ open class StreamZipArchiver {
                 return nil
             }
             return self.requestFromSFTP(at: path, range: range, completion: completion)
-        
+            
             // WebDav인 경우
         case .webdav, .webdav_https:
             guard let path = path else {
@@ -1128,7 +1095,7 @@ open class StreamZipArchiver {
             }
             return self.requestFromWebDav(at: path, range: range, completion: completion)
             
-           // local인 경우
+            // local인 경우
         case .local:
             guard let url = self.fileURL else {
                 completion(nil, StreamZip.Error.unsupportedConnection)
@@ -1136,7 +1103,7 @@ open class StreamZipArchiver {
             }
             return self.requestFromLocal(at: url, range: range, completion: completion)
             
-        // 그 외의 경우
+            // 그 외의 경우
         default:
             // 미지원 연결 방식 에러 반환
             completion(nil, StreamZip.Error.unsupportedConnection)
@@ -1146,9 +1113,9 @@ open class StreamZipArchiver {
     /**
      FTP로 특정 범위 데이터를 가져오는 메쏘드
      - Parameters:
-        - path: 데이터를 가져올 경로
-        - range: 데이터를 가져올 범위
-        - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - path: 데이터를 가져올 경로
+     - range: 데이터를 가져올 범위
+     - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
@@ -1156,31 +1123,31 @@ open class StreamZipArchiver {
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
-
+        
         var progress: Progress?
         progress = ftpProvider.contents(at: path,
                                         offset: UInt64(range.lowerBound),
                                         length: UInt64(range.count)) { complete, data, error in
             guard complete == true else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 작업이 아직 완료되지 않음...", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 진행 중...")
                 return
             }
             // 에러 여부를 먼저 확인
             // 이유: progress?.isCancelled 를 먼저 확인하는 경우, error 가 발생했는데도 사용자 취소로 처리해 버리는 경우가 있기 때문이다
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, error)
             }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 사용자 취소 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 취소 처리.")
                 return completion(nil, StreamZip.Error.aborted)
             }
             guard let data = data else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 데이터가 없음.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 데이터가 없음.")
                 return completion(nil, StreamZip.Error.contentsIsEmpty)
             }
-
+            
             return completion(data, nil)
         }
         return progress
@@ -1188,9 +1155,9 @@ open class StreamZipArchiver {
     /**
      SFTP로 현재 특정 범위 데이터를 가져오는 메쏘드
      - Parameters:
-        - path: 데이터를 가져올 경로
-        - range: 데이터를 가져올 범위
-        - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - path: 데이터를 가져올 경로
+     - range: 데이터를 가져올 범위
+     - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromSFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
@@ -1198,9 +1165,9 @@ open class StreamZipArchiver {
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
-
+        
         var progress: Progress?
-        EdgeLogger.shared.log(loggerMessage: "\(path) >> offset = \(range.lowerBound), length = \(range.count).", category: .archive, type: .debug, function: #function)
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> offset = \(range.lowerBound) || length = \(range.count).")
         progress = sftpProvider.contents(at: path,
                                          offset: UInt64(range.lowerBound),
                                          length: UInt64(range.count)) { complete, success, data in
@@ -1211,19 +1178,19 @@ open class StreamZipArchiver {
             
             // 성공 여부를 먼저 확인
             guard success == true else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 작업 실패.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 실패.")
                 return completion(nil, StreamZip.Error.unknown)
             }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 사용자 취소 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 취소 처리.")
                 return completion(nil, StreamZip.Error.aborted)
             }
             guard let data = data else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 데이터가 없음.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 데이터가 없음.")
                 return completion(nil, StreamZip.Error.contentsIsEmpty)
             }
-
+            
             return completion(data, nil)
         }
         return progress
@@ -1231,9 +1198,9 @@ open class StreamZipArchiver {
     /**
      WebDav로 특정 범위 데이터를 가져오는 메쏘드
      - Parameters:
-        - path: 데이터를 가져올 경로
-        - range: 데이터를 가져올 범위
-        - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - path: 데이터를 가져올 경로
+     - range: 데이터를 가져올 범위
+     - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromWebDav(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
@@ -1241,7 +1208,7 @@ open class StreamZipArchiver {
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
-
+        
         var progress: Progress?
         progress = webDavProvider.contents(path: path,
                                            offset: Int64(range.lowerBound),
@@ -1249,23 +1216,23 @@ open class StreamZipArchiver {
             // 에러 여부를 먼저 확인
             // 이유: progress?.isCancelled 를 먼저 확인하는 경우, error 가 발생했는데도 사용자 취소로 처리해 버리는 경우가 있기 때문이다
             if let error = error {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 에러 발생 = \(error.localizedDescription).", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, error)
             }
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 사용자 중지 발생.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 작업 취소 처리.")
                 return completion(nil, StreamZip.Error.aborted)
             }
             guard let data = data else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 데이터가 없음.", category: .archive, type: .debug, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(path) >> 데이터가 없음.")
                 return completion(nil, StreamZip.Error.contentsIsEmpty)
             }
             guard data.count == range.count else {
-                EdgeLogger.shared.log(loggerMessage: "\(path) >> 실제 데이터 크기가 지정된 크기와 다름. 문제 발생.", category: .archive, type: .error, function: #function)
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(path) >> 데이터 길이가 동일하지 않음, 문제 발생.")
                 return completion(nil, StreamZip.Error.unknown)
             }
-
+            
             return completion(data, nil)
         }
         return progress
@@ -1275,9 +1242,9 @@ open class StreamZipArchiver {
      로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
      - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
      - Parameters:
-        - url: 데이터를 가져올 경로
-        - range: 데이터를 가져올 범위
-        - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - url: 데이터를 가져올 경로
+     - range: 데이터를 가져올 범위
+     - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromLocal(at url: URL,
@@ -1293,7 +1260,7 @@ open class StreamZipArchiver {
             
             do {
                 let fileHandle = try FileHandle.init(forReadingFrom: url)
-
+                
                 // scope 종료시
                 defer {
                     // 15.4 이상인 경우
@@ -1336,4 +1303,3 @@ open class StreamZipArchiver {
         return progress
     }
 }
-
