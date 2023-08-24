@@ -1303,4 +1303,3 @@ open class StreamZipArchiver {
         return progress
     }
 }
-

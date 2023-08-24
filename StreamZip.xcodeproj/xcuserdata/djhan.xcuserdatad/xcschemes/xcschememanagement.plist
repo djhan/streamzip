@@ -7,7 +7,11 @@
 		<key>StreamZip.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
+<<<<<<< HEAD
 			<integer>44</integer>
+=======
+			<integer>42</integer>
+>>>>>>> 11cc588674141e255e70ac8734da206e371ae0b9
 		</dict>
 	</dict>
 </dict>
