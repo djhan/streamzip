@@ -122,8 +122,7 @@ open class StreamZipArchiver {
     
     /**
      FTP 아이템 초기화
-     - Parameters:
-     - ftpProvider: FTPProvider
+     - Parameter ftpProvider: FTPProvider
      */
     public init?(ftpProvider: FTPProvider) {
         self.ftpProvider = ftpProvider
@@ -132,8 +131,7 @@ open class StreamZipArchiver {
     }
     /**
      SFTP 아이템 초기화
-     - Parameters:
-     - sftpProvider: SftpFileProvider
+     - Parameter sftpProvider: SftpFileProvider
      */
     public init?(sftpProvider: SftpFileProvider) {
         self.sftpProvider = sftpProvider
@@ -142,8 +140,7 @@ open class StreamZipArchiver {
     }
     /**
      WebDav 아이템 초기화
-     - Parameters:
-     - webDavProvider: WebDAVFileProvider?
+     - Parameter webDavProvider: WebDAVFileProvider?
      */
     public init?(webDavProvider: WebDAVFileProvider) {
         // 연결 방식 확인
@@ -157,8 +154,7 @@ open class StreamZipArchiver {
     }
     /**
      로컬 아이템 초기화
-     - Parameters:
-     - fileURL: URL
+     - Parameter fileURL: URL
      */
     public init?(fileURL: URL) {
         self.fileURL = fileURL
@@ -172,9 +168,9 @@ open class StreamZipArchiver {
      특정 경로의 zip 파일에 접근, Entries 배열 생성
      - Parameters:
      - path: 파일 경로 지정
-     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-     - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
-     - completion: `StreamZipArchiveCompletion` 완료 핸들러
+         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+         - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
+         - completion: `StreamZipArchiveCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func fetchArchive(at path: String? = nil,
@@ -249,10 +245,10 @@ open class StreamZipArchiver {
     /**
      Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
      - Parameters:
-     - path: 파일 경로 지정
-     - fileLength: `UInt64`. 파일 길이 지정
-     - encoding: `String.Encoding`. 미지정시 자동 인코딩
-     - completion: `StreamZipArchiveCompletion`
+         - path: 파일 경로 지정
+         - fileLength: `UInt64`. 파일 길이 지정
+         - encoding: `String.Encoding`. 미지정시 자동 인코딩
+         - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func makeEntries(at path: String,
@@ -350,11 +346,11 @@ open class StreamZipArchiver {
      특정 Entry의 파일 다운로드 및 압축 해제
      - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
      - Parameters:
-     - path: 네트웍 파일인 경우, 파일 경로 지정. 로컬 파일인 경우 미입력
-     - fileLength: `UInt64`. 파일 길이 지정. 로컬 파일인 경우 미지정 가능
-     - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
-     - encoding: `String.Encoding`. 미지정시 자동 인코딩
-     - completion: `StreamZipFileCompletion`
+         - path: 네트웍 파일인 경우, 파일 경로 지정. 로컬 파일인 경우 미입력
+         - fileLength: `UInt64`. 파일 길이 지정. 로컬 파일인 경우 미지정
+         - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
+         - encoding: `String.Encoding`. 미지정시 자동 인코딩
+         - completion: `StreamZipFileCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func fetchFile(at path: String? = nil,
@@ -444,8 +440,8 @@ open class StreamZipArchiver {
     /**
      Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
      - Parameters:
-     - encoding: `String.Encoding`. 미지정시 자동 인코딩
-     - completion: `StreamZipArchiveCompletion`
+         - encoding: `String.Encoding`. 미지정시 자동 인코딩
+         - completion: `StreamZipArchiveCompletion`
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func makeEntriesFromLocal(at url: URL,
@@ -545,10 +541,10 @@ open class StreamZipArchiver {
     /**
      Entry 데이터 처리 및 완료 처리
      - Parameters:
-     - entry: 데이터를 가져온 `StreamZipEntry`
-     - encoding:`String.Encoding`
-     - data: 가져온 Entry 데이터. 옵셔널
-     - error: 에러값. 옵셔널
+         - entry: 데이터를 가져온 `StreamZipEntry`
+         - encoding:`String.Encoding`
+         - data: 가져온 Entry 데이터. 옵셔널
+         - error: 에러값. 옵셔널
      - completion: 완료 핸들러
      */
     private func processEntryData(at entry: StreamZipEntry,
@@ -610,10 +606,10 @@ open class StreamZipArchiver {
      아카이브 중 최초 이미지를 반환
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
      - Parameters:
-     - path: 네트웍 파일인 경우, 파일 경로 지정
-     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-     - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
-     - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
+         - path: 네트웍 파일인 경우, 파일 경로 지정
+         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+         - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+         - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     public func firstImage(at path: String? = nil,
@@ -691,32 +687,34 @@ open class StreamZipArchiver {
      - 지정된 크기로 썸네일 생성, CGImage 타입으로 완료 핸들러로 반환한다
      
      - Parameters:
-     - path: 파일 경로 지정
-     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-     - size: 최대 크기 지정
-     - completion: `StreamZipThumbnailRequestCompletion` 타입. CGImage, filePath, error 를 반환한다.
+         - path: 파일 경로 지정, Local 파일인 경우 NIL 지정
+         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+         - size: 최대 크기 지정
+         - completion: `StreamZipThumbnailRequestCompletion` 타입. CGImage, filePath, error 를 반환한다.
      - Returns: Progress 반환. 실패시 nil 반환
      */
-    public func thumbnail(at path: String,
+    public func thumbnail(at path: String? = nil,
                           fileLength: UInt64? = nil,
                           size: NSSize,
                           completion: @escaping StreamZipThumbnailRequestCompletion) -> Progress? {
         // Progress 선언
         var progress: Progress?
         
-        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> 썸네일 이미지 획득 시도.")
+        let title = path != nil ? path!.lastPathComponent : self.fileURL?.lastPathComponent ?? "Unknown".localized()
+        
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(title) >> 썸네일 이미지 획득 시도.")
         progress = self.firstImage(at: path, fileLength: fileLength, encoding: nil) { [weak self] (image, filePath, error) in
             guard let strongSelf = self else {
-                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> SELF가 NIL.")
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(title) >> SELF가 NIL.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             // 에러 발생시
             if let error = error {
-                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> 에러 발생 = \(error.localizedDescription).")
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(title) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, nil, error)
             }
             
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> 드로잉 개시.")
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(title) >> 드로잉 개시.")
             
             // progress 작업 개수 1 증가
             progress?.totalUnitCount += 1
@@ -730,12 +728,12 @@ open class StreamZipArchiver {
                                                                  minCroppingRatio: preference.minCroppingRatio,
                                                                  maxCroppingRatio: preference.maxCroppingRatio,
                                                                  maximumSize: size) else {
-                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> cgimage로 변환하는데 실패한 것으로 추정.")
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(title) >> cgimage로 변환하는데 실패한 것으로 추정.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             
             guard let cgcontext = strongSelf.offscreenCGContext(with: targetFrameRects.canvasFrame.size, buffer: nil) else {
-                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> cgcontext 생성에 실패.")
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(title) >> cgcontext 생성에 실패.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             
@@ -748,7 +746,7 @@ open class StreamZipArchiver {
             
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> 작업 취소 처리 (1).")
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(title) >> 작업 취소 처리 (1).")
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
             
@@ -756,7 +754,8 @@ open class StreamZipArchiver {
             cgcontext.draw(cgImage, in: targetFrame)
             // 배너 필요시 드로잉
             if preference.showExtensionBanner == true {
-                let banner = (path as NSString).pathExtension
+                //let banner = (path as NSString).pathExtension
+                let banner = title.pathExtension()
                 if banner.length > 0 {
                     drawBanner(banner,
                                bannerHeightRatio: preference.bannerHeightRatio,
@@ -773,13 +772,13 @@ open class StreamZipArchiver {
             
             // cgImage를 생성
             guard let thumbnailCGImage = cgcontext.makeImage() else {
-                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> cgImage 생성에 실패.")
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(title) >> cgImage 생성에 실패.")
                 return completion(nil, nil, StreamZip.Error.unknown)
             }
             
             // 작업 중지시 중지 처리
             if progress?.isCancelled == true {
-                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> 작업 취소 처리 (2).")
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(title) >> 작업 취소 처리 (2).")
                 return completion(nil, nil, StreamZip.Error.aborted)
             }
             
@@ -794,10 +793,44 @@ open class StreamZipArchiver {
     }
     
     /**
+     압축 파일 썸네일 이미지 반환 Async 메쏘드
+     
+     - Parameters:
+         - path: 파일 경로 지정, Local 파일인 경우 NIL 지정
+         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+         - size: 최대 크기 지정
+     - Returns: Result 형태로 반환
+     */
+    public func thumbnail(at path: String? = nil,
+                          fileLength: UInt64? = nil,
+                          size: NSSize) async -> Result<CGImage, Error> {
+        return await withCheckedContinuation { [weak self] (continuation) in
+            guard let strongSelf = self else {
+                continuation.resume(returning: .failure(StreamZip.Error.unknown))
+                return
+            }
+            _ = strongSelf.thumbnail(at: path,
+                                 fileLength: fileLength,
+                                 size: size) { thumbnail, filepath, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+                guard let thumbnail = thumbnail else {
+                    continuation.resume(returning: .failure(StreamZip.Error.unknown))
+                    return
+                }
+                // 최종 성공시
+                continuation.resume(returning: .success(thumbnail))
+            }
+        }
+    }
+
+    /**
      오프스크린 컨텍스트를 생성, 반환
      - Parameters:
-     - size: CGSize
-     - buffer: 이미지 버퍼. `UnsafeMutableRawPointer`. 보통 nil로 지정
+         - size: CGSize
+         - buffer: 이미지 버퍼. `UnsafeMutableRawPointer`. 보통 nil로 지정
      - Returns: CGContext. 생성 실패시 nil 반환
      */
     private func offscreenCGContext(with size: CGSize, buffer: UnsafeMutableRawPointer?) -> CGContext? {
@@ -834,8 +867,8 @@ open class StreamZipArchiver {
      특정 경로의 FileLength를 구하는 메쏘드
      - 완료 핸들러로 FileLength를 반환
      - Parameters:
-     - path: 파일 경로
-     - completion: `StreamZipFileLengthCompletion` 완료 핸들러
+         - path: 파일 경로
+         - completion: `StreamZipFileLengthCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getFileLength(at path: String, completion: @escaping StreamZipFileLengthCompletion) -> Progress? {
@@ -879,8 +912,8 @@ open class StreamZipArchiver {
     /**
      contents of directory 배열 생성후 완료 핸들러로 반환
      - Parameters:
-     - mainPath: contents 목록을 만들려고 하는 경로
-     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+         - mainPath: contents 목록을 만들려고 하는 경로
+         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectory(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
@@ -902,8 +935,8 @@ open class StreamZipArchiver {
     /**
      FTP에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-     - mainPath: contents 목록을 만들려고 하는 경로
-     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+         - mainPath: contents 목록을 만들려고 하는 경로
+         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectoryInFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
@@ -955,8 +988,8 @@ open class StreamZipArchiver {
     /**
      SFTP에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-     - mainPath: contents 목록을 만들려고 하는 경로
-     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+         - mainPath: contents 목록을 만들려고 하는 경로
+         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectoryInSFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
@@ -1008,8 +1041,8 @@ open class StreamZipArchiver {
     /**
      WebDav에서 mainPath 대입 후, contents of directory 배열 생성
      - Parameters:
-     - mainPath: contents 목록을 만들려고 하는 경로
-     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+         - mainPath: contents 목록을 만들려고 하는 경로
+         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func getContentsOfDirectoryInWebDav(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
@@ -1059,10 +1092,10 @@ open class StreamZipArchiver {
      특정 범위 데이터를 가져오는 메쏘드
      - 네트웍에서 사용
      - Parameters:
-     - path: 파일 경로. 네트웍 파일일 경우 지정
-     - url: 파일 경로. 로컬 파일일 경우 지정
-     - range: 데이터를 가져올 범위
-     - completion: `StreamZipRequestCompletion` 완료 핸들러
+         - path: 파일 경로. 네트웍 파일일 경우 지정
+         - url: 파일 경로. 로컬 파일일 경우 지정
+         - range: 데이터를 가져올 범위
+         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func request(path: String? = nil,
@@ -1113,9 +1146,9 @@ open class StreamZipArchiver {
     /**
      FTP로 특정 범위 데이터를 가져오는 메쏘드
      - Parameters:
-     - path: 데이터를 가져올 경로
-     - range: 데이터를 가져올 범위
-     - completion: `StreamZipRequestCompletion` 완료 핸들러
+         - path: 데이터를 가져올 경로
+         - range: 데이터를 가져올 범위
+         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
@@ -1155,9 +1188,9 @@ open class StreamZipArchiver {
     /**
      SFTP로 현재 특정 범위 데이터를 가져오는 메쏘드
      - Parameters:
-     - path: 데이터를 가져올 경로
-     - range: 데이터를 가져올 범위
-     - completion: `StreamZipRequestCompletion` 완료 핸들러
+         - path: 데이터를 가져올 경로
+         - range: 데이터를 가져올 범위
+         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromSFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
@@ -1198,9 +1231,9 @@ open class StreamZipArchiver {
     /**
      WebDav로 특정 범위 데이터를 가져오는 메쏘드
      - Parameters:
-     - path: 데이터를 가져올 경로
-     - range: 데이터를 가져올 범위
-     - completion: `StreamZipRequestCompletion` 완료 핸들러
+         - path: 데이터를 가져올 경로
+         - range: 데이터를 가져올 범위
+         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromWebDav(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
@@ -1242,9 +1275,9 @@ open class StreamZipArchiver {
      로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
      - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
      - Parameters:
-     - url: 데이터를 가져올 경로
-     - range: 데이터를 가져올 범위
-     - completion: `StreamZipRequestCompletion` 완료 핸들러
+         - url: 데이터를 가져올 경로
+         - range: 데이터를 가져올 범위
+         - completion: `StreamZipRequestCompletion` 완료 핸들러
      - Returns: Progress 반환. 실패시 nil 반환
      */
     private func requestFromLocal(at url: URL,
