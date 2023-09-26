@@ -680,7 +680,40 @@ open class StreamZipArchiver {
         
         return progress
     }
-    
+    /**
+     압축 파일 썸네일 이미지 반환 Async 메쏘드
+     - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
+     - Parameters:
+         - path: 네트웍 파일인 경우, 파일 경로 지정
+         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+         - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+     - Returns: Result 형태로 반환
+     */
+    public func firstImage(at path: String? = nil,
+                           fileLength: UInt64? = nil,
+                           encoding: String.Encoding? = nil) async -> Result<CGImage, Error> {
+        return await withCheckedContinuation { [weak self] (continuation) in
+            guard let strongSelf = self else {
+                continuation.resume(returning: .failure(StreamZip.Error.unknown))
+                return
+            }
+            _ = strongSelf.firstImage(at: path,
+                                      fileLength: fileLength,
+                                      encoding: encoding) { image, filepath, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(error))
+                    return
+                }
+                guard let firstImage = image?.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                    continuation.resume(returning: .failure(StreamZip.Error.unknown))
+                    return
+                }
+                // 최종 성공시
+                continuation.resume(returning: .success(firstImage))
+            }
+        }
+    }
+
     /**
      압축 파일 썸네일 이미지 반환
      - 그룹 환경설정에서 배너 표시가 지정된 경우 배너까지 추가
