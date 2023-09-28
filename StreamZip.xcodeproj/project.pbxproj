@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EE283EE125D8C45D00D3C62B /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EB225D8B3AF00D3C62B /* FilesProvider.framework */; };
 		EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F1625D8E7CE00D3C62B /* CommonLibrary.framework */; };
 		EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; };
 		EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; };
@@ -26,34 +25,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		EE283EAF25D8B3AF00D3C62B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 799396671D48B7F600086753;
-			remoteInfo = "FilesProvider iOS";
-		};
-		EE283EB125D8B3AF00D3C62B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 799396751D48B80D00086753;
-			remoteInfo = "FilesProvider OSX";
-		};
-		EE283EB325D8B3AF00D3C62B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 799396821D48B82700086753;
-			remoteInfo = "FilesProvider tvOS";
-		};
-		EE283EB525D8B3AF00D3C62B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 79D903511FAB647400D61D31;
-			remoteInfo = FilesProviderTests;
-		};
 		EE283EEE25D8C47000D3C62B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */;
@@ -81,13 +52,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 79D903511FAB647400D61D31;
 			remoteInfo = FilesProviderTests;
-		};
-		EE283EF625D8C47800D3C62B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 799396741D48B80D00086753;
-			remoteInfo = "FilesProvider OSX";
 		};
 		EE283F1525D8E7CE00D3C62B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -170,7 +134,6 @@
 
 /* Begin PBXFileReference section */
 		EE283EA325D8B39700D3C62B /* FilesProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FilesProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FilesProvider.xcodeproj; path = ../FileProvider/FilesProvider.xcodeproj; sourceTree = "<group>"; };
 		EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FilesProvider.xcodeproj; path = ../FileProvider/FilesProvider.xcodeproj; sourceTree = "<group>"; };
 		EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommonLibrary.xcodeproj; path = ../CommonLibrary/CommonLibrary.xcodeproj; sourceTree = "<group>"; };
 		EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Detector.xcodeproj; path = ../Detector/Detector.xcodeproj; sourceTree = "<group>"; };
@@ -198,7 +161,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EE283EE125D8C45D00D3C62B /* FilesProvider.framework in Frameworks */,
 				EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */,
 				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
@@ -221,21 +183,9 @@
 			isa = PBXGroup;
 			children = (
 				EE3BCAA12823E2150064E218 /* SftpProvider.framework */,
-				EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */,
 				EE283EA325D8B39700D3C62B /* FilesProvider.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		EE283EA925D8B3AF00D3C62B /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				EE283EB025D8B3AF00D3C62B /* FilesProvider.framework */,
-				EE283EB225D8B3AF00D3C62B /* FilesProvider.framework */,
-				EE283EB425D8B3AF00D3C62B /* FilesProvider.framework */,
-				EE283EB625D8B3AF00D3C62B /* FilesProviderTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		EE283EE825D8C47000D3C62B /* Products */ = {
@@ -371,7 +321,6 @@
 				EE3BCAB52823E2240064E218 /* PBXTargetDependency */,
 				EE283F2A25D8E82A00D3C62B /* PBXTargetDependency */,
 				EE283F1825D8E7D400D3C62B /* PBXTargetDependency */,
-				EE283EF725D8C47800D3C62B /* PBXTargetDependency */,
 			);
 			name = StreamZip;
 			productName = StreamZip;
@@ -444,10 +393,6 @@
 					ProjectRef = EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */;
 				},
 				{
-					ProductGroup = EE283EA925D8B3AF00D3C62B /* Products */;
-					ProjectRef = EE283EA825D8B3AF00D3C62B /* FilesProvider.xcodeproj */;
-				},
-				{
 					ProductGroup = EE3BCAAC2823E21D0064E218 /* Products */;
 					ProjectRef = EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */;
 				},
@@ -461,34 +406,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		EE283EB025D8B3AF00D3C62B /* FilesProvider.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = FilesProvider.framework;
-			remoteRef = EE283EAF25D8B3AF00D3C62B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EE283EB225D8B3AF00D3C62B /* FilesProvider.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = FilesProvider.framework;
-			remoteRef = EE283EB125D8B3AF00D3C62B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EE283EB425D8B3AF00D3C62B /* FilesProvider.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = FilesProvider.framework;
-			remoteRef = EE283EB325D8B3AF00D3C62B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EE283EB625D8B3AF00D3C62B /* FilesProviderTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = FilesProviderTests.xctest;
-			remoteRef = EE283EB525D8B3AF00D3C62B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		EE283EEF25D8C47000D3C62B /* FilesProvider.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -605,11 +522,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		EE283EF725D8C47800D3C62B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "FilesProvider OSX";
-			targetProxy = EE283EF625D8C47800D3C62B /* PBXContainerItemProxy */;
-		};
 		EE283F1825D8E7D400D3C62B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = CommonLibrary;
