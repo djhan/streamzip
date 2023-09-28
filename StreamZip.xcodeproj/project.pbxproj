@@ -22,6 +22,7 @@
 		EE83CBC725D815890095A058 /* DataDecompressionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */; };
 		EE8443FF25D2A89B005EA4B6 /* DataTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */; };
 		EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */; };
+		EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EF125D8C47000D3C62B /* FilesProvider.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -130,6 +131,13 @@
 			remoteGlobalIDString = EE8FBAB529CE9FF80061779A;
 			remoteInfo = EdgeFtpProvider;
 		};
+		EED34A052AC590D200AC1F2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 799396741D48B80D00086753;
+			remoteInfo = "FilesProvider OSX";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +171,7 @@
 			files = (
 				EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */,
 				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
+				EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
 				EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */,
 			);
@@ -317,6 +326,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EED34A062AC590D200AC1F2F /* PBXTargetDependency */,
 				EEA5416029D16C2700C81239 /* PBXTargetDependency */,
 				EE3BCAB52823E2240064E218 /* PBXTargetDependency */,
 				EE283F2A25D8E82A00D3C62B /* PBXTargetDependency */,
@@ -546,6 +556,11 @@
 			isa = PBXTargetDependency;
 			name = EdgeFtpProvider;
 			targetProxy = EEA5415F29D16C2700C81239 /* PBXContainerItemProxy */;
+		};
+		EED34A062AC590D200AC1F2F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "FilesProvider OSX";
+			targetProxy = EED34A052AC590D200AC1F2F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
