@@ -44,13 +44,6 @@ internal struct ContentOfDirectory {
     }
     /// 파일 크기
     var fileSize: UInt64
-    /// 생성일
-    // var creationDate: Date?
-    /// 수정일
-    // var modificationDate: Date?
-    
-    /// 하위 아이템 갯수
-    // var count: Int?
 }
 
 // MARK: - Zip Information Protocol -

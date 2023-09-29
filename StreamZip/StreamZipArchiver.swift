@@ -84,10 +84,6 @@ public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Er
 open class StreamZipArchiver {
     
     // MARK: - Properties
-    
-    /// Base URL
-    //var baseUrl: URL
-    
     /// 동기화 큐
     private let syncQueue = { let syncQueue = DispatchQueue(label: "djhan.EdgeView.StreamZipArchiver_" + UUID().uuidString,
                                                             qos: .default,
@@ -106,7 +102,6 @@ open class StreamZipArchiver {
     // MARK: FTP Properties
     /// FTP File Provider
     weak var ftpProvider: FTPProvider?
-    //weak var ftpProvider: FTPFileProvider?
     
     // MARK: SFTP Properties
     /// SFTP File Provider

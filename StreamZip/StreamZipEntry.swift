@@ -273,6 +273,4 @@ open class StreamZipEntry: Codable {
                   comment: comment,
                   data: nil)
     }
-    
-    // MARK: - Encoding and Decoding
 }
