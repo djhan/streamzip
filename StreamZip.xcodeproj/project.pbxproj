@@ -7,25 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE1EA2D12AC67070008A3F6C /* DefaultStreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED34A662AC66F9A00AC1F2F /* DefaultStreamZip.framework */; };
+		EE1EA2D22AC67070008A3F6C /* DefaultStreamZip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EED34A662AC66F9A00AC1F2F /* DefaultStreamZip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F1625D8E7CE00D3C62B /* CommonLibrary.framework */; };
 		EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; };
 		EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; };
-		EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6449E925D5297E008FA69E /* GetValue.swift */; };
 		EE7732CA25D0D37C00414625 /* StreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7732C025D0D37C00414625 /* StreamZip.framework */; };
 		EE7732CF25D0D37C00414625 /* StreamZipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732CE25D0D37C00414625 /* StreamZipTests.swift */; };
 		EE7732D125D0D37C00414625 /* StreamZip.h in Headers */ = {isa = PBXBuildFile; fileRef = EE7732C325D0D37C00414625 /* StreamZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732DC25D0F98000414625 /* StreamZipEntry.swift */; };
 		EE7732E125D0FF4100414625 /* StreamZipArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */; };
-		EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E425D106AE00414625 /* StreamZipStructures.swift */; };
-		EE77337725D3ACE600414625 /* SizeOf.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE77337625D3ACE600414625 /* SizeOf.swift */; };
-		EE7EFFB425D8108E00EA59A1 /* CRC32.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7EFFB325D8108E00EA59A1 /* CRC32.swift */; };
-		EE83CBC725D815890095A058 /* DataDecompressionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */; };
-		EE8443FF25D2A89B005EA4B6 /* DataTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */; };
 		EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */; };
 		EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EF125D8C47000D3C62B /* FilesProvider.framework */; };
+		EED34A0E2AC66EF300AC1F2F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = EED34A0D2AC66EF300AC1F2F /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		EE1EA2CF2AC67057008A3F6C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EED34A602AC66F9900AC1F2F /* DefaultStreamZip.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EED34A452AC66F9900AC1F2F;
+			remoteInfo = DefaultStreamZip;
+		};
 		EE283EEE25D8C47000D3C62B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */;
@@ -138,7 +141,35 @@
 			remoteGlobalIDString = 799396741D48B80D00086753;
 			remoteInfo = "FilesProvider OSX";
 		};
+		EED34A652AC66F9A00AC1F2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EED34A602AC66F9900AC1F2F /* DefaultStreamZip.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EED34A462AC66F9900AC1F2F;
+			remoteInfo = DefaultStreamZip;
+		};
+		EED34A672AC66F9A00AC1F2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EED34A602AC66F9900AC1F2F /* DefaultStreamZip.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EED34A502AC66F9900AC1F2F;
+			remoteInfo = DefaultStreamZipTests;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EE1EA2D32AC67070008A3F6C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				EE1EA2D22AC67070008A3F6C /* DefaultStreamZip.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		EE283EA325D8B39700D3C62B /* FilesProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FilesProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,21 +178,16 @@
 		EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Detector.xcodeproj; path = ../Detector/Detector.xcodeproj; sourceTree = "<group>"; };
 		EE3BCAA12823E2150064E218 /* SftpProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SftpProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SftpProvider.xcodeproj; path = ../SftpProvider/SftpProvider.xcodeproj; sourceTree = "<group>"; };
-		EE6449E925D5297E008FA69E /* GetValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetValue.swift; sourceTree = "<group>"; };
 		EE7732C025D0D37C00414625 /* StreamZip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StreamZip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE7732C325D0D37C00414625 /* StreamZip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StreamZip.h; sourceTree = "<group>"; };
 		EE7732C425D0D37C00414625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EE7732C925D0D37C00414625 /* StreamZipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreamZipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE7732CE25D0D37C00414625 /* StreamZipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipTests.swift; sourceTree = "<group>"; };
 		EE7732D025D0D37C00414625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		EE7732DC25D0F98000414625 /* StreamZipEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipEntry.swift; sourceTree = "<group>"; };
 		EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipArchiver.swift; sourceTree = "<group>"; };
-		EE7732E425D106AE00414625 /* StreamZipStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipStructures.swift; sourceTree = "<group>"; };
-		EE77337625D3ACE600414625 /* SizeOf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SizeOf.swift; sourceTree = "<group>"; };
-		EE7EFFB325D8108E00EA59A1 /* CRC32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC32.swift; sourceTree = "<group>"; };
-		EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDecompressionExtension.swift; sourceTree = "<group>"; };
-		EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTransformExtension.swift; sourceTree = "<group>"; };
 		EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EdgeFtpProvider.xcodeproj; path = ../EdgeFtpProvider/EdgeFtpProvider.xcodeproj; sourceTree = "<group>"; };
+		EED34A0D2AC66EF300AC1F2F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		EED34A602AC66F9900AC1F2F /* DefaultStreamZip.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DefaultStreamZip.xcodeproj; path = DefaultStreamZip/DefaultStreamZip.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +199,7 @@
 				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
 				EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
+				EE1EA2D12AC67070008A3F6C /* DefaultStreamZip.framework in Frameworks */,
 				EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -240,6 +267,7 @@
 				EE7732CD25D0D37C00414625 /* StreamZipTests */,
 				EE7732C125D0D37C00414625 /* Products */,
 				EE283EA225D8B39700D3C62B /* Frameworks */,
+				EED34A602AC66F9900AC1F2F /* DefaultStreamZip.xcodeproj */,
 				EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */,
 				EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */,
 				EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */,
@@ -260,15 +288,10 @@
 		EE7732C225D0D37C00414625 /* StreamZip */ = {
 			isa = PBXGroup;
 			children = (
-				EE83CBCC25D815BC0095A058 /* Extensions */,
 				EE7732C325D0D37C00414625 /* StreamZip.h */,
 				EE7732C425D0D37C00414625 /* Info.plist */,
+				EED34A0D2AC66EF300AC1F2F /* README.md */,
 				EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */,
-				EE7732E425D106AE00414625 /* StreamZipStructures.swift */,
-				EE7732DC25D0F98000414625 /* StreamZipEntry.swift */,
-				EE77337625D3ACE600414625 /* SizeOf.swift */,
-				EE6449E925D5297E008FA69E /* GetValue.swift */,
-				EE7EFFB325D8108E00EA59A1 /* CRC32.swift */,
 			);
 			path = StreamZip;
 			sourceTree = "<group>";
@@ -282,20 +305,20 @@
 			path = StreamZipTests;
 			sourceTree = "<group>";
 		};
-		EE83CBCC25D815BC0095A058 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				EE8443FE25D2A89B005EA4B6 /* DataTransformExtension.swift */,
-				EE83CBC625D815890095A058 /* DataDecompressionExtension.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
 		EEA5414C29D16C0E00C81239 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */,
 				EEA5415329D16C0E00C81239 /* EdgeFtpProviderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EED34A612AC66F9900AC1F2F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EED34A662AC66F9A00AC1F2F /* DefaultStreamZip.framework */,
+				EED34A682AC66F9A00AC1F2F /* DefaultStreamZipTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -322,10 +345,12 @@
 				EE7732BC25D0D37C00414625 /* Sources */,
 				EE7732BD25D0D37C00414625 /* Frameworks */,
 				EE7732BE25D0D37C00414625 /* Resources */,
+				EE1EA2D32AC67070008A3F6C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EE1EA2D02AC67057008A3F6C /* PBXTargetDependency */,
 				EED34A062AC590D200AC1F2F /* PBXTargetDependency */,
 				EEA5416029D16C2700C81239 /* PBXTargetDependency */,
 				EE3BCAB52823E2240064E218 /* PBXTargetDependency */,
@@ -389,6 +414,10 @@
 				{
 					ProductGroup = EE283F1225D8E7CE00D3C62B /* Products */;
 					ProjectRef = EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */;
+				},
+				{
+					ProductGroup = EED34A612AC66F9900AC1F2F /* Products */;
+					ProjectRef = EED34A602AC66F9900AC1F2F /* DefaultStreamZip.xcodeproj */;
 				},
 				{
 					ProductGroup = EE283F2025D8E81900D3C62B /* Products */;
@@ -486,6 +515,20 @@
 			remoteRef = EEA5415229D16C0E00C81239 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		EED34A662AC66F9A00AC1F2F /* DefaultStreamZip.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = DefaultStreamZip.framework;
+			remoteRef = EED34A652AC66F9A00AC1F2F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EED34A682AC66F9A00AC1F2F /* DefaultStreamZipTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = DefaultStreamZipTests.xctest;
+			remoteRef = EED34A672AC66F9A00AC1F2F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -493,6 +536,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EED34A0E2AC66EF300AC1F2F /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,14 +554,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EE6449EA25D5297E008FA69E /* GetValue.swift in Sources */,
-				EE83CBC725D815890095A058 /* DataDecompressionExtension.swift in Sources */,
-				EE7732E525D106AE00414625 /* StreamZipStructures.swift in Sources */,
-				EE8443FF25D2A89B005EA4B6 /* DataTransformExtension.swift in Sources */,
 				EE7732E125D0FF4100414625 /* StreamZipArchiver.swift in Sources */,
-				EE77337725D3ACE600414625 /* SizeOf.swift in Sources */,
-				EE7EFFB425D8108E00EA59A1 /* CRC32.swift in Sources */,
-				EE7732DD25D0F98000414625 /* StreamZipEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,6 +569,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		EE1EA2D02AC67057008A3F6C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = DefaultStreamZip;
+			targetProxy = EE1EA2CF2AC67057008A3F6C /* PBXContainerItemProxy */;
+		};
 		EE283F1825D8E7D400D3C62B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = CommonLibrary;

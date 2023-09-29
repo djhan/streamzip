@@ -8,6 +8,8 @@
 import Foundation
 import Cocoa
 
+import CommonLibrary
+
 /**
  
  # Zip 파일의 해석 및 압축 해제 순서
@@ -26,28 +28,98 @@ let CentralDirectorySignature: Array<UInt8> = [0x50, 0x4b, 0x01, 0x02]
 /// 개별 Local File Header signature
 let LocalFileHeaderSignature: Array<UInt8> = [0x50, 0x4b, 0x03, 0x04]
 
+
+// MARK: - Typealiases -
+
+/**
+ Data Request 완료 핸들러
+ - Parameters:
+ - data: `Data`. 미발견시 nil 반환
+ - error: 에러. 옵셔널
+ */
+public typealias StreamZipDataRequestCompletion = (_ data: Data?, _ error: Error?) -> Void
+/**
+ Image Request 완료 핸들러
+ - Parameters:
+ - image: `NSImage`. 미발견시 nil 반환
+ - filePath: `String`. 미발견시 nil 반환
+ - error: 에러. 옵셔널
+ */
+public typealias StreamZipImageRequestCompletion = (_ image: NSImage?, _ filepath: String?, _ error: Error?) -> Void
+/**
+ Thumbnail Image Request 완료 핸들러
+ - Parameters:
+ - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
+ - filePath: `String`. 미발견시 nil 반환
+ - error: 에러. 옵셔널
+ */
+public typealias StreamZipThumbnailRequestCompletion = (_ thumbnail: CGImage?, _ filepath: String?, _ error: Error?) -> Void
+
+/**
+ FileLength 완료 핸들러
+ - Parameters:
+ - fileLength: 파일 길이. `UInt64`
+ - error: 에러. 옵셔널
+ */
+public typealias StreamZipFileLengthCompletion = (_ fileLength: UInt64, _ error: Error?) -> Void
+
+/**
+ Contents of Directory 완료 핸들러
+ - Parameters:
+ - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
+ - error: 에러. 옵셔널
+ */
+public typealias ContentsOfDirectoryCompletion = (_ contentsOfDirectory: [ContentOfDirectory]?, _ error: Error?) -> Void
+
+/**
+ Archive 해제 완료 핸들러
+ - Parameters:
+ - fileLength: 파일 길이. `UInt64`
+ - entries: `StreamZipEntry` 배열. 옵셔널
+ - error: 에러. 옵셔널
+ */
+public typealias StreamZipArchiveCompletion = (_ fileLength: UInt64, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
+/**
+ Entry 생성 완료 핸들러
+ - Parameters:
+ - entry: `StreamZipEntry`
+ - error: 에러. 옵셔널
+ */
+public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
+
+
 // MARK: - Content of Directory Struct -
 /// 디렉토리 하위 Content 구조체
 /// - 파일 경로와 길이 등 최소한의 정보만 격납한다
-internal struct ContentOfDirectory {
+public struct ContentOfDirectory {
     /// 경로
-    var path: String
+    public var path: String
     /// 파일명 반환
-    var fileName: String {
+    public var fileName: String {
         return (self.path as NSString).lastPathComponent
     }
     /// 디렉토리 여부
-    var isDirectory: Bool
+    public var isDirectory: Bool
     /// leaf 노드 여부
-    var isLeaf: Bool {
+    public var isLeaf: Bool {
         return !isDirectory
     }
     /// 파일 크기
-    var fileSize: UInt64
+    public var fileSize: UInt64
+
+    /// 초기화
+    /// - [참고 링크](https://stackoverflow.com/questions/54673224/public-struct-in-framework-init-is-inaccessible-due-to-internal-protection-lev) : public 으로 선언된 Strcut는 외부에서 초기화하려면 반드시 public 으로 선언된 초기화 메쏘드를 추가해야 한다
+    public init(path: String,
+         isDirectory: Bool,
+         fileSize: UInt64) {
+        self.path = path
+        self.isDirectory = isDirectory
+        self.fileSize = fileSize
+    }
 }
 
 // MARK: - Zip Information Protocol -
-internal protocol ZipInformationConvertible {
+public protocol ZipInformationConvertible {
     /// 자기 자신의 길이
     var length: Int { get set }
     
@@ -91,7 +163,7 @@ internal protocol ZipInformationConvertible {
     @discardableResult
     static func getData(from data: Data, offset: inout Int, length: Int) -> Data?
 }
-extension ZipInformationConvertible {
+public extension ZipInformationConvertible {
     /**
      Data 기반으로 Zip 정보 구조체 생성후 반환
      - 인코딩은 utf-8을 사용
@@ -148,24 +220,24 @@ extension ZipInformationConvertible {
 
 // MARK: - End of Central Directory Struct -
 /// Zip End Record 구조체
-internal struct ZipEndRecord: ZipInformationConvertible {
+public struct ZipEndRecord: ZipInformationConvertible {
     
-    var length: Int
+    public var length: Int
     
-    var endOfCentralDirectorySignature: UInt32
-    var numberOfThisDisk: UInt16
-    var diskWhereCentralDirectoryStarts: UInt16
-    var numberOfCentralDirectoryRecordsOnThisDisk: UInt16
-    var totalNumberOfCentralDirectoryRecords: UInt16
-    var sizeOfCentralDirectory: UInt32
-    var offsetOfStartOfCentralDirectory: UInt32
-    var zipFileCommentLength: UInt16
-    var comment: String?
+    public var endOfCentralDirectorySignature: UInt32
+    public var numberOfThisDisk: UInt16
+    public var diskWhereCentralDirectoryStarts: UInt16
+    public var numberOfCentralDirectoryRecordsOnThisDisk: UInt16
+    public var totalNumberOfCentralDirectoryRecords: UInt16
+    public var sizeOfCentralDirectory: UInt32
+    public var offsetOfStartOfCentralDirectory: UInt32
+    public var zipFileCommentLength: UInt16
+    public var comment: String?
     
     /**
      Data 기반으로 특정 인코딩 정보로 Zip 정보 구조체 생성후 반환
      */
-    static func make(from data: Data, encoding: String.Encoding?) -> Self? {
+    public static func make(from data: Data, encoding: String.Encoding?) -> Self? {
         var offset = NSNotFound
         var signature = [UInt8].init(repeating: 0, count: 4)
         
@@ -239,26 +311,26 @@ internal struct ZipEndRecord: ZipInformationConvertible {
 
 // MARK: - File Header Struct -
 /// Zip File Header 구조체
-internal struct ZipFileHeader: ZipInformationConvertible {
+public struct ZipFileHeader: ZipInformationConvertible {
     
-    var length: Int
+    public var length: Int
 
-    var localFileHeaderSignature: UInt32
-    var versionNeededToExtract: UInt16
-    var generalPurposeBitFlag: UInt16
-    var compressionMethod: UInt16
-    var fileLastModificationTime: UInt16
-    var fileLastModificationDate: UInt16
-    var crc32: UInt32
-    var compressedSize: UInt32
-    var uncompressedSize: UInt32
-    var fileNameLength: UInt16
-    var extraFieldLength: UInt16
+    public var localFileHeaderSignature: UInt32
+    public var versionNeededToExtract: UInt16
+    public var generalPurposeBitFlag: UInt16
+    public var compressionMethod: UInt16
+    public var fileLastModificationTime: UInt16
+    public var fileLastModificationDate: UInt16
+    public var crc32: UInt32
+    public var compressedSize: UInt32
+    public var uncompressedSize: UInt32
+    public var fileNameLength: UInt16
+    public var extraFieldLength: UInt16
 
     /**
      특정 데이터에서 Zip File Header 구조체 생성후 반환
      */
-    static func make(from data: Data, encoding: String.Encoding?) -> ZipFileHeader? {
+    public static func make(from data: Data, encoding: String.Encoding?) -> ZipFileHeader? {
         // 도중에 파일이 제거되는 경우를 대비, 0바이트 이상인지 확인한다
         guard data.count > 0,
               data.count >= 4 else { return nil }

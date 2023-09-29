@@ -55,7 +55,7 @@ extension Data {
         - crc32: `UInt`로 CRC 값 지정. CRC32 체크시 해당 값을 입력. nil로 지정하는 경우, CRC 체크를 건너뛴다
      - Returns: 압축 해제된 Data 반환. 실패시 에러값 반환
      */
-    internal func unzip(offset: Int, compressedSize: Int, crc32: UInt?) throws -> Data {
+    public func unzip(offset: Int, compressedSize: Int, crc32: UInt?) throws -> Data {
         guard self.count >= offset + compressedSize else {
             print("StreamZip>DataDecompressionExtension>unzip(): offset + compressedSize가 현재 데이터 길이를 초과, 해제 불가능")
             throw StreamZip.Error.excessDataLength

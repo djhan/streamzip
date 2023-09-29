@@ -8,71 +8,13 @@
 import Foundation
 import Cocoa
 
+import DefaultStreamZip
 import EdgeFtpProvider
 import FilesProvider
 import SftpProvider
 import CommonLibrary
 import Detector
 import zlib
-
-// MARK: - Typealiases -
-
-/**
- Data Request 완료 핸들러
- - Parameters:
- - data: `Data`. 미발견시 nil 반환
- - error: 에러. 옵셔널
- */
-public typealias StreamZipDataRequestCompletion = (_ data: Data?, _ error: Error?) -> Void
-/**
- Image Request 완료 핸들러
- - Parameters:
- - image: `NSImage`. 미발견시 nil 반환
- - filePath: `String`. 미발견시 nil 반환
- - error: 에러. 옵셔널
- */
-public typealias StreamZipImageRequestCompletion = (_ image: NSImage?, _ filepath: String?, _ error: Error?) -> Void
-/**
- Thumbnail Image Request 완료 핸들러
- - Parameters:
- - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
- - filePath: `String`. 미발견시 nil 반환
- - error: 에러. 옵셔널
- */
-public typealias StreamZipThumbnailRequestCompletion = (_ thumbnail: CGImage?, _ filepath: String?, _ error: Error?) -> Void
-
-/**
- FileLength 완료 핸들러
- - Parameters:
- - fileLength: 파일 길이. `UInt64`
- - error: 에러. 옵셔널
- */
-internal typealias StreamZipFileLengthCompletion = (_ fileLength: UInt64, _ error: Error?) -> Void
-
-/**
- Contents of Directory 완료 핸들러
- - Parameters:
- - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
- - error: 에러. 옵셔널
- */
-internal typealias ContentsOfDirectoryCompletion = (_ contentsOfDirectory: [ContentOfDirectory]?, _ error: Error?) -> Void
-
-/**
- Archive 해제 완료 핸들러
- - Parameters:
- - fileLength: 파일 길이. `UInt64`
- - entries: `StreamZipEntry` 배열. 옵셔널
- - error: 에러. 옵셔널
- */
-public typealias StreamZipArchiveCompletion = (_ fileLength: UInt64, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
-/**
- Entry 생성 완료 핸들러
- - Parameters:
- - entry: `StreamZipEntry`
- - error: 에러. 옵셔널
- */
-public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
-
 
 // MARK: - Stream Zip Archiver Class -
 /**

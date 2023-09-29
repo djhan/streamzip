@@ -8,6 +8,8 @@
 import Foundation
 import Cocoa
 
+import CommonLibrary
+
 // MARK: - Stream Zip Enumerations -
 
 /// StreamZip 열거형
@@ -24,7 +26,7 @@ public enum StreamZip {
         case unknown        = "unknown"
         
         /// Scheme 반환 Static 메쏘드
-        static func scheme(_ connection: StreamZip.Connection) -> String? {
+        public static func scheme(_ connection: StreamZip.Connection) -> String? {
             switch connection {
             case .ftp: return "ftp"
             case .ftps: return "ftps"
@@ -100,26 +102,26 @@ open class StreamZipEntry: Codable {
     public var filePath: String
     /// offset
     /// - File Header를 찾기 위한 offset 값으로 `relativeOffsetOfLocalFileHeader` 를 대입
-    var offset: Int
+    public var offset: Int
     /// method
-    var method: Int32
+    public var method: Int32
     /// 압축 크기
     public var sizeCompressed: Int
     /// 비압축 크기
     public var sizeUncompressed: Int
     /// 파일명 길이
-    var filenameLength: Int
+    public var filenameLength: Int
     /// extra field 길이
-    var extraFieldLength: Int
+    public var extraFieldLength: Int
     /// crc32
-    var crc32: UInt
+    public var crc32: UInt
 
     /// 최종 수정날짜
     public var modificationDate: Date
     /// extraField
-    var extraField: String?
+    public var extraField: String?
     /// comment
-    var comment: String?
+    public var comment: String?
     
     /// 데이터
     public var data: Data?
@@ -132,7 +134,7 @@ open class StreamZipEntry: Codable {
         - data: 원본 Central Directory Data
         - encoding: `String.Encoding`. nil 지정시 자동 추정 실행
      */
-    internal static func makeEntries(from data: Data, encoding: String.Encoding?) -> [StreamZipEntry]? {
+    public static func makeEntries(from data: Data, encoding: String.Encoding?) -> [StreamZipEntry]? {
         var offset = 0
         var entries: [StreamZipEntry]?
         
