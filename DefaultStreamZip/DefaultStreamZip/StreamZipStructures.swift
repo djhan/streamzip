@@ -34,56 +34,56 @@ let LocalFileHeaderSignature: Array<UInt8> = [0x50, 0x4b, 0x03, 0x04]
 /**
  Data Request 완료 핸들러
  - Parameters:
- - data: `Data`. 미발견시 nil 반환
- - error: 에러. 옵셔널
+     - data: `Data`. 미발견시 nil 반환
+     - error: 에러. 옵셔널
  */
 public typealias StreamZipDataRequestCompletion = (_ data: Data?, _ error: Error?) -> Void
 /**
  Image Request 완료 핸들러
  - Parameters:
- - image: `NSImage`. 미발견시 nil 반환
- - filePath: `String`. 미발견시 nil 반환
- - error: 에러. 옵셔널
+     - image: `NSImage`. 미발견시 nil 반환
+     - filePath: `String`. 미발견시 nil 반환
+     - error: 에러. 옵셔널
  */
 public typealias StreamZipImageRequestCompletion = (_ image: NSImage?, _ filepath: String?, _ error: Error?) -> Void
 /**
  Thumbnail Image Request 완료 핸들러
  - Parameters:
- - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
- - filePath: `String`. 미발견시 nil 반환
- - error: 에러. 옵셔널
+     - thumbnail: `CGImage`. 미발견 또는 생성 실패시 nil 반환
+     - filePath: `String`. 미발견시 nil 반환
+     - error: 에러. 옵셔널
  */
 public typealias StreamZipThumbnailRequestCompletion = (_ thumbnail: CGImage?, _ filepath: String?, _ error: Error?) -> Void
 
 /**
  FileLength 완료 핸들러
  - Parameters:
- - fileLength: 파일 길이. `UInt64`
- - error: 에러. 옵셔널
+     - fileLength: 파일 길이. `UInt64`
+     - error: 에러. 옵셔널
  */
 public typealias StreamZipFileLengthCompletion = (_ fileLength: UInt64, _ error: Error?) -> Void
 
 /**
  Contents of Directory 완료 핸들러
  - Parameters:
- - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
- - error: 에러. 옵셔널
+     - contentsOfDirectory: `[ContentOfDirectory]`. 실패시 nil
+     - error: 에러. 옵셔널
  */
 public typealias ContentsOfDirectoryCompletion = (_ contentsOfDirectory: [ContentOfDirectory]?, _ error: Error?) -> Void
 
 /**
  Archive 해제 완료 핸들러
  - Parameters:
- - fileLength: 파일 길이. `UInt64`
- - entries: `StreamZipEntry` 배열. 옵셔널
- - error: 에러. 옵셔널
+     - fileLength: 파일 길이. `UInt64`
+     - entries: `StreamZipEntry` 배열. 옵셔널
+     - error: 에러. 옵셔널
  */
 public typealias StreamZipArchiveCompletion = (_ fileLength: UInt64, _ entries: [StreamZipEntry]?, _ error: Error?) -> Void
 /**
  Entry 생성 완료 핸들러
  - Parameters:
- - entry: `StreamZipEntry`
- - error: 에러. 옵셔널
+     - entry: `StreamZipEntry`
+     - error: 에러. 옵셔널
  */
 public typealias StreamZipFileCompletion = (_ entry: StreamZipEntry, _ error: Error?) -> Void
 
@@ -195,7 +195,7 @@ public extension ZipInformationConvertible {
             return property
         }
         catch {
-            print("ZipInformationConvertible>getValue(from:offset:): error = \(error.localizedDescription)")
+            EdgeLogger.shared.archiveLogger.error("\(#function) :: 에러 발생 = \(error.localizedDescription)")
             return nil
         }
     }
@@ -242,14 +242,14 @@ public struct ZipEndRecord: ZipInformationConvertible {
         var signature = [UInt8].init(repeating: 0, count: 4)
         
         guard data.count > 4 else {
-            print("StreamZip>StreamZipStructures>make(from:encoding:): Data 길이가 4 바이트를 넘지 않는다")
+            EdgeLogger.shared.archiveLogger.error("\(#function) :: Data 길이가 4 바이트를 넘지 않기 때문에 처리 불가능.")
             return nil
         }
         
         // 0번째부터 순환하며 end of central directory signature를 찾는다
         for index in 0 ..< data.count - 4  {
             guard data.count >= index + 4 else {
-                print("StreamZip>StreamZipStructures>make(from:encoding:): Data 길이 = \(data.count), index = \(index) 로, 4바이트를 넘는 값이 존재할 수 없는 상황, 중지")
+                EdgeLogger.shared.archiveLogger.error("\(#function) :: Data 길이 = \(data.count), index = \(index) 로, 4바이트를 넘는 값이 존재할 수 없는 상황, 중지.")
                 break
             }
             data[index ..< index + 4].copyBytes(to: &signature, count: 4)
