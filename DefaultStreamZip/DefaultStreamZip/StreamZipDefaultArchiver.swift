@@ -106,16 +106,16 @@ public class StreamZipDefaultArchiver {
 
         // 해당 범위에서 request 비동기 실행
         let requestResult = await self.request(range: range, addProgressTo: self.entriesProgerss!)
+        // 작업 중지시 중지 처리
+        if Task.isCancelled == true {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #1.")
+            return finish(nil, StreamZip.Error.aborted)
+        }
         // 에러 검증
         if case let .failure(error) = requestResult {
             EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 마지막 4096 바이트 데이터 전송중 에러 발생 = \(error.localizedDescription).")
             // 에러 발생 시, 그대로 반환 처리
             return finish(nil, error)
-        }
-        // 작업 중지시 중지 처리
-        if Task.isCancelled == true {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생.")
-            return finish(nil, StreamZip.Error.aborted)
         }
         guard case let .success(data) = requestResult,
               data.count > 4 else {
@@ -134,7 +134,11 @@ public class StreamZipDefaultArchiver {
         let centralDirectoryRange = offsetOfCentralDirectory ..< offsetOfCentralDirectory + sizeOfCentralDirectory
         
         let subRequestResult = await self.request(range: centralDirectoryRange, addProgressTo: self.entriesProgerss!)
-        
+        // 작업 중지시 중지 처리
+        if Task.isCancelled == true {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #2.")
+            return finish(nil, StreamZip.Error.aborted)
+        }
         if case let .failure(error) = subRequestResult {
             EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> central directory data 전송중 에러 발생 = \(error.localizedDescription).")
             return finish(nil, error)
@@ -261,6 +265,7 @@ public class StreamZipDefaultArchiver {
     private func request(range: Range<UInt64>, 
                          addProgressTo parentProgress: Progress) async -> Result<Data, StreamZip.Error> {
         guard Task.isCancelled == false else {
+            // 사용자 중지 시 에러 처리
             return .failure(StreamZip.Error.aborted)
         }
             
@@ -461,10 +466,32 @@ public class StreamZipDefaultArchiver {
                            encoding: String.Encoding? = nil,
                            addProgressTo parentProgress: Progress) async -> Result<StreamZipEntry, StreamZip.Error> {
         
+        //-----------------------------------------------------------------------------------------------------------//
+        /// 종료 처리 내부 메쏘드
+        func finish(_ error: StreamZip.Error? = nil) -> Result<StreamZipEntry, StreamZip.Error> {
+            defer {
+                self.fetchProgerss?.completedUnitCount = 2
+            }
+            
+            guard let error = error else {
+                // 에러가 없으면 성공으로 간주하고 entry 반환
+                return .success(entry)
+            }
+            // 실패 처리
+            return .failure(error)
+        }
+        //-----------------------------------------------------------------------------------------------------------//
+
         self.fetchProgerss = nil
         self.fetchProgerss = Progress(totalUnitCount: 2)
         // fetchProgerss를 새끼 Progress로 추가한다
         parentProgress.addChild(self.fetchProgerss!, withPendingUnitCount: 1)
+
+        // 작업 중지시 중지 처리
+        if Task.isCancelled == true {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #1.")
+            return finish(.aborted)
+        }
 
         // 이미 data가 있는 경우 nil 처리
         entry.data = nil
@@ -481,23 +508,7 @@ public class StreamZipDefaultArchiver {
         
         // 해당 범위의 데이터를 받아온다
         let requestResult = await self.request(range: range, addProgressTo: self.entriesProgerss!)
-        
-        //-----------------------------------------------------------------------------------------------------------//
-        /// 종료 처리 내부 메쏘드
-        func finish(_ error: StreamZip.Error? = nil) -> Result<StreamZipEntry, StreamZip.Error> {
-            defer {
-                self.fetchProgerss?.completedUnitCount = 2
-            }
-            
-            guard let error = error else {
-                // 에러가 없으면 성공으로 간주하고 entry 반환
-                return .success(entry)
-            }
-            // 실패 처리
-            return .failure(error)
-        }
-        //-----------------------------------------------------------------------------------------------------------//
-        
+                
         // 에러 검증
         if case let .failure(error) = requestResult {
             EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
@@ -506,7 +517,7 @@ public class StreamZipDefaultArchiver {
         }
         // 작업 중지시 중지 처리
         if Task.isCancelled == true {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생.")
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #2.")
             return finish(.aborted)
         }
         guard case let .success(data) = requestResult,
@@ -681,7 +692,7 @@ public class StreamZipDefaultArchiver {
         }
         // 작업 중지시 중지 처리
         if Task.isCancelled == true {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생.")
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #1.")
             return finish(error: .aborted)
         }
         guard case var .success(entries) = makeEntriesResult else {
@@ -708,6 +719,12 @@ public class StreamZipDefaultArchiver {
         
         let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!)
         
+        // 작업 중지시 중지 처리
+        if Task.isCancelled == true {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #2.")
+            return finish(error: .aborted)
+        }
+
         // 에러 검증
         if case let .failure(error) = fetchResult {
             EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
