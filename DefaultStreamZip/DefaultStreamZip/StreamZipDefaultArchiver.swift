@@ -703,47 +703,56 @@ public class StreamZipDefaultArchiver {
         // entry를 이름순으로 정렬
         entries.sort { $0.filePath < $1.filePath }
         
-        var targetEntry: StreamZipEntry?
+        var count = 0
+        
+        //var targetEntry: StreamZipEntry?
         for entry in entries {
-            guard let utiString = entry.filePath.utiString else { continue }
-            if Detector.shared.detectImageFormat(utiString) == .unknown { continue }
+            guard let utiString = entry.filePath.utiString else {
+                continue
+            }
+            if Detector.shared.detectImageFormat(utiString) == .unknown {
+                continue
+            }
             // 이미지 entry 발견시, 대입
-            targetEntry = entry
-            break
-        }
-        
-        guard let entry = targetEntry else {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: 이미지 파일이 없음")
-            return finish(error: StreamZip.Error.contentsIsEmpty)
-        }
-        
-        let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!)
-        
-        // 작업 중지시 중지 처리
-        if Task.isCancelled == true {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #2.")
-            return finish(error: .aborted)
-        }
+            //targetEntry = entry
+            //break
+            
+            let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!)
 
-        // 에러 검증
-        if case let .failure(error) = fetchResult {
-            EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
-            // 에러 발생 시, 그대로 반환 처리
-            return finish(error: error)
-        }
-        // 작업 중지시 중지 처리
-        if Task.isCancelled == true {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생.")
-            return finish(error: .aborted)
-        }
-        guard case .success(_) = fetchResult,
-              let data = entry.data,
-              let image = NSImage.init(data: data) else {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: data가 nil, 또는 image가 아님.")
-            return finish(error: StreamZip.Error.contentsIsEmpty)
+            // 작업 중지시 중지 처리
+            if Task.isCancelled == true {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #2.")
+                return finish(error: .aborted)
+            }
+
+            // 에러 검증
+            if case let .failure(error) = fetchResult {
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
+                // 에러 발생 시, 그대로 반환 처리
+                return finish(error: error)
+            }
+            // 작업 중지시 중지 처리
+            if Task.isCancelled == true {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생.")
+                return finish(error: .aborted)
+            }
+            guard case .success(_) = fetchResult,
+                  let data = entry.data,
+                  let image = NSImage.init(data: data) else {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: data가 nil, 또는 image가 아님.")
+                guard count > 10 else {
+                    // 잘못된 이미지인 경우 최대 10장까지 건너뛰며 시도한다
+                    count += 1
+                    continue
+                }
+                return finish(error: StreamZip.Error.contentsIsEmpty)
+            }
+            
+            return .success(image)
         }
         
-        return .success(image)
+        EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: image가 없음.")
+        return finish(error: StreamZip.Error.contentsIsEmpty)
     }
 
     /**
