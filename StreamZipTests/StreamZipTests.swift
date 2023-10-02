@@ -30,22 +30,4 @@ class StreamZipTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-    
-    func testSizeOf() {
-        print("size of header = \(MemoryLayout<ZipFileHeader>.size)")
-    }
-
-    func testLocal() {
-        let url = URL.init(fileURLWithPath: "/Users/djhan/Desktop/exr.zip")
-        let archiver = StreamZipArchiver.init(fileURL: url)
-
-        let expt = expectation(description: "Waiting done parsing...")
-        
-        let progress = archiver?.firstImage(completion: { image, filepath, error in
-            print("filePath = \(filepath), error = \(error?.localizedDescription ?? "no error")")
-            expt.fulfill()
-        })
-        
-        waitForExpectations(timeout: 3.0, handler: nil)
-    }
 }

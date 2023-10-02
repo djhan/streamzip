@@ -7,6 +7,8 @@
 
 import Foundation
 import Cocoa
+
+import CommonLibrary
 import Compression
 
 
@@ -53,16 +55,24 @@ extension Data {
         - offset: 건너뛰어야 할 헤더 부분 offset 값을 지정
         - compressedSize: 압축되어 있는 크기
         - crc32: `UInt`로 CRC 값 지정. CRC32 체크시 해당 값을 입력. nil로 지정하는 경우, CRC 체크를 건너뛴다
+        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+        예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
      - Returns: 압축 해제된 Data 반환. 실패시 에러값 반환
      */
-    public func unzip(offset: Int, compressedSize: Int, crc32: UInt?) throws -> Data {
-        guard self.count >= offset + compressedSize else {
-            print("StreamZip>DataDecompressionExtension>unzip(): offset + compressedSize가 현재 데이터 길이를 초과, 해제 불가능")
-            throw StreamZip.Error.excessDataLength
+    public func unzip(offset: Int, 
+                      compressedSize: Int,
+                      crc32: UInt?,
+                      checkSafety: Bool = true) throws -> Data {
+        if checkSafety == true {
+            guard self.count >= offset + compressedSize else {
+                EdgeLogger.shared.archiveLogger.error("\(#function) :: offset + compressedSize가 현재 데이터 길이를 초과, 해제 불가능.")
+                throw StreamZip.Error.excessDataLength
+            }
         }
         let result: Data? = try self.withUnsafeBytes { (bytes) -> Data? in
             let source = bytes.baseAddress?.advanced(by: offset)
             guard let sourcePointer = source?.bindMemory(to: UInt8.self, capacity: compressedSize) else {
+                EdgeLogger.shared.archiveLogger.error("\(#function) :: 포인터 생성 중 에러 발생.")
                 // 미확인 에러를 반환한다
                 throw StreamZip.Error.unknown
             }
@@ -71,18 +81,20 @@ extension Data {
             return performDecompress(config, source: sourcePointer, sourceSize: compressedSize)
         }
         guard let deflated = result else {
-            print("StreamZip>DataDecompressionExtension>unzip(): 해제 실패")
+            EdgeLogger.shared.archiveLogger.error("\(#function) :: 압축 해제 실패.")
             // 해제 실패 에러를 반환한다
             throw StreamZip.Error.deflationIsFailed
         }
 
-        // crc32 값이 입력된 경우, 체크섬 확인 진행
-        if let inputCrc32 = crc32 {
-            let outputCrc32 = deflated.crc32()
-            guard inputCrc32 == outputCrc32 else {
-                print("StreamZip>DataDecompressionExtension>unzip(): 원본 CRC = \(inputCrc32) || 계산값 = \(outputCrc32) 이 일치하지 않는다")
-                // checksum 불일치 에러를 반환한다
-                throw StreamZip.Error.checksumIsDifferent
+        if checkSafety == true {
+            // crc32 값이 입력된 경우, 체크섬 확인 진행
+            if let inputCrc32 = crc32 {
+                let outputCrc32 = deflated.crc32()
+                guard inputCrc32 == outputCrc32 else {
+                    EdgeLogger.shared.archiveLogger.error("\(#function) :: 원본 CRC = \(inputCrc32) || 계산값 = \(outputCrc32) 이 일치하지 않는다.")
+                    // checksum 불일치 에러를 반환한다
+                    throw StreamZip.Error.checksumIsDifferent
+                }
             }
         }
         

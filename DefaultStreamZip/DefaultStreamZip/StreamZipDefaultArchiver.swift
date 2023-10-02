@@ -20,11 +20,11 @@ public class StreamZipDefaultArchiver {
     
     // MARK: - Properties
     /// 파일 URL
-    var url: URL
+    public var url: URL
     
     /// 진행상태
     /// - async 메쏘드 사용 시, 이 프로퍼티로 진행상태를 파악한다
-    var progress: Progress?
+    public var progress: Progress?
     /// LocalEntries 진행상태
     /// - 외부에 노출되지 않는 프로퍼티
     private var entriesProgerss: Progress?
@@ -460,11 +460,14 @@ public class StreamZipDefaultArchiver {
         - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
         - encoding: `String.Encoding`. 미지정시 자동 인코딩
         - parentProgress: requestProgerss 를 child로 추가할 부모 Progress
+        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+            예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
      - Returns: Result 타입으로 StreamZipEntry 또는 에러 반환
      */
     private func fetchFile(entry: StreamZipEntry,
                            encoding: String.Encoding? = nil,
-                           addProgressTo parentProgress: Progress) async -> Result<StreamZipEntry, StreamZip.Error> {
+                           addProgressTo parentProgress: Progress,
+                           checkSafety: Bool = true) async -> Result<StreamZipEntry, StreamZip.Error> {
         
         //-----------------------------------------------------------------------------------------------------------//
         /// 종료 처리 내부 메쏘드
@@ -540,7 +543,8 @@ public class StreamZipDefaultArchiver {
                 // 성공 처리
                 let decompressData = try data.unzip(offset: offset,
                                                     compressedSize: entry.sizeCompressed,
-                                                    crc32: entry.crc32)
+                                                    crc32: entry.crc32,
+                                                    checkSafety: checkSafety)
                 entry.data = decompressData
                 // 성공 반환
                 return finish()
@@ -654,10 +658,13 @@ public class StreamZipDefaultArchiver {
      아카이브 중 최초 이미지를 반환하는 Async 메쏘드
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
      - Parameters:
-         - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+        - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+         예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
      - Returns: Result 타입으로 NSImage 또는 에러 반환
      */
-    public func firstImage(encoding: String.Encoding? = nil) async -> Result<NSImage, StreamZip.Error> {
+    public func firstImage(encoding: String.Encoding? = nil,
+                           checkSafety: Bool = true) async -> Result<NSImage, StreamZip.Error> {
         
         //-----------------------------------------------------------------------------------------------------------//
         /// 종료 처리 내부 메쏘드
@@ -713,11 +720,8 @@ public class StreamZipDefaultArchiver {
             if Detector.shared.detectImageFormat(utiString) == .unknown {
                 continue
             }
-            // 이미지 entry 발견시, 대입
-            //targetEntry = entry
-            //break
             
-            let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!)
+            let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!, checkSafety: checkSafety)
 
             // 작업 중지시 중지 처리
             if Task.isCancelled == true {
@@ -759,11 +763,14 @@ public class StreamZipDefaultArchiver {
      아카이브 중 최초 이미지를 CGImage로 반환하는 Async 메쏘드
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
      - Parameters:
-         - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+        - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+        예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
      - Returns: Result 타입으로 CGImage 또는 에러 반환
      */
-    public func firstCGImage(encoding: String.Encoding? = nil) async -> Result<CGImage, StreamZip.Error> {
-        let result = await self.firstImage(encoding: encoding)
+    public func firstCGImage(encoding: String.Encoding? = nil,
+                             checkSafety: Bool = true) async -> Result<CGImage, StreamZip.Error> {
+        let result = await self.firstImage(encoding: encoding, checkSafety: checkSafety)
         // 에러 검증
         if case let .failure(error) = result {
             // 에러 발생 시, 그대로 반환 처리
