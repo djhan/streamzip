@@ -665,12 +665,25 @@ public class StreamZipDefaultArchiver {
      */
     public func firstImage(encoding: String.Encoding? = nil,
                            checkSafety: Bool = true) async -> Result<NSImage, StreamZip.Error> {
-        
+        let result = await imageWithTitleDicts(count: 1)
+        switch result {
+            // 성공시
+        case .success(let dicts):
+            guard let image = dicts.first?["image"] as? NSImage else {
+                return .failure(.contentsIsEmpty)
+            }
+            return .success(image)
+            
+            // 에러는 그대로 반환
+        case .failure(let error): return .failure(error)
+        }
+        /*
         //-----------------------------------------------------------------------------------------------------------//
         /// 종료 처리 내부 메쏘드
         func finish(image: NSImage? = nil, error: StreamZip.Error? = nil) -> Result<NSImage, StreamZip.Error> {
+            
             defer {
-                self.progress?.completedUnitCount += 2
+                self.progress?.completedUnitCount = 2
             }
             
             if let error = error {
@@ -712,7 +725,6 @@ public class StreamZipDefaultArchiver {
         
         var count = 0
         
-        //var targetEntry: StreamZipEntry?
         for entry in entries {
             guard let utiString = entry.filePath.utiString else {
                 continue
@@ -757,8 +769,8 @@ public class StreamZipDefaultArchiver {
         
         EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: image가 없음.")
         return finish(error: StreamZip.Error.contentsIsEmpty)
+         */
     }
-
     /**
      아카이브 중 최초 이미지를 CGImage로 반환하는 Async 메쏘드
      - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
@@ -781,8 +793,129 @@ public class StreamZipDefaultArchiver {
             // 이미지가 없음
             return .failure(.contentsIsEmpty)
         }
-
+        // 성공 시
         return .success(cgImage)
+    }
+    
+    /**
+     지정된 갯수 만큼의 이미지 + 타이틀 딕셔너리 배열 반환
+     - Returns:
+     */
+    public func imageWithTitleDicts(count: Int = 10,
+                                    encoding: String.Encoding? = nil) async -> Result<[Dictionary<String, Any>], StreamZip.Error> {
+        
+        self.progress = nil
+        self.progress = Progress(totalUnitCount: 2)
+
+        //-----------------------------------------------------------------------------------------------------------//
+        /// 종료 처리 내부 메쏘드
+        func finish(dicts: [Dictionary<String, Any>]? = nil, 
+                    error: StreamZip.Error? = nil) -> Result<[Dictionary<String, Any>], StreamZip.Error> {
+            
+            defer {
+                let addCount = (self.progress?.totalUnitCount ?? 0) - (self.progress?.completedUnitCount ?? 0)
+                self.progress?.completedUnitCount += addCount
+            }
+            
+            if let error = error {
+                // 에러 발생 시 즉시 에러 반환
+                return .failure(error)
+            }
+            guard let dicts = dicts else {
+                // 빈 이미지 에러 반환
+                return .failure(.contentsIsEmpty)
+            }
+            // 이미지 반환
+            return .success(dicts)
+        }
+        //-----------------------------------------------------------------------------------------------------------//
+        
+        let makeEntriesResult = await self.makeEntriesFromLocal(encoding: encoding, addProgressTo: self.progress!)
+        
+        // 에러 검증
+        if case let .failure(error) = makeEntriesResult {
+            EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
+            // 에러 발생 시, 그대로 반환 처리
+            return finish(error: error)
+        }
+        // 작업 중지시 중지 처리
+        if Task.isCancelled == true {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #1.")
+            return finish(error: .aborted)
+        }
+        guard case var .success(entries) = makeEntriesResult,
+              entries.count > 0 else {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> entry가 0개")
+            return finish(error: .contentsIsEmpty)
+        }
+
+        // entry를 이름순으로 정렬
+        entries.sort { $0.filePath < $1.filePath }
+        
+        // 하위 Progress를 지정 생성 개수로 지정, Progress에 추가
+        let subProgress = Progress.init(totalUnitCount: Int64(count))
+        self.progress?.addChild(subProgress, withPendingUnitCount: 1)
+
+        // 타이틀 / 이미지 딕셔너리
+        var dicts = [Dictionary<String, Any>]()
+        
+        for entry in entries {
+            guard let utiString = entry.filePath.utiString else {
+                continue
+            }
+            if Detector.shared.detectImageFormat(utiString) == .unknown {
+                continue
+            }
+            
+            let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!)
+
+            // 작업 중지시 중지 처리
+            if Task.isCancelled == true {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생 #2.")
+                return finish(error: .aborted)
+            }
+
+            // 에러 검증
+            if case let .failure(error) = fetchResult {
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(self.url.filePath) >> 데이터 전송중 에러 발생 = \(error.localizedDescription).")
+                // 에러 발생 시, 그대로 반환 처리
+                return finish(error: error)
+            }
+            // 작업 중지시 중지 처리
+            if Task.isCancelled == true {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(self.url.filePath) >> 사용자 중지 발생.")
+                return finish(error: .aborted)
+            }
+            guard case .success(_) = fetchResult,
+                  let data = entry.data,
+                  let image = NSImage.init(data: data) else {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: data가 nil, 또는 image가 아님.")
+                // 잘못된 이미지인 경우 다음 이미지로 건너뛴다
+                continue
+            }
+
+            let dict: [String : Any] = ["title": entry.filePath.lastPathComponent,
+                                        "image": image as Any]
+            dicts.append(dict)
+            // 하위 Progress 완료 1 추가
+            subProgress.completedUnitCount += 1
+            // 지정 개수 초과 시 중지
+            if subProgress.completedUnitCount >= count {
+                break
+            }
+        }
+
+        // 지정 개수보다 모자라게 처리된 경우, 확인해서 완료 처리
+        let addCount = subProgress.totalUnitCount - subProgress.completedUnitCount
+        subProgress.completedUnitCount += addCount
+
+        guard dicts.count > 0 else {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: image가 없음.")
+            return finish(error: StreamZip.Error.contentsIsEmpty)
+        }
+        
+        // 성공 처리
+        return finish(dicts: dicts)
     }
 
     // MARK: Completion Handler Method for Image
