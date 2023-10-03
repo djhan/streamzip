@@ -15,7 +15,7 @@
 		EE7732D125D0D37C00414625 /* StreamZip.h in Headers */ = {isa = PBXBuildFile; fileRef = EE7732C325D0D37C00414625 /* StreamZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EE7732E125D0FF4100414625 /* StreamZipArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */; };
 		EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */; };
-		EED09BC42AC7A95000B2398C /* DefaultStreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */; };
+		EED23E5C2ACBF2F9002AEB72 /* DefaultStreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */; };
 		EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EF125D8C47000D3C62B /* FilesProvider.framework */; };
 		EED34A0E2AC66EF300AC1F2F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = EED34A0D2AC66EF300AC1F2F /* README.md */; };
 /* End PBXBuildFile section */
@@ -184,7 +184,7 @@
 				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
 				EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
-				EED09BC42AC7A95000B2398C /* DefaultStreamZip.framework in Frameworks */,
+				EED23E5C2ACBF2F9002AEB72 /* DefaultStreamZip.framework in Frameworks */,
 				EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
