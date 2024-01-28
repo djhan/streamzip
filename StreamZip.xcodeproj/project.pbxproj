@@ -15,6 +15,7 @@
 		EE7732D125D0D37C00414625 /* StreamZip.h in Headers */ = {isa = PBXBuildFile; fileRef = EE7732C325D0D37C00414625 /* StreamZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EE7732E125D0FF4100414625 /* StreamZipArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */; };
 		EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5415129D16C0E00C81239 /* EdgeFtpProvider.framework */; };
+		EEA5855F2B64E2630095E67C /* CloudProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEA5855E2B64E2630095E67C /* CloudProvider.framework */; };
 		EED23E5C2ACBF2F9002AEB72 /* DefaultStreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */; };
 		EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EF125D8C47000D3C62B /* FilesProvider.framework */; };
 		EED34A0E2AC66EF300AC1F2F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = EED34A0D2AC66EF300AC1F2F /* README.md */; };
@@ -126,6 +127,20 @@
 			remoteGlobalIDString = EE8FBAB529CE9FF80061779A;
 			remoteInfo = EdgeFtpProvider;
 		};
+		EEA585752B64E2B50095E67C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EEA585122B64DB340095E67C;
+			remoteInfo = CloudProvider;
+		};
+		EEA585772B64E2BD0095E67C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EEA585112B64DB340095E67C;
+			remoteInfo = CloudProvider;
+		};
 		EED09BBE2AC7A93800B2398C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EED09BB92AC7A93800B2398C /* DefaultStreamZip.xcodeproj */;
@@ -171,6 +186,8 @@
 		EE7732D025D0D37C00414625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamZipArchiver.swift; sourceTree = "<group>"; };
 		EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EdgeFtpProvider.xcodeproj; path = ../EdgeFtpProvider/EdgeFtpProvider.xcodeproj; sourceTree = "<group>"; };
+		EEA5855E2B64E2630095E67C /* CloudProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CloudProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CloudProvider.xcodeproj; path = ../CloudProvider/CloudProvider.xcodeproj; sourceTree = "<group>"; };
 		EED09BB92AC7A93800B2398C /* DefaultStreamZip.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DefaultStreamZip.xcodeproj; path = DefaultStreamZip/DefaultStreamZip.xcodeproj; sourceTree = "<group>"; };
 		EED34A0D2AC66EF300AC1F2F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -180,6 +197,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEA5855F2B64E2630095E67C /* CloudProvider.framework in Frameworks */,
 				EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */,
 				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
 				EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */,
@@ -203,6 +221,7 @@
 		EE283EA225D8B39700D3C62B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EEA5855E2B64E2630095E67C /* CloudProvider.framework */,
 				EE3BCAA12823E2150064E218 /* SftpProvider.framework */,
 				EE283EA325D8B39700D3C62B /* FilesProvider.framework */,
 			);
@@ -256,6 +275,7 @@
 				EEA5414B29D16C0E00C81239 /* EdgeFtpProvider.xcodeproj */,
 				EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */,
 				EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */,
+				EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */,
 				EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */,
 				EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */,
 			);
@@ -299,6 +319,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EEA585722B64E2B50095E67C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EEA585762B64E2B50095E67C /* CloudProvider.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		EED09BBA2AC7A93800B2398C /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -334,6 +362,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EEA585782B64E2BD0095E67C /* PBXTargetDependency */,
 				EED09BC32AC7A94900B2398C /* PBXTargetDependency */,
 				EED34A062AC590D200AC1F2F /* PBXTargetDependency */,
 				EEA5416029D16C2700C81239 /* PBXTargetDependency */,
@@ -372,7 +401,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1240;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					EE7732BF25D0D37C00414625 = {
 						CreatedOnToolsVersion = 12.4;
@@ -395,6 +424,10 @@
 			productRefGroup = EE7732C125D0D37C00414625 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = EEA585722B64E2B50095E67C /* Products */;
+					ProjectRef = EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */;
+				},
 				{
 					ProductGroup = EE283F1225D8E7CE00D3C62B /* Products */;
 					ProjectRef = EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */;
@@ -499,6 +532,13 @@
 			remoteRef = EEA5415229D16C0E00C81239 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		EEA585762B64E2B50095E67C /* CloudProvider.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = CloudProvider.framework;
+			remoteRef = EEA585752B64E2B50095E67C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -578,6 +618,11 @@
 			name = EdgeFtpProvider;
 			targetProxy = EEA5415F29D16C2700C81239 /* PBXContainerItemProxy */;
 		};
+		EEA585782B64E2BD0095E67C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CloudProvider;
+			targetProxy = EEA585772B64E2BD0095E67C /* PBXContainerItemProxy */;
+		};
 		EED09BC32AC7A94900B2398C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = DefaultStreamZip;
@@ -595,6 +640,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -660,6 +706,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

@@ -15,6 +15,7 @@ import SftpProvider
 import CommonLibrary
 import Detector
 import zlib
+import CloudProvider
 
 // MARK: - Stream Zip Archiver Class -
 /**
@@ -88,6 +89,19 @@ open class StreamZipArchiver {
         default: return nil
         }
         self.webDavProvider = webDavProvider
+    }
+    /**
+     클라우드 아이템 초기화
+     - Parameters
+        - url: URL
+        - host: 클라우드 호스트.
+     */
+    public init?(url: URL, host: CloudHost) {
+        self.fileURL = url
+        // 클라우드 호스트 종류에 따라 연결 방식 지정
+        switch host {
+        case .oneDrivie: self.connection = .oneDrive
+        }
     }
     /**
      로컬 아이템 초기화
@@ -894,6 +908,9 @@ open class StreamZipArchiver {
         case .sftp: return self.getContentsOfDirectoryInSFTP(at: mainPath, completion: completion)
             // webDav인 경우
         case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
+            // oneDrive인 경우
+        case .oneDrive: return self.getContentsOfDirectoryInOneDrive(at: mainPath, completion: completion)
+
             // 그 외: 미지원으로 실패 처리
         default:
             completion(nil, StreamZip.Error.unsupportedConnection)
@@ -1056,6 +1073,43 @@ open class StreamZipArchiver {
         }
         return progress
     }
+    /**
+     OneDrive에서 mainPath 대입 후, contents of directory 배열 생성
+     - Parameters:
+         - mainPath: contents 목록을 만들려고 하는 경로
+         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+     - Returns: Progress 반환. 실패시 nil 반환
+     */
+    private func getContentsOfDirectoryInOneDrive(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
+        let progress = Progress.init(totalUnitCount: 1)
+        Task {
+            let contentsProgress = await CloudProvider.shared.contentsOfOneDrive(at: mainPath) { contents, error in
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> 디렉토리 목록 작성 완료.")
+                // 에러 발생시 중지
+                if let error = error {
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(mainPath) >> 에러 발생 = \(error.localizedDescription).")
+                    return completion(nil, error)
+                }
+                if progress.isCancelled == true {
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> 작업 취소 처리.")
+                    return completion(nil, StreamZip.Error.aborted)
+                }
+                
+                // contents of directory 배열에 아이템 대입
+                let contentsOfDirectory = contents.map { (item) -> ContentOfDirectory in
+                    let size = item.size > 0 ? item.size : 0
+                    return ContentOfDirectory.init(path: item.path,
+                                                   isDirectory: item.isDirectory,
+                                                   fileSize: UInt64(size))
+                }
+                
+                // 완료 처리
+                return completion(contentsOfDirectory, nil)
+            }
+            progress.addChild(contentsProgress, withPendingUnitCount: 1)
+        }
+        return progress
+    }
     
     // MARK: Get Data
     /**
@@ -1098,6 +1152,14 @@ open class StreamZipArchiver {
             }
             return self.requestFromWebDav(at: path, range: range, completion: completion)
             
+            // OneDrive인 경우
+        case .oneDrive:
+            guard let path = path else {
+                completion(nil, StreamZip.Error.unsupportedConnection)
+                return nil
+            }
+            return self.requestFromOneDrive(at: path, range: range, completion: completion)
+
             // local인 경우
         case .local:
             guard let url = self.fileURL else {
@@ -1240,7 +1302,51 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    
+    /**
+     OneDrive로 특정 범위 데이터를 가져오는 메쏘드
+     - Parameters:
+         - path: 데이터를 가져올 경로
+         - range: 데이터를 가져올 범위
+         - completion: `StreamZipRequestCompletion` 완료 핸들러
+     - Returns: Progress 반환. 실패시 nil 반환
+     */
+    private func requestFromOneDrive(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
+        let progress = Progress.init(totalUnitCount: 1)
+        Task {
+            guard let downloadProgress = await CloudProvider.shared.downloadFromOneDrive(path: path,
+                                                                                         offset: Int64(range.lowerBound),
+                                                                                         length: range.count,
+                                                                                         completionHandler: { data, error in
+                
+                // 에러 여부를 먼저 확인
+                // 이유: progress?.isCancelled 를 먼저 확인하는 경우, error 가 발생했는데도 사용자 취소로 처리해 버리는 경우가 있기 때문이다
+                if let error = error {
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> 에러 발생 = \(error.localizedDescription).")
+                    return completion(nil, error)
+                }
+                // 작업 중지시 중지 처리
+                if progress.isCancelled == true {
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> 작업 취소 처리.")
+                    return completion(nil, StreamZip.Error.aborted)
+                }
+                guard let data = data else {
+                    EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(path) >> 데이터가 없음.")
+                    return completion(nil, StreamZip.Error.contentsIsEmpty)
+                }
+                guard data.count == range.count else {
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> 데이터 길이가 동일하지 않음, 문제 발생.")
+                    return completion(nil, StreamZip.Error.unknown)
+                }
+                
+                return completion(data, nil)
+            }) else {
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> 다운로드 불가능.")
+                return completion(nil, StreamZip.Error.unknown)
+            }
+            progress.addChild(downloadProgress, withPendingUnitCount: 1)
+        }
+        return progress
+    }
     /**
      로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
      - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
