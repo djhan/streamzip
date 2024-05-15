@@ -47,13 +47,11 @@ public class StreamZipDefaultArchiver {
     
     // MARK: - Methods
     
-    /**
-     Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private async 메쏘드
-     - Parameters:
-        - encoding: `String.Encoding`. 미지정시 자동 인코딩
-        - parentProgress: requestProgerss 를 child로 추가할 부모 Progress
-     - Returns: Progress 는 프로퍼티로 지정하고, 여기선 Result 타입으로 Entry 배열 또는 에러 값을 반환한다
-     */
+    /// Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private 비동기 메쏘드
+    /// - Parameters:
+    ///     - encoding: `String.Encoding`. 미지정시 자동 인코딩
+    ///     - parentProgress: requestProgerss 를 child로 추가할 부모 `Progress`
+    /// - Returns: `Progress` 는 프로퍼티로 지정하고, 여기선 Result 타입으로 Entry 배열 또는 에러 값을 반환한다
     private func makeEntriesFromLocal(encoding: String.Encoding? = nil,
                                       addProgressTo parentProgress: Progress) async -> Result<[StreamZipEntry], StreamZip.Error> {
         // 파일 크기를 구한다
@@ -155,13 +153,11 @@ public class StreamZipDefaultArchiver {
         // 엔트리 배열 반환, 종료 처리
         return finish(entries, nil)
     }
-    /**
-     Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
-     - Parameters:
-         - encoding: `String.Encoding`. 미지정시 자동 인코딩
-         - completion: `StreamZipArchiveCompletion`
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// Local URL에서 Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
+    /// - Parameters:
+    ///     - encoding: `String.Encoding`. 미지정시 자동 인코딩
+    ///     - completion: `StreamZipArchiveCompletion`
+    /// - Returns: Progress 반환. 실패시 nil 반환
     public func makeEntriesFromLocal(encoding: String.Encoding? = nil,
                                      completion: @escaping StreamZipArchiveCompletion) -> Progress? {
         // 파일 크기를 구한다
@@ -254,15 +250,13 @@ public class StreamZipDefaultArchiver {
         return progress
     }
     
-    /**
-     로컬 영역의 특정 범위 데이터를 가져오는 Async 메쏘드
-     - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
-     - Parameters:
-        - range: 데이터를 가져올 범위
-        - parentProgress: requestProgerss 를 child로 추가할 부모 Progress
-     - Returns: Progress 는 프로퍼티로 지정하며, 여기선 Result 타입으로 데이터 또는 에러를 반환한다.
-     */
-    private func request(range: Range<UInt64>, 
+    /// 로컬 영역의 특정 범위 데이터를 가져오는 비동기 메쏘드
+    /// - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
+    /// - Parameters:
+    ///     - range: 데이터를 가져올 범위
+    ///     - parentProgress: requestProgerss 를 child로 추가할 부모 Progress
+    /// - Returns: Progress 는 프로퍼티로 지정하며, 여기선 Result 타입으로 데이터 또는 에러를 반환한다.
+    private func request(range: Range<UInt64>,
                          addProgressTo parentProgress: Progress) async -> Result<Data, StreamZip.Error> {
         guard Task.isCancelled == false else {
             // 사용자 중지 시 에러 처리
@@ -317,14 +311,12 @@ public class StreamZipDefaultArchiver {
             return .failure(StreamZip.Error.unknown)
         }
     }
-    /**
-     로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
-     - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
-     - Parameters:
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipDataRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// 로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
+    /// - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
+    /// - Parameters:
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipDataRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func request(range: Range<UInt64>,
                          completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         let progress = Progress.init(totalUnitCount: 1)
@@ -389,15 +381,72 @@ public class StreamZipDefaultArchiver {
     }
     
     // MARK: Process Entry Data
-    /**
-     Entry 데이터 처리 및 완료 처리
-     - Parameters:
-         - entry: 데이터를 가져온 `StreamZipEntry`
-         - encoding:`String.Encoding`
-         - data: 가져온 Entry 데이터. 옵셔널
-         - error: 에러값. 옵셔널
-     - completion: `StreamZipFileCompletion` 완료 핸들러
-     */
+    /// Entry 데이터 처리 및 완료 처리 비동기 메쏘드
+    /// - Parameters:
+    ///     - entry: 데이터를 가져온 `StreamZipEntry`
+    ///     - encoding:`String.Encoding`
+    ///     - data: 가져온 Entry 데이터. 옵셔널
+    ///     - error: 에러값. 옵셔널
+    /// - Returns: Result 타입으로 StreamZipEntry 또는 에러 값을 반환한다
+    private func processEntryData(at entry: StreamZipEntry,
+                                  encoding: String.Encoding? = nil,
+                                  data: Data?,
+                                  error: Error?) async -> Result<StreamZipEntry, Error> {
+        if let error = error {
+            EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: 데이터 전송중 에러 발생 = \(error.localizedDescription).")
+            return .failure(error)
+        }
+        guard let data = data else {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: 에러가 없는데 데이터 크기가 0. 중지.")
+            return .failure(StreamZip.Error.contentsIsEmpty)
+        }
+        
+        // Local Zip File Header 구조체 생성
+        guard let zipFileHeader = ZipFileHeader.make(from: data, encoding: encoding) else {
+            EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: local file hedaer를 찾지 못함. 중지.")
+            return .failure(StreamZip.Error.localFileHeaderIsFailed)
+        }
+        
+        let offset = zipFileHeader.length + Int(zipFileHeader.fileNameLength + zipFileHeader.extraFieldLength)
+        
+        switch entry.method {
+            // Defalte 방식인 경우
+        case Z_DEFLATED:
+            do {
+                // 성공 처리
+                let decompressData = try data.unzip(offset: offset,
+                                                    compressedSize: entry.sizeCompressed,
+                                                    crc32: entry.crc32)
+                entry.data = decompressData
+                return .success(entry)
+            }
+            catch {
+                EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: 해제 도중 에러 발생 = \(error.localizedDescription).")
+                return .failure(error)
+            }
+            
+            // 비압축시
+        case 0:
+            // upperBound가 현재 데이터 길이를 초과하지 않도록 조절한다
+            // 이상하지만, uncompressedSize를 더한 값이 데이터 길이를 초과하는 경우가 있다
+            // 아마도 잘못 만들어진 zip 파일인 것으로 추정된다
+            let upperBound = offset + entry.sizeUncompressed > data.count ? data.count : offset + entry.sizeUncompressed
+            entry.data = data[offset ..< upperBound]
+            return .success(entry)
+            
+            // 그 외의 경우
+        default:
+            EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: 미지원 압축 해제 방식. 데이터 해제 불가.")
+            return .failure(StreamZip.Error.unsupportedCompressMethod)
+        }
+    }
+    /// Entry 데이터 처리 및 완료 처리
+    /// - Parameters:
+    ///     - entry: 데이터를 가져온 `StreamZipEntry`
+    ///     - encoding:`String.Encoding`
+    ///     - data: 가져온 Entry 데이터. 옵셔널
+    ///     - error: 에러값. 옵셔널
+    ///     - completion: `StreamZipFileCompletion` 완료 핸들러
     private func processEntryData(at entry: StreamZipEntry,
                                   encoding: String.Encoding? = nil,
                                   data: Data?,
@@ -451,19 +500,16 @@ public class StreamZipDefaultArchiver {
             return completion(entry, StreamZip.Error.unsupportedCompressMethod)
         }
     }
-    
     // MARK: Get Data from Entry
-    /**
-     특정 Entry의 파일 다운로드 및 압축 해제 Async 메소드
-     - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
-     - Parameters:
-        - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
-        - encoding: `String.Encoding`. 미지정시 자동 인코딩
-        - parentProgress: requestProgerss 를 child로 추가할 부모 Progress
-        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
-            예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
-     - Returns: Result 타입으로 StreamZipEntry 또는 에러 반환
-     */
+    /// 특정 Entry의 파일 다운로드 및 압축 해제 비동기 메소드
+    ///  - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
+    /// - Parameters:
+    ///    - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
+    ///    - encoding: `String.Encoding`. 미지정시 자동 인코딩
+    ///    - parentProgress: requestProgerss 를 child로 추가할 부모 Progress
+    ///    - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+    ///    예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다. 기본값은 true.
+    /// - Returns: `Result` 타입으로 `StreamZipEntry` 또는 에러 반환
     private func fetchFile(entry: StreamZipEntry,
                            encoding: String.Encoding? = nil,
                            addProgressTo parentProgress: Progress,
@@ -570,17 +616,17 @@ public class StreamZipDefaultArchiver {
             return finish(.unsupportedCompressMethod)
         }
     }
-    /**
-     특정 Entry의 파일 다운로드 및 압축 해제
-     - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
-     - Parameters:
-         - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
-         - encoding: `String.Encoding`. 미지정시 자동 인코딩
-         - completion: `StreamZipFileCompletion`
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// 특정 Entry의 파일 다운로드 및 압축 해제 메쏘드
+    ///  - 다운로드후 압축 해제된 데이터는 해당 entry의 data 프로퍼티에 격납된다
+    /// - Parameters:
+    ///    - entry: 압축 해제를 하고자 하는 `StreamZipEntry`
+    ///    - encoding: `String.Encoding`. 미지정시 자동 인코딩
+    ///    - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다. 기본값은 true.
+    ///    - completion: `StreamZipFileCompletion`
+    /// - Returns: Progress 반환. 실패시 nil 반환
     public func fetchFile(entry: StreamZipEntry,
                           encoding: String.Encoding? = nil,
+                          checkSafety: Bool = true,
                           completion: @escaping StreamZipFileCompletion) -> Progress? {
         // 이미 data가 있는 경우 nil 처리
         entry.data = nil
@@ -625,7 +671,8 @@ public class StreamZipDefaultArchiver {
                     // 성공 처리
                     let decompressData = try data.unzip(offset: offset,
                                                         compressedSize: entry.sizeCompressed,
-                                                        crc32: entry.crc32)
+                                                        crc32: entry.crc32,
+                                                        checkSafety: checkSafety)
                     entry.data = decompressData
                     return completion(entry, nil)
                 }
@@ -654,15 +701,13 @@ public class StreamZipDefaultArchiver {
     // MARK: - Image
 
     // MARK: Public Async Method for Image
-    /**
-     아카이브 중 최초 이미지를 반환하는 Async 메쏘드
-     - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
-     - Parameters:
-        - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
-        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
-         예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
-     - Returns: Result 타입으로 NSImage 또는 에러 반환
-     */
+    /// 아카이브 중 최초 이미지를 반환하는 비동기 메쏘드
+    /// - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
+    /// - Parameters:
+    ///     - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+    ///     - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+    ///     예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다. 기본값은 true
+    /// - Returns: Result 타입으로 NSImage 또는 에러 반환
     public func firstImage(encoding: String.Encoding? = nil,
                            checkSafety: Bool = true) async -> Result<NSImage, StreamZip.Error> {
         let result = await imageWithTitleDicts(count: 1)
@@ -771,15 +816,13 @@ public class StreamZipDefaultArchiver {
         return finish(error: StreamZip.Error.contentsIsEmpty)
          */
     }
-    /**
-     아카이브 중 최초 이미지를 CGImage로 반환하는 Async 메쏘드
-     - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
-     - Parameters:
-        - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
-        - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
-        예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다.
-     - Returns: Result 타입으로 CGImage 또는 에러 반환
-     */
+    /// 아카이브 중 최초 이미지를 CGImage로 반환하는 비동기 메쏘드
+    /// - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
+    /// - Parameters:
+    ///     - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+    ///     - checkSafety: 안전성 확인 여부, False 지정시 offset + compressedSize 의 길이 초과 여부, CRC 정합성 여부를 모두 무시한다.
+    ///     예전에 만들어진 zip파일이 이 정합성 검사를 통과 못하는 관계로 퀵룩 썸네일 생성 시에는 이 값을 false로 지정한다. 기본값은 true
+    /// - Returns: Result 타입으로 CGImage 또는 에러 반환
     public func firstCGImage(encoding: String.Encoding? = nil,
                              checkSafety: Bool = true) async -> Result<CGImage, StreamZip.Error> {
         let result = await self.firstImage(encoding: encoding, checkSafety: checkSafety)
@@ -797,10 +840,8 @@ public class StreamZipDefaultArchiver {
         return .success(cgImage)
     }
     
-    /**
-     지정된 갯수 만큼의 이미지 + 타이틀 딕셔너리 배열 반환
-     - Returns:
-     */
+    /// 지정된 갯수 만큼의 이미지 + 타이틀 딕셔너리 배열 반환 비동기 메쏘드
+    /// - Returns: Result 타입으로 이미지 + 타이틀 딕셔너리 배열 또는 에러 반환.
     public func imageWithTitleDicts(count: Int = 10,
                                     encoding: String.Encoding? = nil) async -> Result<[Dictionary<String, Any>], StreamZip.Error> {
         
@@ -919,14 +960,12 @@ public class StreamZipDefaultArchiver {
     }
 
     // MARK: Completion Handler Method for Image
-    /**
-     아카이브 중 최초 이미지를 반환
-     - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
-     - Parameters:
-         - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
-         - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// 아카이브 중 최초 이미지를 반환하는 메쏘드
+    /// - 인코딩된 파일명 순서로 정렬, 그 중에서 최초의 이미지 파일을 반환한디
+    /// - Parameters:
+    ///     - encoding: 파일명 인코딩 지정. 미지정시 자동 인코딩
+    ///     - completion: `StreamZipImageRequestCompletion` 타입으로 이미지 및 에러 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
     public func firstImage(encoding: String.Encoding? = nil,
                            completion: @escaping StreamZipImageRequestCompletion) -> Progress? {
         // Progress 선언
