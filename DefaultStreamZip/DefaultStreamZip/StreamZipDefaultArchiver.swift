@@ -901,12 +901,18 @@ public class StreamZipDefaultArchiver {
         var dicts = [Dictionary<String, Any>]()
         
         for entry in entries {
-            guard let utiString = entry.filePath.utiString else {
+            guard let utiStrings = entry.filePath.utiStrings else {
                 continue
             }
-            if Detector.shared.detectImageFormat(utiString) == .unknown {
+            if Detector.shared.detectImageFormat(utiStrings) == .unknown {
                 continue
             }
+//            guard let utiString = entry.filePath.utiString else {
+//                continue
+//            }
+//            if Detector.shared.detectImageFormat(utiString) == .unknown {
+//                continue
+//            }
             
             let fetchResult = await self.fetchFile(entry: entry, addProgressTo: self.progress!)
 
@@ -991,8 +997,10 @@ public class StreamZipDefaultArchiver {
             
             var targetEntry: StreamZipEntry?
             for entry in entries {
-                guard let utiString = entry.filePath.utiString else { continue }
-                if Detector.shared.detectImageFormat(utiString) == .unknown { continue }
+                guard let utiStrings = entry.filePath.utiStrings else { continue }
+                if Detector.shared.detectImageFormat(utiStrings) == .unknown { continue }
+//                guard let utiString = entry.filePath.utiString else { continue }
+//                if Detector.shared.detectImageFormat(utiString) == .unknown { continue }
                 // 이미지 entry 발견시, 대입
                 targetEntry = entry
                 break
