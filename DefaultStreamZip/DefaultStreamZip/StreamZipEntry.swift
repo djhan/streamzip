@@ -22,6 +22,7 @@ public enum StreamZip {
         case sftp           = "sftp"
         case webdav         = "webdav"
         case webdav_https   = "webdav(https)"
+        case smb   = "smb"
         case oneDrive       = "onedrive"
         case local          = "file"
         case unknown        = "unknown"

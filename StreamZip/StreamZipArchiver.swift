@@ -16,6 +16,7 @@ import CommonLibrary
 import Detector
 import zlib
 import CloudProvider
+import SMBClient
 
 // MARK: - Stream Zip Archiver Class -
 /**
@@ -53,33 +54,30 @@ open class StreamZipArchiver {
     // MARK: WebDav Properties
     weak var webDavProvider: WebDAVFileProvider?
     
+    // MARK: SMBClient
+    weak var smbClient: SMBClient?
+    
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
     
     // MARK: - Initialization
     
-    /**
-     FTP 아이템 초기화
-     - Parameter ftpProvider: FTPProvider
-     */
+    /// FTP 아이템 초기화
+    /// - Parameter ftpProvider: FTPProvider
     public init?(ftpProvider: FTPProvider) {
         self.ftpProvider = ftpProvider
         // 연결 방식 확인 불필요, FTP 지정
         self.connection = .ftp
     }
-    /**
-     SFTP 아이템 초기화
-     - Parameter sftpProvider: SftpFileProvider
-     */
+    /// SFTP 아이템 초기화
+    /// - Parameter sftpProvider: SftpFileProvider
     public init?(sftpProvider: SftpFileProvider) {
         self.sftpProvider = sftpProvider
         // 연결 방식 확인 불필요, SFTP 지정
         self.connection = .sftp
     }
-    /**
-     WebDav 아이템 초기화
-     - Parameter webDavProvider: WebDAVFileProvider?
-     */
+    /// WebDav 아이템 초기화
+    /// - Parameter webDavProvider: WebDAVFileProvider?
     public init?(webDavProvider: WebDAVFileProvider) {
         // 연결 방식 확인
         guard let scheme = webDavProvider.baseURL?.scheme else { return nil }
@@ -90,12 +88,18 @@ open class StreamZipArchiver {
         }
         self.webDavProvider = webDavProvider
     }
-    /**
-     클라우드 아이템 초기화
-     - Parameters
-        - url: URL
-        - host: 클라우드 호스트.
-     */
+    /// SMB 아이템 초기화
+    /// - Parameter smbClient: SMBClient
+    public init?(smbClient: SMBClient) {
+        self.smbClient = smbClient
+        self.connection = .smb
+    }
+
+    
+    /// 클라우드 아이템 초기화
+    /// - Parameters
+    ///    - url: URL
+    ///    - host: 클라우드 호스트.
     public init?(url: URL, host: CloudHost) {
         self.fileURL = url
         // 클라우드 호스트 종류에 따라 연결 방식 지정
@@ -103,10 +107,8 @@ open class StreamZipArchiver {
         case .oneDrivie: self.connection = .oneDrive
         }
     }
-    /**
-     로컬 아이템 초기화
-     - Parameter fileURL: URL
-     */
+    /// 로컬 아이템 초기화
+    /// - Parameter fileURL: URL
     public init?(fileURL: URL) {
         self.fileURL = fileURL
         // 연결 방식 확인 불필요, FTP 지정
@@ -115,15 +117,13 @@ open class StreamZipArchiver {
     
     // MARK: - Methods
     
-    /**
-     특정 경로의 zip 파일에 접근, Entries 배열 생성
-     - Parameters:
-     - path: 파일 경로 지정
-         - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
-         - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
-         - completion: `StreamZipArchiveCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// 특정 경로의 zip 파일에 접근, Entries 배열 생성
+    /// - Parameters:
+    /// - path: 파일 경로 지정
+    ///     - fileLength: `UInt64` 타입으로 파일 길이 지정. nil로 지정되는 경우 해당 파일이 있는 디렉토리를 검색해서 파일 길이를 알아낸다
+    ///     - encoding: `String.Encoding` 형으로 파일명 인코딩 지정. 미지정시 자동 인코딩
+    ///     - completion: `StreamZipArchiveCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     public func fetchArchive(at path: String? = nil,
                              fileLength: UInt64? = nil,
                              encoding: String.Encoding? = nil,
@@ -193,15 +193,13 @@ open class StreamZipArchiver {
         return progress
     }
     
-    /**
-     Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
-     - Parameters:
-         - path: 파일 경로 지정
-         - fileLength: `UInt64`. 파일 길이 지정
-         - encoding: `String.Encoding`. 미지정시 자동 인코딩
-         - completion: `StreamZipArchiveCompletion`
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// Central Directory 정보를 찾아 Entry 배열을 생성하는 private 메쏘드
+    /// - Parameters:
+    ///     - path: 파일 경로 지정
+    ///     - fileLength: `UInt64`. 파일 길이 지정
+    ///     - encoding: `String.Encoding`. 미지정시 자동 인코딩
+    ///     - completion: `StreamZipArchiveCompletion`
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func makeEntries(at path: String,
                              fileLength: UInt64,
                              encoding: String.Encoding? = nil,
@@ -1349,6 +1347,20 @@ open class StreamZipArchiver {
         }
         return progress
     }
+    /// SMB로 특정 범위 데이터를 가져오는 메쏘드
+    /// - Parameters:
+    ///     - path: 데이터를 가져올 경로
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
+    private func requestFromSMB(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
+        let progress = Progress.init(totalUnitCount: 1)
+        Task {
+
+        }
+        return progress
+    }
+
     /**
      로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
      - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
