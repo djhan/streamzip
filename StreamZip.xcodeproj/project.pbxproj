@@ -19,6 +19,7 @@
 		EED23E5C2ACBF2F9002AEB72 /* DefaultStreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */; };
 		EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EF125D8C47000D3C62B /* FilesProvider.framework */; };
 		EED34A0E2AC66EF300AC1F2F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = EED34A0D2AC66EF300AC1F2F /* README.md */; };
+		EEF6552C2E1D46BC0021CE93 /* SMBProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEF6552B2E1D46BC0021CE93 /* SMBProvider.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -169,6 +170,27 @@
 			remoteGlobalIDString = 799396741D48B80D00086753;
 			remoteInfo = "FilesProvider OSX";
 		};
+		EEF655322E1D46C80021CE93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = EEF6543B2E1D45DF0021CE93;
+			remoteInfo = SMBProvider;
+		};
+		EEF655362E1D46C80021CE93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EEF6543C2E1D45DF0021CE93;
+			remoteInfo = SMBProvider;
+		};
+		EEF655382E1D46C80021CE93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EEF654472E1D45DF0021CE93;
+			remoteInfo = SMBProviderTests;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -190,6 +212,9 @@
 		EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CloudProvider.xcodeproj; path = ../CloudProvider/CloudProvider.xcodeproj; sourceTree = "<group>"; };
 		EED09BB92AC7A93800B2398C /* DefaultStreamZip.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DefaultStreamZip.xcodeproj; path = DefaultStreamZip/DefaultStreamZip.xcodeproj; sourceTree = "<group>"; };
 		EED34A0D2AC66EF300AC1F2F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		EEF655222E1D46B50021CE93 /* SMBProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMBProvider.xcodeproj; path = ../SMBProvider/SMBProvider.xcodeproj; sourceTree = "<group>"; };
+		EEF6552B2E1D46BC0021CE93 /* SMBProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SMBProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMBProvider.xcodeproj; path = /Users/djhan/repos/edgeview3/SMBProvider/SMBProvider.xcodeproj; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +228,7 @@
 				EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
 				EED23E5C2ACBF2F9002AEB72 /* DefaultStreamZip.framework in Frameworks */,
+				EEF6552C2E1D46BC0021CE93 /* SMBProvider.framework in Frameworks */,
 				EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -221,6 +247,7 @@
 		EE283EA225D8B39700D3C62B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EEF6552B2E1D46BC0021CE93 /* SMBProvider.framework */,
 				EEA5855E2B64E2630095E67C /* CloudProvider.framework */,
 				EE3BCAA12823E2150064E218 /* SftpProvider.framework */,
 				EE283EA325D8B39700D3C62B /* FilesProvider.framework */,
@@ -277,7 +304,9 @@
 				EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */,
 				EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */,
 				EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */,
+				EEF655222E1D46B50021CE93 /* SMBProvider.xcodeproj */,
 				EE283F1F25D8E81900D3C62B /* Detector.xcodeproj */,
+				EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -336,6 +365,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EEF655302E1D46C80021CE93 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EEF655372E1D46C80021CE93 /* SMBProvider.framework */,
+				EEF655392E1D46C80021CE93 /* SMBProviderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -362,6 +400,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EEF655332E1D46C80021CE93 /* PBXTargetDependency */,
 				EEA585782B64E2BD0095E67C /* PBXTargetDependency */,
 				EED09BC32AC7A94900B2398C /* PBXTargetDependency */,
 				EED34A062AC590D200AC1F2F /* PBXTargetDependency */,
@@ -451,6 +490,10 @@
 				{
 					ProductGroup = EE3BCAAC2823E21D0064E218 /* Products */;
 					ProjectRef = EE3BCAAB2823E21D0064E218 /* SftpProvider.xcodeproj */;
+				},
+				{
+					ProductGroup = EEF655302E1D46C80021CE93 /* Products */;
+					ProjectRef = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -553,6 +596,20 @@
 			remoteRef = EED09BC02AC7A93800B2398C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		EEF655372E1D46C80021CE93 /* SMBProvider.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SMBProvider.framework;
+			remoteRef = EEF655362E1D46C80021CE93 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EEF655392E1D46C80021CE93 /* SMBProviderTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SMBProviderTests.xctest;
+			remoteRef = EEF655382E1D46C80021CE93 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -632,6 +689,11 @@
 			isa = PBXTargetDependency;
 			name = "FilesProvider OSX";
 			targetProxy = EED34A052AC590D200AC1F2F /* PBXContainerItemProxy */;
+		};
+		EEF655332E1D46C80021CE93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SMBProvider;
+			targetProxy = EEF655322E1D46C80021CE93 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

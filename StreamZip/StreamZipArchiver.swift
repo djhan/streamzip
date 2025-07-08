@@ -16,7 +16,7 @@ import CommonLibrary
 import Detector
 import zlib
 import CloudProvider
-import SMBClient
+import SMBProvider
 
 // MARK: - Stream Zip Archiver Class -
 /**
