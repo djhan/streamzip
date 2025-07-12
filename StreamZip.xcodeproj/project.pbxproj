@@ -142,6 +142,20 @@
 			remoteGlobalIDString = EEA585112B64DB340095E67C;
 			remoteInfo = CloudProvider;
 		};
+		EEC9C7CA2E1FD60300538050 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEF655222E1D46B50021CE93 /* SMBProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EEF6543C2E1D45DF0021CE93;
+			remoteInfo = SMBProvider;
+		};
+		EEC9C7CC2E1FD60300538050 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEF655222E1D46B50021CE93 /* SMBProvider.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EEF654472E1D45DF0021CE93;
+			remoteInfo = SMBProviderTests;
+		};
 		EED09BBE2AC7A93800B2398C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EED09BB92AC7A93800B2398C /* DefaultStreamZip.xcodeproj */;
@@ -356,6 +370,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EEC9C7A12E1FD60300538050 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EEC9C7CB2E1FD60300538050 /* SMBProvider.framework */,
+				EEC9C7CD2E1FD60300538050 /* SMBProviderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		EED09BBA2AC7A93800B2398C /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -495,6 +518,10 @@
 					ProductGroup = EEF655302E1D46C80021CE93 /* Products */;
 					ProjectRef = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
 				},
+				{
+					ProductGroup = EEC9C7A12E1FD60300538050 /* Products */;
+					ProjectRef = EEF655222E1D46B50021CE93 /* SMBProvider.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -580,6 +607,20 @@
 			fileType = wrapper.framework;
 			path = CloudProvider.framework;
 			remoteRef = EEA585752B64E2B50095E67C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EEC9C7CB2E1FD60300538050 /* SMBProvider.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SMBProvider.framework;
+			remoteRef = EEC9C7CA2E1FD60300538050 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EEC9C7CD2E1FD60300538050 /* SMBProviderTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SMBProviderTests.xctest;
+			remoteRef = EEC9C7CC2E1FD60300538050 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */ = {

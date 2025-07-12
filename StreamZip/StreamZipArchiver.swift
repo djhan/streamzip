@@ -893,13 +893,11 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     contents of directory 배열 생성후 완료 핸들러로 반환
-     - Parameters:
-         - mainPath: contents 목록을 만들려고 하는 경로
-         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// contents of directory 배열 생성후 완료 핸들러로 반환
+    /// - Parameters:
+    ///     - mainPath: contents 목록을 만들려고 하는 경로
+    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func getContentsOfDirectory(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         switch self.connection {
             // FTP인 경우
@@ -910,6 +908,8 @@ open class StreamZipArchiver {
         case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
             // oneDrive인 경우
         case .oneDrive: return self.getContentsOfDirectoryInOneDrive(at: mainPath, completion: completion)
+            // SMB인 경우
+        case .smb: return self.getContentsOfDirectoryInSMB(at: mainPath, completion: completion)
 
             // 그 외: 미지원으로 실패 처리
         default:
@@ -919,13 +919,11 @@ open class StreamZipArchiver {
     }
     
     // MARK: Get Contents of Directory
-    /**
-     FTP에서 mainPath 대입 후, contents of directory 배열 생성
-     - Parameters:
-         - mainPath: contents 목록을 만들려고 하는 경로
-         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// FTP에서 mainPath 대입 후, contents of directory 배열 생성
+    /// - Parameters:
+    ///     - mainPath: contents 목록을 만들려고 하는 경로
+    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func getContentsOfDirectoryInFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         
         guard let ftpProvider = self.ftpProvider else {
@@ -972,13 +970,11 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     SFTP에서 mainPath 대입 후, contents of directory 배열 생성
-     - Parameters:
-         - mainPath: contents 목록을 만들려고 하는 경로
-         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// SFTP에서 mainPath 대입 후, contents of directory 배열 생성
+    /// - Parameters:
+    ///     - mainPath: contents 목록을 만들려고 하는 경로
+    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func getContentsOfDirectoryInSFTP(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         
         guard let sftpProvider = self.sftpProvider else {
@@ -1025,13 +1021,11 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     WebDav에서 mainPath 대입 후, contents of directory 배열 생성
-     - Parameters:
-         - mainPath: contents 목록을 만들려고 하는 경로
-         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// WebDav에서 mainPath 대입 후, contents of directory 배열 생성
+    /// - Parameters:
+    ///     - mainPath: contents 목록을 만들려고 하는 경로
+    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func getContentsOfDirectoryInWebDav(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         guard let webDavProvider = self.webDavProvider else {
             EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> webDavProvider가 nil.")
@@ -1073,13 +1067,11 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     OneDrive에서 mainPath 대입 후, contents of directory 배열 생성
-     - Parameters:
-         - mainPath: contents 목록을 만들려고 하는 경로
-         - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// OneDrive에서 mainPath 대입 후, contents of directory 배열 생성
+    /// - Parameters:
+    ///     - mainPath: contents 목록을 만들려고 하는 경로
+    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func getContentsOfDirectoryInOneDrive(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
         let progress = Progress.init(totalUnitCount: 1)
         Task {
@@ -1111,17 +1103,51 @@ open class StreamZipArchiver {
         return progress
     }
     
+    /// SMB 네트웍에서 mainPath 대입 후, contents of directory 배열 생성
+    /// - Parameters:
+    ///     - mainPath: contents 목록을 만들려고 하는 경로
+    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
+    /// - Returns: Progress 반환. 실패시 nil 반환
+    private func getContentsOfDirectoryInSMB(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
+        guard let smbClient = self.smbClient else {
+            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> smbClient가 nil.")
+            completion(nil, StreamZip.Error.unknown)
+            return nil
+        }
+
+        let progress = Progress.init(totalUnitCount: 1)
+        Task {
+            do {
+                let files = try await smbClient.listDirectory(path: mainPath)
+                // contents of directory 배열에 아이템 대입
+                let contentsOfDirectory = files.map { (item) -> ContentOfDirectory in
+                    let size = item.size > 0 ? item.size : 0
+                    return ContentOfDirectory.init(path: item.name,
+                                                   isDirectory: item.isDirectory,
+                                                   fileSize: UInt64(size))
+                }
+
+                progress.completedUnitCount += 1
+                return completion(contentsOfDirectory, nil)
+            }
+            catch {
+                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> 에러 발생 = \(error.localizedDescription).")
+                completion(nil, error)
+            }
+        }
+        
+        return progress
+    }
+    
     // MARK: Get Data
-    /**
-     특정 범위 데이터를 가져오는 메쏘드
-     - 네트웍에서 사용
-     - Parameters:
-         - path: 파일 경로. 네트웍 파일일 경우 지정
-         - url: 파일 경로. 로컬 파일일 경우 지정
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// 특정 범위 데이터를 가져오는 메쏘드
+    /// - 네트웍에서 사용
+    /// - Parameters:
+    ///     - path: 파일 경로. 네트웍 파일일 경우 지정
+    ///     - url: 파일 경로. 로컬 파일일 경우 지정
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func request(path: String? = nil,
                          url: URL? = nil,
                          range: Range<UInt64>,
@@ -1159,6 +1185,14 @@ open class StreamZipArchiver {
                 return nil
             }
             return self.requestFromOneDrive(at: path, range: range, completion: completion)
+            
+            // SMB인 경우
+        case .smb:
+            guard let path else {
+                completion(nil, StreamZip.Error.unsupportedConnection)
+                return nil
+            }
+            return self.requestFromSMB(at: path, range: range, completion: completion)
 
             // local인 경우
         case .local:
@@ -1175,14 +1209,12 @@ open class StreamZipArchiver {
             return nil
         }
     }
-    /**
-     FTP로 특정 범위 데이터를 가져오는 메쏘드
-     - Parameters:
-         - path: 데이터를 가져올 경로
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// FTP로 특정 범위 데이터를 가져오는 메쏘드
+    /// - Parameters:
+    ///     - path: 데이터를 가져올 경로
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         guard let ftpProvider = self.ftpProvider else {
             completion(nil, StreamZip.Error.unknown)
@@ -1217,14 +1249,12 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     SFTP로 현재 특정 범위 데이터를 가져오는 메쏘드
-     - Parameters:
-         - path: 데이터를 가져올 경로
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// SFTP로 현재 특정 범위 데이터를 가져오는 메쏘드
+    /// - Parameters:
+    ///     - path: 데이터를 가져올 경로
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromSFTP(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         guard let sftpProvider = self.sftpProvider else {
             completion(nil, StreamZip.Error.unknown)
@@ -1260,14 +1290,12 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     WebDav로 특정 범위 데이터를 가져오는 메쏘드
-     - Parameters:
-         - path: 데이터를 가져올 경로
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// WebDav로 특정 범위 데이터를 가져오는 메쏘드
+    /// - Parameters:
+    ///     - path: 데이터를 가져올 경로
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromWebDav(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         guard let webDavProvider = self.webDavProvider else {
             completion(nil, StreamZip.Error.unknown)
@@ -1302,14 +1330,12 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /**
-     OneDrive로 특정 범위 데이터를 가져오는 메쏘드
-     - Parameters:
-         - path: 데이터를 가져올 경로
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// OneDrive로 특정 범위 데이터를 가져오는 메쏘드
+    /// - Parameters:
+    ///     - path: 데이터를 가져올 경로
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromOneDrive(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
         let progress = Progress.init(totalUnitCount: 1)
         Task {
@@ -1354,22 +1380,41 @@ open class StreamZipArchiver {
     ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
     /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromSMB(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
-        let progress = Progress.init(totalUnitCount: 1)
-        Task {
-
+        guard let smbClient else {
+            completion(nil, StreamZip.Error.unknown)
+            return nil
         }
-        return progress
+
+        let returnProgress = Progress.init(totalUnitCount: Int64(range.count))
+        Task {
+            do {
+                let data = try await smbClient.read(path: path,
+                                                    offset: UInt64(range.lowerBound),
+                                                    length: UInt32(range.count)) { progress in
+                    returnProgress.completedUnitCount = Int64(progress)
+                }
+                guard data.count == range.count else {
+                    EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> 데이터 길이가 동일하지 않음, 문제 발생.")
+                    return completion(nil, StreamZip.Error.unknown)
+                }
+                
+                return completion(data, nil)
+            }
+            catch {
+                EdgeLogger.shared.archiveLogger.error("\(#function) :: \(path) >> 에러 발생 = \(error.localizedDescription).")
+                return completion(nil, error)
+            }
+        }
+        return returnProgress
     }
 
-    /**
-     로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
-     - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
-     - Parameters:
-         - url: 데이터를 가져올 경로
-         - range: 데이터를 가져올 범위
-         - completion: `StreamZipRequestCompletion` 완료 핸들러
-     - Returns: Progress 반환. 실패시 nil 반환
-     */
+    /// 로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
+    /// - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
+    /// - Parameters:
+    ///     - url: 데이터를 가져올 경로
+    ///     - range: 데이터를 가져올 범위
+    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromLocal(at url: URL,
                                   range: Range<UInt64>,
                                   completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
