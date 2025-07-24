@@ -183,13 +183,6 @@
 			remoteGlobalIDString = 799396741D48B80D00086753;
 			remoteInfo = "FilesProvider OSX";
 		};
-		EEF655322E1D46C80021CE93 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = EEF6543B2E1D45DF0021CE93;
-			remoteInfo = SMBProvider;
-		};
 		EEF655362E1D46C80021CE93 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */;
@@ -421,7 +414,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				EEF655332E1D46C80021CE93 /* PBXTargetDependency */,
 				EEA585782B64E2BD0095E67C /* PBXTargetDependency */,
 				EED09BC32AC7A94900B2398C /* PBXTargetDependency */,
 				EED34A062AC590D200AC1F2F /* PBXTargetDependency */,
@@ -728,11 +720,6 @@
 			isa = PBXTargetDependency;
 			name = "FilesProvider OSX";
 			targetProxy = EED34A052AC590D200AC1F2F /* PBXContainerItemProxy */;
-		};
-		EEF655332E1D46C80021CE93 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = SMBProvider;
-			targetProxy = EEF655322E1D46C80021CE93 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
