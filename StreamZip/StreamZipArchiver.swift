@@ -16,7 +16,10 @@ import CommonLibrary
 import Detector
 import zlib
 import CloudProvider
-import SMBProvider
+/// # 참고사항: 2925-07-24
+/// - 구 버전 사용자의 문제로 제거.
+//import SMBProvider
+
 
 // MARK: - Stream Zip Archiver Class -
 /**
@@ -55,7 +58,7 @@ open class StreamZipArchiver {
     weak var webDavProvider: WebDAVFileProvider?
     
     // MARK: SMBClient
-    weak var smbClient: SMBClient?
+//    weak var smbClient: SMBClient?
     
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
@@ -90,10 +93,10 @@ open class StreamZipArchiver {
     }
     /// SMB 아이템 초기화
     /// - Parameter smbClient: SMBClient
-    public init?(smbClient: SMBClient) {
-        self.smbClient = smbClient
-        self.connection = .smb
-    }
+//    public init?(smbClient: SMBClient) {
+//        self.smbClient = smbClient
+//        self.connection = .smb
+//    }
 
     
     /// 클라우드 아이템 초기화
@@ -908,8 +911,8 @@ open class StreamZipArchiver {
         case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
             // oneDrive인 경우
         case .oneDrive: return self.getContentsOfDirectoryInOneDrive(at: mainPath, completion: completion)
-            // SMB인 경우
-        case .smb: return self.getContentsOfDirectoryInSMB(at: mainPath, completion: completion)
+//            // SMB인 경우
+//        case .smb: return self.getContentsOfDirectoryInSMB(at: mainPath, completion: completion)
 
             // 그 외: 미지원으로 실패 처리
         default:
@@ -1102,7 +1105,7 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    
+    /*
     /// SMB 네트웍에서 mainPath 대입 후, contents of directory 배열 생성
     /// - Parameters:
     ///     - mainPath: contents 목록을 만들려고 하는 경로
@@ -1138,7 +1141,7 @@ open class StreamZipArchiver {
         
         return progress
     }
-    
+    */
     // MARK: Get Data
     /// 특정 범위 데이터를 가져오는 메쏘드
     /// - 네트웍에서 사용
@@ -1187,12 +1190,12 @@ open class StreamZipArchiver {
             return self.requestFromOneDrive(at: path, range: range, completion: completion)
             
             // SMB인 경우
-        case .smb:
-            guard let path else {
-                completion(nil, StreamZip.Error.unsupportedConnection)
-                return nil
-            }
-            return self.requestFromSMB(at: path, range: range, completion: completion)
+//        case .smb:
+//            guard let path else {
+//                completion(nil, StreamZip.Error.unsupportedConnection)
+//                return nil
+//            }
+//            return self.requestFromSMB(at: path, range: range, completion: completion)
 
             // local인 경우
         case .local:
@@ -1373,6 +1376,7 @@ open class StreamZipArchiver {
         }
         return progress
     }
+    /*
     /// SMB로 특정 범위 데이터를 가져오는 메쏘드
     /// - Parameters:
     ///     - path: 데이터를 가져올 경로
@@ -1407,7 +1411,7 @@ open class StreamZipArchiver {
         }
         return returnProgress
     }
-
+*/
     /// 로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
     /// - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
     /// - Parameters:
