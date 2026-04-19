@@ -19,6 +19,34 @@
 		EED23E5C2ACBF2F9002AEB72 /* DefaultStreamZip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EED09BBF2AC7A93800B2398C /* DefaultStreamZip.framework */; };
 		EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283EF125D8C47000D3C62B /* FilesProvider.framework */; };
 		EED34A0E2AC66EF300AC1F2F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = EED34A0D2AC66EF300AC1F2F /* README.md */; };
+		EEEE14DD2F949CCE00F45046 /* SMBFileProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14DA2F949BAF00F45046 /* SMBFileProvider.swift */; };
+		EEEE14DE2F949CDC00F45046 /* CloudConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D52F949BAF00F45046 /* CloudConfiguration.swift */; };
+		EEEE14DF2F949CDD00F45046 /* OneDriveFileProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D62F949BAF00F45046 /* OneDriveFileProvider.swift */; };
+		EEEE14E02F949CDF00F45046 /* WebDAVFilesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D72F949BAF00F45046 /* WebDAVFilesProvider.swift */; };
+		EEEE14E12F949CE100F45046 /* WebDAVResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D82F949BAF00F45046 /* WebDAVResponse.swift */; };
+		EEEE14E22F949CE500F45046 /* AEXMLDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D12F949BAF00F45046 /* AEXMLDocument.swift */; };
+		EEEE14E32F949CE700F45046 /* AEXMLElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D22F949BAF00F45046 /* AEXMLElement.swift */; };
+		EEEE14E42F949CEA00F45046 /* AEXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D32F949BAF00F45046 /* AEXMLParser.swift */; };
+		EEEE14E52F949CFB00F45046 /* GetValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14CE2F949BAF00F45046 /* GetValue.swift */; };
+		EEEE14E62F949CFE00F45046 /* Read.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14CF2F949BAF00F45046 /* Read.swift */; };
+		EEEE14E72F949D0600F45046 /* CharacterSetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C62F949BAF00F45046 /* CharacterSetExtension.swift */; };
+		EEEE14E82F949D0B00F45046 /* DataTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C72F949BAF00F45046 /* DataTransformExtension.swift */; };
+		EEEE14E92F949D0E00F45046 /* URL+Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C82F949BAF00F45046 /* URL+Request.swift */; };
+		EEEE14EA2F949D1100F45046 /* URLCacheExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C92F949BAF00F45046 /* URLCacheExtension.swift */; };
+		EEEE14EB2F949D1400F45046 /* URLError.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14CA2F949BAF00F45046 /* URLError.swift */; };
+		EEEE14EC2F949D1800F45046 /* URLRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14CB2F949BAF00F45046 /* URLRequestExtension.swift */; };
+		EEEE14ED2F949D1C00F45046 /* URLResourceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14CC2F949BAF00F45046 /* URLResourceKey.swift */; };
+		EEEE14EE2F949D2000F45046 /* SessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C42F949BAF00F45046 /* SessionDelegate.swift */; };
+		EEEE14EF2F949D2200F45046 /* OAuthorizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C32F949BAF00F45046 /* OAuthorizable.swift */; };
+		EEEE14F02F949D2500F45046 /* HTTPProviderable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C22F949BAF00F45046 /* HTTPProviderable.swift */; };
+		EEEE14F12F949D2D00F45046 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C12F949BAF00F45046 /* Files.swift */; };
+		EEEE14F22F949D3000F45046 /* FileProviderable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14C02F949BAF00F45046 /* FileProviderable.swift */; };
+		EEEE14F32F949D3500F45046 /* FIleOperationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14BF2F949BAF00F45046 /* FIleOperationType.swift */; };
+		EEEE14F42F949D3800F45046 /* FileIProvidertem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14BE2F949BAF00F45046 /* FileIProvidertem.swift */; };
+		EEEE14F52F949D3B00F45046 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14BD2F949BAF00F45046 /* Constants.swift */; };
+		EEEE15242F949D7000F45046 /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = EEEE15232F949D7000F45046 /* MSAL */; };
+		EEEE15272F94B7F600F45046 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = EEEE15262F94B7F600F45046 /* OAuthSwift */; };
+		EEEE152D2F94B97F00F45046 /* SMBClient in Frameworks */ = {isa = PBXBuildFile; productRef = EEEE152C2F94B97F00F45046 /* SMBClient */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -218,6 +246,31 @@
 		EEA585712B64E2B50095E67C /* CloudProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CloudProvider.xcodeproj; path = ../CloudProvider/CloudProvider.xcodeproj; sourceTree = "<group>"; };
 		EED09BB92AC7A93800B2398C /* DefaultStreamZip.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DefaultStreamZip.xcodeproj; path = DefaultStreamZip/DefaultStreamZip.xcodeproj; sourceTree = "<group>"; };
 		EED34A0D2AC66EF300AC1F2F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		EEEE14BD2F949BAF00F45046 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		EEEE14BE2F949BAF00F45046 /* FileIProvidertem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIProvidertem.swift; sourceTree = "<group>"; };
+		EEEE14BF2F949BAF00F45046 /* FIleOperationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FIleOperationType.swift; sourceTree = "<group>"; };
+		EEEE14C02F949BAF00F45046 /* FileProviderable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileProviderable.swift; sourceTree = "<group>"; };
+		EEEE14C12F949BAF00F45046 /* Files.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Files.swift; sourceTree = "<group>"; };
+		EEEE14C22F949BAF00F45046 /* HTTPProviderable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPProviderable.swift; sourceTree = "<group>"; };
+		EEEE14C32F949BAF00F45046 /* OAuthorizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthorizable.swift; sourceTree = "<group>"; };
+		EEEE14C42F949BAF00F45046 /* SessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDelegate.swift; sourceTree = "<group>"; };
+		EEEE14C62F949BAF00F45046 /* CharacterSetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSetExtension.swift; sourceTree = "<group>"; };
+		EEEE14C72F949BAF00F45046 /* DataTransformExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTransformExtension.swift; sourceTree = "<group>"; };
+		EEEE14C82F949BAF00F45046 /* URL+Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Request.swift"; sourceTree = "<group>"; };
+		EEEE14C92F949BAF00F45046 /* URLCacheExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCacheExtension.swift; sourceTree = "<group>"; };
+		EEEE14CA2F949BAF00F45046 /* URLError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLError.swift; sourceTree = "<group>"; };
+		EEEE14CB2F949BAF00F45046 /* URLRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
+		EEEE14CC2F949BAF00F45046 /* URLResourceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLResourceKey.swift; sourceTree = "<group>"; };
+		EEEE14CE2F949BAF00F45046 /* GetValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetValue.swift; sourceTree = "<group>"; };
+		EEEE14CF2F949BAF00F45046 /* Read.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Read.swift; sourceTree = "<group>"; };
+		EEEE14D12F949BAF00F45046 /* AEXMLDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEXMLDocument.swift; sourceTree = "<group>"; };
+		EEEE14D22F949BAF00F45046 /* AEXMLElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEXMLElement.swift; sourceTree = "<group>"; };
+		EEEE14D32F949BAF00F45046 /* AEXMLParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEXMLParser.swift; sourceTree = "<group>"; };
+		EEEE14D52F949BAF00F45046 /* CloudConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConfiguration.swift; sourceTree = "<group>"; };
+		EEEE14D62F949BAF00F45046 /* OneDriveFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveFileProvider.swift; sourceTree = "<group>"; };
+		EEEE14D72F949BAF00F45046 /* WebDAVFilesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVFilesProvider.swift; sourceTree = "<group>"; };
+		EEEE14D82F949BAF00F45046 /* WebDAVResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVResponse.swift; sourceTree = "<group>"; };
+		EEEE14DA2F949BAF00F45046 /* SMBFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMBFileProvider.swift; sourceTree = "<group>"; };
 		EEF655222E1D46B50021CE93 /* SMBProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMBProvider.xcodeproj; path = ../SMBProvider/SMBProvider.xcodeproj; sourceTree = "<group>"; };
 		EEF6552B2E1D46BC0021CE93 /* SMBProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SMBProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEF6552F2E1D46C80021CE93 /* SMBProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMBProvider.xcodeproj; path = /Users/djhan/repos/edgeview3/SMBProvider/SMBProvider.xcodeproj; sourceTree = "<absolute>"; };
@@ -229,7 +282,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				EEA5855F2B64E2630095E67C /* CloudProvider.framework in Frameworks */,
+				EEEE15242F949D7000F45046 /* MSAL in Frameworks */,
+				EEEE15272F94B7F600F45046 /* OAuthSwift in Frameworks */,
 				EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */,
+				EEEE152D2F94B97F00F45046 /* SMBClient in Frameworks */,
 				EEA5415C29D16C1900C81239 /* EdgeFtpProvider.framework in Frameworks */,
 				EED34A002AC590C300AC1F2F /* FilesProvider.framework in Frameworks */,
 				EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */,
@@ -299,6 +355,7 @@
 		EE7732B625D0D37C00414625 = {
 			isa = PBXGroup;
 			children = (
+				EEEE14DC2F949BAF00F45046 /* FileProvider */,
 				EE7732C225D0D37C00414625 /* StreamZip */,
 				EE7732CD25D0D37C00414625 /* StreamZipTests */,
 				EE7732C125D0D37C00414625 /* Products */,
@@ -377,6 +434,86 @@
 				EED09BC12AC7A93800B2398C /* DefaultStreamZipTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		EEEE14C52F949BAF00F45046 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14BD2F949BAF00F45046 /* Constants.swift */,
+				EEEE14BE2F949BAF00F45046 /* FileIProvidertem.swift */,
+				EEEE14BF2F949BAF00F45046 /* FIleOperationType.swift */,
+				EEEE14C02F949BAF00F45046 /* FileProviderable.swift */,
+				EEEE14C12F949BAF00F45046 /* Files.swift */,
+				EEEE14C22F949BAF00F45046 /* HTTPProviderable.swift */,
+				EEEE14C32F949BAF00F45046 /* OAuthorizable.swift */,
+				EEEE14C42F949BAF00F45046 /* SessionDelegate.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		EEEE14CD2F949BAF00F45046 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14C62F949BAF00F45046 /* CharacterSetExtension.swift */,
+				EEEE14C72F949BAF00F45046 /* DataTransformExtension.swift */,
+				EEEE14C82F949BAF00F45046 /* URL+Request.swift */,
+				EEEE14C92F949BAF00F45046 /* URLCacheExtension.swift */,
+				EEEE14CA2F949BAF00F45046 /* URLError.swift */,
+				EEEE14CB2F949BAF00F45046 /* URLRequestExtension.swift */,
+				EEEE14CC2F949BAF00F45046 /* URLResourceKey.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		EEEE14D02F949BAF00F45046 /* Functions */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14CE2F949BAF00F45046 /* GetValue.swift */,
+				EEEE14CF2F949BAF00F45046 /* Read.swift */,
+			);
+			path = Functions;
+			sourceTree = "<group>";
+		};
+		EEEE14D42F949BAF00F45046 /* AEXML */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14D12F949BAF00F45046 /* AEXMLDocument.swift */,
+				EEEE14D22F949BAF00F45046 /* AEXMLElement.swift */,
+				EEEE14D32F949BAF00F45046 /* AEXMLParser.swift */,
+			);
+			path = AEXML;
+			sourceTree = "<group>";
+		};
+		EEEE14D92F949BAF00F45046 /* HTTP */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14D42F949BAF00F45046 /* AEXML */,
+				EEEE14D52F949BAF00F45046 /* CloudConfiguration.swift */,
+				EEEE14D62F949BAF00F45046 /* OneDriveFileProvider.swift */,
+				EEEE14D72F949BAF00F45046 /* WebDAVFilesProvider.swift */,
+				EEEE14D82F949BAF00F45046 /* WebDAVResponse.swift */,
+			);
+			path = HTTP;
+			sourceTree = "<group>";
+		};
+		EEEE14DB2F949BAF00F45046 /* SMB */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14DA2F949BAF00F45046 /* SMBFileProvider.swift */,
+			);
+			path = SMB;
+			sourceTree = "<group>";
+		};
+		EEEE14DC2F949BAF00F45046 /* FileProvider */ = {
+			isa = PBXGroup;
+			children = (
+				EEEE14C52F949BAF00F45046 /* Common */,
+				EEEE14CD2F949BAF00F45046 /* Extension */,
+				EEEE14D02F949BAF00F45046 /* Functions */,
+				EEEE14D92F949BAF00F45046 /* HTTP */,
+				EEEE14DB2F949BAF00F45046 /* SMB */,
+			);
+			path = FileProvider;
 			sourceTree = "<group>";
 		};
 		EEF655302E1D46C80021CE93 /* Products */ = {
@@ -473,6 +610,11 @@
 				Base,
 			);
 			mainGroup = EE7732B625D0D37C00414625;
+			packageReferences = (
+				EEEE15222F949D7000F45046 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */,
+				EEEE15252F94B7F600F45046 /* XCRemoteSwiftPackageReference "OAuthSwift" */,
+				EEEE152B2F94B97F00F45046 /* XCRemoteSwiftPackageReference "SMBClient" */,
+			);
 			productRefGroup = EE7732C125D0D37C00414625 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
@@ -666,7 +808,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEEE14F52F949D3B00F45046 /* Constants.swift in Sources */,
 				EE7732E125D0FF4100414625 /* StreamZipArchiver.swift in Sources */,
+				EEEE14E22F949CE500F45046 /* AEXMLDocument.swift in Sources */,
+				EEEE14E42F949CEA00F45046 /* AEXMLParser.swift in Sources */,
+				EEEE14E32F949CE700F45046 /* AEXMLElement.swift in Sources */,
+				EEEE14DF2F949CDD00F45046 /* OneDriveFileProvider.swift in Sources */,
+				EEEE14E02F949CDF00F45046 /* WebDAVFilesProvider.swift in Sources */,
+				EEEE14DD2F949CCE00F45046 /* SMBFileProvider.swift in Sources */,
+				EEEE14DE2F949CDC00F45046 /* CloudConfiguration.swift in Sources */,
+				EEEE14E12F949CE100F45046 /* WebDAVResponse.swift in Sources */,
+				EEEE14E52F949CFB00F45046 /* GetValue.swift in Sources */,
+				EEEE14E62F949CFE00F45046 /* Read.swift in Sources */,
+				EEEE14E72F949D0600F45046 /* CharacterSetExtension.swift in Sources */,
+				EEEE14E82F949D0B00F45046 /* DataTransformExtension.swift in Sources */,
+				EEEE14E92F949D0E00F45046 /* URL+Request.swift in Sources */,
+				EEEE14EA2F949D1100F45046 /* URLCacheExtension.swift in Sources */,
+				EEEE14EB2F949D1400F45046 /* URLError.swift in Sources */,
+				EEEE14EC2F949D1800F45046 /* URLRequestExtension.swift in Sources */,
+				EEEE14ED2F949D1C00F45046 /* URLResourceKey.swift in Sources */,
+				EEEE14F02F949D2500F45046 /* HTTPProviderable.swift in Sources */,
+				EEEE14EF2F949D2200F45046 /* OAuthorizable.swift in Sources */,
+				EEEE14F22F949D3000F45046 /* FileProviderable.swift in Sources */,
+				EEEE14F42F949D3800F45046 /* FileIProvidertem.swift in Sources */,
+				EEEE14F32F949D3500F45046 /* FIleOperationType.swift in Sources */,
+				EEEE14EE2F949D2000F45046 /* SessionDelegate.swift in Sources */,
+				EEEE14F12F949D2D00F45046 /* Files.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -993,6 +1160,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EEEE15222F949D7000F45046 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AzureAD/microsoft-authentication-library-for-objc";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.0;
+			};
+		};
+		EEEE15252F94B7F600F45046 /* XCRemoteSwiftPackageReference "OAuthSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OAuthSwift/OAuthSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+		EEEE152B2F94B97F00F45046 /* XCRemoteSwiftPackageReference "SMBClient" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/djhan/SMBClient.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EEEE15232F949D7000F45046 /* MSAL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EEEE15222F949D7000F45046 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
+			productName = MSAL;
+		};
+		EEEE15262F94B7F600F45046 /* OAuthSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EEEE15252F94B7F600F45046 /* XCRemoteSwiftPackageReference "OAuthSwift" */;
+			productName = OAuthSwift;
+		};
+		EEEE152C2F94B97F00F45046 /* SMBClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EEEE152B2F94B97F00F45046 /* XCRemoteSwiftPackageReference "SMBClient" */;
+			productName = SMBClient;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EE7732B725D0D37C00414625 /* Project object */;
 }

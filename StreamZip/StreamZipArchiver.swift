@@ -57,8 +57,8 @@ open class StreamZipArchiver {
     // MARK: WebDav Properties
     weak var webDavProvider: WebDAVFileProvider?
     
-    // MARK: SMBClient
-//    weak var smbClient: SMBClient?
+    // MARK: SMB Properties
+    weak var smbProvider: SMBFileProvider?
     
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
@@ -92,11 +92,11 @@ open class StreamZipArchiver {
         self.webDavProvider = webDavProvider
     }
     /// SMB 아이템 초기화
-    /// - Parameter smbClient: SMBClient
-//    public init?(smbClient: SMBClient) {
-//        self.smbClient = smbClient
-//        self.connection = .smb
-//    }
+    /// - Parameter smbProvider: SMBFileProvider
+    public init?(smbProvider: SMBFileProvider) {
+        self.smbProvider = smbProvider
+        self.connection = .smb
+    }
 
     
     /// 클라우드 아이템 초기화
@@ -911,8 +911,8 @@ open class StreamZipArchiver {
         case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
             // oneDrive인 경우
         case .oneDrive: return self.getContentsOfDirectoryInOneDrive(at: mainPath, completion: completion)
-//            // SMB인 경우
-//        case .smb: return self.getContentsOfDirectoryInSMB(at: mainPath, completion: completion)
+            // SMB인 경우
+        case .smb: return self.getContentsOfDirectoryInSMB(at: mainPath, completion: completion)
 
             // 그 외: 미지원으로 실패 처리
         default:
@@ -1105,14 +1105,13 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /*
     /// SMB 네트웍에서 mainPath 대입 후, contents of directory 배열 생성
     /// - Parameters:
     ///     - mainPath: contents 목록을 만들려고 하는 경로
     ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
     /// - Returns: Progress 반환. 실패시 nil 반환
     private func getContentsOfDirectoryInSMB(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
-        guard let smbClient = self.smbClient else {
+        guard let smbProvider else {
             EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> smbClient가 nil.")
             completion(nil, StreamZip.Error.unknown)
             return nil
@@ -1120,20 +1119,18 @@ open class StreamZipArchiver {
 
         let progress = Progress.init(totalUnitCount: 1)
         Task {
-            do {
-                let files = try await smbClient.listDirectory(path: mainPath)
+            let result = await smbProvider.contents(of: mainPath, showHiddenFiles: false)
+            switch result {
+            case .success(let items):
                 // contents of directory 배열에 아이템 대입
-                let contentsOfDirectory = files.map { (item) -> ContentOfDirectory in
-                    let size = item.size > 0 ? item.size : 0
-                    return ContentOfDirectory.init(path: item.name,
+                let contentsOfDirectory = items.map { (item) -> ContentOfDirectory in
+                    let size = item.fileSize > 0 ? item.fileSize : 0
+                    return ContentOfDirectory.init(path: item.filename,
                                                    isDirectory: item.isDirectory,
                                                    fileSize: UInt64(size))
                 }
 
-                progress.completedUnitCount += 1
-                return completion(contentsOfDirectory, nil)
-            }
-            catch {
+            case .failure(let error):
                 EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> 에러 발생 = \(error.localizedDescription).")
                 completion(nil, error)
             }
@@ -1141,7 +1138,6 @@ open class StreamZipArchiver {
         
         return progress
     }
-    */
     // MARK: Get Data
     /// 특정 범위 데이터를 가져오는 메쏘드
     /// - 네트웍에서 사용
@@ -1190,12 +1186,12 @@ open class StreamZipArchiver {
             return self.requestFromOneDrive(at: path, range: range, completion: completion)
             
             // SMB인 경우
-//        case .smb:
-//            guard let path else {
-//                completion(nil, StreamZip.Error.unsupportedConnection)
-//                return nil
-//            }
-//            return self.requestFromSMB(at: path, range: range, completion: completion)
+        case .smb:
+            guard let path else {
+                completion(nil, StreamZip.Error.unsupportedConnection)
+                return nil
+            }
+            return self.requestFromSMB(at: path, range: range, completion: completion)
 
             // local인 경우
         case .local:
@@ -1376,42 +1372,40 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /*
     /// SMB로 특정 범위 데이터를 가져오는 메쏘드
     /// - Parameters:
-    ///     - path: 데이터를 가져올 경로
-    ///     - range: 데이터를 가져올 범위
-    ///     - completion: `StreamZipRequestCompletion` 완료 핸들러
+    ///   - path: 데이터를 가져올 경로
+    ///   - range: 데이터를 가져올 범위
+    ///   - completion: `StreamZipRequestCompletion` 완료 핸들러
     /// - Returns: Progress 반환. 실패시 nil 반환
     private func requestFromSMB(at path: String, range: Range<UInt64>, completion: @escaping StreamZipDataRequestCompletion) -> Progress? {
-        guard let smbClient else {
+        guard let smbProvider else {
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
 
         let returnProgress = Progress.init(totalUnitCount: Int64(range.count))
         Task {
-            do {
-                let data = try await smbClient.read(path: path,
-                                                    offset: UInt64(range.lowerBound),
-                                                    length: UInt32(range.count)) { progress in
-                    returnProgress.completedUnitCount = Int64(progress)
-                }
+            let dataResult = await smbProvider.data(of: path,
+                                                    offset: Int64(range.lowerBound),
+                                                    length: Int64(range.count)) { totalUnitCount, completedUnitCount, fractionCompleted, work, label in
+                returnProgress.completedUnitCount = completedUnitCount
+            }
+            switch dataResult {
+            case .success(let data):
                 guard data.count == range.count else {
                     EdgeLogger.shared.archiveLogger.log(level: .error, "\(#function) :: \(path) >> 데이터 길이가 동일하지 않음, 문제 발생.")
                     return completion(nil, StreamZip.Error.unknown)
                 }
-                
                 return completion(data, nil)
-            }
-            catch {
+                
+            case .failure(let error):
                 EdgeLogger.shared.archiveLogger.error("\(#function) :: \(path) >> 에러 발생 = \(error.localizedDescription).")
                 return completion(nil, error)
             }
         }
         return returnProgress
     }
-*/
     /// 로컬 영역의 특정 범위 데이터를 가져오는 메쏘드
     /// - Important: `fileHandle` 패러미터의 close 처리는 이 메쏘드를 부른 곳에서 처리해야 한다
     /// - Parameters:
