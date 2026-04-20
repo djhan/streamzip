@@ -1130,6 +1130,9 @@ open class StreamZipArchiver {
                                                    fileSize: UInt64(size))
                 }
 
+                // 완료 처리
+                return completion(contentsOfDirectory, nil)
+
             case .failure(let error):
                 EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> 에러 발생 = \(error.localizedDescription).")
                 completion(nil, error)
