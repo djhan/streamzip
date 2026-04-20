@@ -1116,10 +1116,14 @@ open class StreamZipArchiver {
             completion(nil, StreamZip.Error.unknown)
             return nil
         }
+        
+        // 첫 번째 경로 컴포넌트를 drive로 간주하고 제거한다.
+        var pathComponents = mainPath.components(separatedBy: "/").filter { !$0.isEmpty }
+        let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
 
         let progress = Progress.init(totalUnitCount: 1)
         Task {
-            let result = await smbProvider.contents(of: mainPath, showHiddenFiles: false)
+            let result = await smbProvider.contents(of: realPath, showHiddenFiles: false)
             switch result {
             case .success(let items):
                 // contents of directory 배열에 아이템 대입
@@ -1387,9 +1391,13 @@ open class StreamZipArchiver {
             return nil
         }
 
+        // 첫 번째 경로 컴포넌트를 drive로 간주하고 제거한다.
+        var pathComponents = path.components(separatedBy: "/").filter { !$0.isEmpty }
+        let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
+
         let returnProgress = Progress.init(totalUnitCount: Int64(range.count))
         Task {
-            let dataResult = await smbProvider.data(of: path,
+            let dataResult = await smbProvider.data(of: realPath,
                                                     offset: Int64(range.lowerBound),
                                                     length: Int64(range.count)) { totalUnitCount, completedUnitCount, fractionCompleted, work, label in
                 returnProgress.completedUnitCount = completedUnitCount

@@ -64,13 +64,13 @@ public actor SMBFileProvider: FileProviderable {
     ///   - username: 사용자 명.
     ///   - password: 비밀번호.
     ///   - port: 포트 번호. 기본값은 445다.
-    ///   - drive: 접속할 드라이브. 기본값은 널값이다. 단, 미 지정 상태로는 `listDrives()`와 `setDrive(_:)`를 제외한 대부분의 메쏘드 사용이 불가능하다.
+    ///   - drive: 접속할 드라이브를 지정한다.
     ///   - urlCache: 파일을 임시 저장할 수 있는 `URLCache` 지정. 기본값은 널값이다.
     public init(host: String,
                 username: String,
                 password: String,
                 port: Int = 445,
-                drive: String? = nil,
+                drive: String,
                 urlCache: URLCache? = nil) {
         self.host = host
         self.username = username
@@ -84,7 +84,7 @@ public actor SMBFileProvider: FileProviderable {
         urlComponents.port = port
         urlComponents.user = username
         urlComponents.password = password
-        urlComponents.path = drive != nil ? drive! : "/"
+        urlComponents.path = drive
 
         self.baseURL = urlComponents.url
         self.urlCache = urlCache
