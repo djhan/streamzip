@@ -241,7 +241,7 @@ public struct OneDriveItem: FileProviderItemConvertible {
     ///   - baseURL: baseURL 지정.
     ///   - route: `OneDriveFileProvider.Route`
     /// - Returns: `URL` 반환.
-    static func url(of path: String, modifier: String?, baseURL: URL, route: OneDriveFileProvider.Route) -> URL {
+    static func url(of path: String, modifier: String?, baseURL: URL, route: OneDriveFilesProvider.Route) -> URL {
         var url: URL = baseURL
         let isId = path.hasPrefix("id:")
         var realPath: String = path.replacingOccurrences(of: "id:", with: "", options: .anchored)
@@ -282,7 +282,7 @@ public struct OneDriveItem: FileProviderItemConvertible {
     ///   - baseURL: baseURL 지정. 널값 지정 가능.
     ///   - route: `OneDriveFileProvider.Route`
     /// - Returns: 경로를 `String` 으로 반환.
-    static func relativePath(of url: URL, baseURL: URL?, route: OneDriveFileProvider.Route) -> String {
+    static func relativePath(of url: URL, baseURL: URL?, route: OneDriveFilesProvider.Route) -> String {
         let base = baseURL?.appendingPathComponent(route.drivePath).path ?? ""
         
         let crudePath = url.filePath.replacingOccurrences(of: base, with: "", options: .anchored)
@@ -339,7 +339,7 @@ public struct OneDriveItem: FileProviderItemConvertible {
     ///   - json: JSON 데이터 지정.
     ///   - showHiddenFile: 감춤 파일 표시 여부. false 로 지정한 경우, 파일명이 감춤 파일이면 널값을 반환한다. 기본값은 true.
     internal init?(baseURL: URL,
-                   route: OneDriveFileProvider.Route,
+                   route: OneDriveFilesProvider.Route,
                    json: [String: Any],
                    showHiddenFile: Bool = true) {
         guard let name = json["name"] as? String else {

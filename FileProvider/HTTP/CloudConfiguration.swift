@@ -11,20 +11,20 @@ import Foundation
 /// 클라우드 서버 정보
 public enum CloudInformation {
     /// Host / 최상위 경로
-    enum Host: String {
+    public enum Host: String {
         /// OneDrive 의 Host / 최상위 경로
         case oneDrive = "onedrive.com"
     }
 
     /// API Host 주소
-    enum APIHost: String {
+    public enum APIHost: String {
         /// OneDrive API Host 주소
         case oneDrive = "graph.microsoft.com"
     }
     
     /// Token Label
     /// - 토큰 값을 가리키는 라벨명
-    enum TokenLabel: String {
+    public enum TokenLabel: String {
         /// OneDrive 의 Token Lable
         case oneDrive = "onedrive_Token_Label"
     }

@@ -208,11 +208,11 @@ fileprivate actor TaskState<HTTPProvider: HTTPProviderable, ResultType: Sendable
 
 // MARK: - Session Delegate Actor -
 /// URLSession 델리게이트 메쏘드를 다루는 Actor
-internal actor SessionDelegate<HTTPProvider: HTTPProviderable>: NSObject,
-                                                                URLSessionDataDelegate,
-                                                                URLSessionDownloadDelegate,
-                                                                URLSessionTaskDelegate,
-                                                                URLSessionStreamDelegate {
+public actor SessionDelegate<HTTPProvider: HTTPProviderable>: NSObject,
+                                                              URLSessionDataDelegate,
+                                                              URLSessionDownloadDelegate,
+                                                              URLSessionTaskDelegate,
+                                                              URLSessionStreamDelegate {
     /// Parent Provider
     private weak var provider: HTTPProvider?
     /// Credential

@@ -21,7 +21,7 @@
 		EED34A0E2AC66EF300AC1F2F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = EED34A0D2AC66EF300AC1F2F /* README.md */; };
 		EEEE14DD2F949CCE00F45046 /* SMBFileProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14DA2F949BAF00F45046 /* SMBFileProvider.swift */; };
 		EEEE14DE2F949CDC00F45046 /* CloudConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D52F949BAF00F45046 /* CloudConfiguration.swift */; };
-		EEEE14DF2F949CDD00F45046 /* OneDriveFileProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D62F949BAF00F45046 /* OneDriveFileProvider.swift */; };
+		EEEE14DF2F949CDD00F45046 /* OneDriveFilesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D62F949BAF00F45046 /* OneDriveFilesProvider.swift */; };
 		EEEE14E02F949CDF00F45046 /* WebDAVFilesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D72F949BAF00F45046 /* WebDAVFilesProvider.swift */; };
 		EEEE14E12F949CE100F45046 /* WebDAVResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D82F949BAF00F45046 /* WebDAVResponse.swift */; };
 		EEEE14E22F949CE500F45046 /* AEXMLDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE14D12F949BAF00F45046 /* AEXMLDocument.swift */; };
@@ -267,7 +267,7 @@
 		EEEE14D22F949BAF00F45046 /* AEXMLElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEXMLElement.swift; sourceTree = "<group>"; };
 		EEEE14D32F949BAF00F45046 /* AEXMLParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AEXMLParser.swift; sourceTree = "<group>"; };
 		EEEE14D52F949BAF00F45046 /* CloudConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConfiguration.swift; sourceTree = "<group>"; };
-		EEEE14D62F949BAF00F45046 /* OneDriveFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveFileProvider.swift; sourceTree = "<group>"; };
+		EEEE14D62F949BAF00F45046 /* OneDriveFilesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveFilesProvider.swift; sourceTree = "<group>"; };
 		EEEE14D72F949BAF00F45046 /* WebDAVFilesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVFilesProvider.swift; sourceTree = "<group>"; };
 		EEEE14D82F949BAF00F45046 /* WebDAVResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVResponse.swift; sourceTree = "<group>"; };
 		EEEE14DA2F949BAF00F45046 /* SMBFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMBFileProvider.swift; sourceTree = "<group>"; };
@@ -489,7 +489,7 @@
 			children = (
 				EEEE14D42F949BAF00F45046 /* AEXML */,
 				EEEE14D52F949BAF00F45046 /* CloudConfiguration.swift */,
-				EEEE14D62F949BAF00F45046 /* OneDriveFileProvider.swift */,
+				EEEE14D62F949BAF00F45046 /* OneDriveFilesProvider.swift */,
 				EEEE14D72F949BAF00F45046 /* WebDAVFilesProvider.swift */,
 				EEEE14D82F949BAF00F45046 /* WebDAVResponse.swift */,
 			);
@@ -813,7 +813,7 @@
 				EEEE14E22F949CE500F45046 /* AEXMLDocument.swift in Sources */,
 				EEEE14E42F949CEA00F45046 /* AEXMLParser.swift in Sources */,
 				EEEE14E32F949CE700F45046 /* AEXMLElement.swift in Sources */,
-				EEEE14DF2F949CDD00F45046 /* OneDriveFileProvider.swift in Sources */,
+				EEEE14DF2F949CDD00F45046 /* OneDriveFilesProvider.swift in Sources */,
 				EEEE14E02F949CDF00F45046 /* WebDAVFilesProvider.swift in Sources */,
 				EEEE14DD2F949CCE00F45046 /* SMBFileProvider.swift in Sources */,
 				EEEE14DE2F949CDC00F45046 /* CloudConfiguration.swift in Sources */,

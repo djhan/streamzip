@@ -59,7 +59,11 @@ open class StreamZipArchiver {
     
     // MARK: SMB Properties
     weak var smbProvider: SMBFileProvider?
-    
+
+    // MARK: OneDrive Properties
+    /// OneDrive 접속 Provider
+    weak var oneDriveProvider: OneDriveFilesProvider?
+
     /// 연결 타입
     public var connection: StreamZip.Connection = .unknown
     
@@ -96,6 +100,12 @@ open class StreamZipArchiver {
     public init?(smbProvider: SMBFileProvider) {
         self.smbProvider = smbProvider
         self.connection = .smb
+    }
+    /// OneDrive 아이템 초기화
+    /// - Parameter oneDriveProvider: SMBFileProvider
+    public init?(oneDriveProvider: OneDriveFilesProvider) {
+        self.oneDriveProvider = oneDriveProvider
+        self.connection = .oneDrive
     }
 
     
@@ -1118,7 +1128,7 @@ open class StreamZipArchiver {
         }
         
         // 첫 번째 경로 컴포넌트를 drive로 간주하고 제거한다.
-        var pathComponents = mainPath.components(separatedBy: "/").filter { !$0.isEmpty }
+        let pathComponents = mainPath.components(separatedBy: "/").filter { !$0.isEmpty }
         let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
 
         let progress = Progress.init(totalUnitCount: 1)
@@ -1392,7 +1402,7 @@ open class StreamZipArchiver {
         }
 
         // 첫 번째 경로 컴포넌트를 drive로 간주하고 제거한다.
-        var pathComponents = path.components(separatedBy: "/").filter { !$0.isEmpty }
+        let pathComponents = path.components(separatedBy: "/").filter { !$0.isEmpty }
         let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
 
         let returnProgress = Progress.init(totalUnitCount: Int64(range.count))

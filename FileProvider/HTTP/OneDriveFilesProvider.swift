@@ -1,5 +1,5 @@
 //
-//  OneDriveFileProvider.swift
+//  OneDriveFilesProvider.swift
 //  EdgeFileProvider
 //
 //  Created by DJ.HAN on 11/13/25.
@@ -20,7 +20,7 @@ extension MSALPublicClientApplication: @unchecked @retroactive Sendable {
 
 // MARK: - OneDrive Provider Actor -
 /// - OneDrive 파일 공급자
-public actor OneDriveFileProvider: HTTPProviderable {
+public actor OneDriveFilesProvider: HTTPProviderable {
     
     // MARK: - Enumeration
     /// OneDrive 파일 컨테이너 접근용 Route
@@ -111,22 +111,22 @@ public actor OneDriveFileProvider: HTTPProviderable {
     /// baseURL
     public var baseURL: URL?
     /// URL Credential
-    var credential: URLCredential
+    public var credential: URLCredential
     
     /// Session Delegate
-    var sessionDelegate: SessionDelegate<OneDriveFileProvider>?
+    public var sessionDelegate: SessionDelegate<OneDriveFilesProvider>?
     /// Session
-    var _session: URLSession!
+    public var _session: URLSession!
     
     /// URL Session Queue
-    var operationQueue = OperationQueue()
+    public var operationQueue = OperationQueue()
 
     public weak var urlCache: URLCache?
     /// E-Tag 또는 Revision identifier로 Cache Validating
-    var validatingCache: Bool = false
+    public var validatingCache: Bool = false
 
     /// 최대 업로드 사이즈
-    var maxUploadSize: Int64 {
+    public var maxUploadSize: Int64 {
         /// 4MB로 제한
         return 4_194_304
     }
@@ -141,7 +141,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     
     // MARK: OneDrive
     /// Route
-    let route: OneDriveFileProvider.Route
+    let route: OneDriveFilesProvider.Route
     
     /// MSAL로 대체
     /// OAuth2Swift
@@ -179,7 +179,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     public init(_ serverURL: URL? = nil,
                 appId: String,
                 redirectPath: String,
-                route: OneDriveFileProvider.Route = .me,
+                route: OneDriveFilesProvider.Route = .me,
                 urlCache: URLCache? = nil) async throws {
         
         let baseURL = (serverURL?.absoluteURL ?? Self.graphURL).appendingPathComponent(Self.graphVersion, isDirectory: true)
@@ -397,7 +397,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
         
     /// 접근 가능 여부
     /// - Returns: Result 타입으로 성공 시 true 반환. 실패 시 에러 반환.
-    func canAccessible() async -> Result<Bool, Error> {
+    public func canAccessible() async -> Result<Bool, Error> {
         guard Task.isCancelled == false else {
             EdgeLogger.shared.networkLogger.debug("\(#file):\(#function) :: 사용자 취소 발생.")
             // 사용자 취소로 중지 처리
@@ -440,7 +440,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     ///   - operation: `FileOperationType`
     ///   - overwrite: 덮어쓰기
     /// - Returns: `URLRequest`. 실패 시 널값 반환.
-    func request(for operation: FileOperationType,
+    public func request(for operation: FileOperationType,
                     overwrite: Bool = false) async -> URLRequest? {
         
         /// 경로 수정용 내부 메쏘드
@@ -553,7 +553,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     /// 특정 경로의 아이템을 찾아서 반환
     /// - Parameter path: 상대 경로.
     /// - Returns: `FileItem` 또는 에러 반환.
-    func item(of path: String) async -> Result<OneDriveItem, Error> {
+    public func item(of path: String) async -> Result<OneDriveItem, Error> {
         // 접속 확인
         let connected = await self.connect()
         switch connected {
@@ -596,7 +596,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     /// - OneDrive / WebDAV 여부에 따라 다른 로직을 실행한다.
     /// - Parameter path: 접근하려는 상대적 경로 지정.
     /// - Returns: `URL` 반환
-    func url(of path: String) -> URL {
+    public func url(of path: String) -> URL {
         // 경로 정규화 처리
         let path = path.precomposedStringWithCanonicalMapping
         return OneDriveItem.url(of: path, modifier: nil, baseURL: baseURL!, route: self.route)
@@ -615,7 +615,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     /// 특정 URL의 상대적 경로 반환
     /// - Parameter url: `URL`
     /// - Returns: `String`으로 상대 경로 반환.
-    func relativePath(of url: URL) -> String {
+    public func relativePath(of url: URL) -> String {
         return OneDriveItem.relativePath(of: url, baseURL: baseURL, route: self.route)
     }
     
@@ -623,7 +623,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     /// - Parameters:
     ///   - destinationPath: 업로드 경로.
     /// - Returns: `URLRequest`. 실패 시 널값 반환.
-    func requestForUploadData(to destinationPath: String) async -> URLRequest? {
+    public func requestForUploadData(to destinationPath: String) async -> URLRequest? {
         let operation = FileOperationType.copy(source: "file://", destination: destinationPath)
         var request = await self.request(for: operation)
         request?.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
@@ -787,7 +787,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     ///   - path: 경로. 널값 지정 가능.
     ///   - data: response가 포함된 `Data`. 널값 지정 가능.
     /// - Returns: `HTTPError` 반환.
-    func serverError(with code: HTTPErrorCode, path: String?, data: Data?) -> HTTPError {
+    public func serverError(with code: HTTPErrorCode, path: String?, data: Data?) -> HTTPError {
         let errorDescription: String?
         if let response = data?.deserializeJSON() {
             errorDescription = (response["error"] as? [String: Any])?["message"] as? String
@@ -801,7 +801,7 @@ public actor OneDriveFileProvider: HTTPProviderable {
     ///   - operation: 작업 종류.
     ///   - data: response가 포함된 `Data`
     /// - Returns: HTTP 에러 반환.
-    func multiStatusError(operation: FileOperationType, data: Data) -> HTTPError? {
+    public func multiStatusError(operation: FileOperationType, data: Data) -> HTTPError? {
         // 사용하지 않음
         return nil
     }

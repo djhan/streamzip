@@ -20,15 +20,15 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     /// baseURL
     public var baseURL: URL?
     /// URL Credential
-    var credential: URLCredential
+    public var credential: URLCredential
     
     /// Session Delegate
-    var sessionDelegate: SessionDelegate<WebDAVFilesProvider>?
+    public var sessionDelegate: SessionDelegate<WebDAVFilesProvider>?
     /// Session
-    var _session: URLSession!
+    public var _session: URLSession!
     
     /// URL Session Queue
-    var operationQueue = OperationQueue()
+    public var operationQueue = OperationQueue()
 
     public weak var urlCache: URLCache?
     
@@ -36,10 +36,10 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     /// - WebDAV는 URLSession을 사용하므로 동시 연결을 잘 처리함
     public var maxConcurrentUploads: Int { 5 }
     /// E-Tag 또는 Revision identifier로 Cache Validating
-    var validatingCache: Bool = false
+    public var validatingCache: Bool = false
 
     /// 최대 업로드 사이즈
-    var maxUploadSize: Int64 {
+    public var maxUploadSize: Int64 {
         return Int64.max
     }
 
@@ -79,7 +79,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     // MARK: - HTTP Providerable
     
     /// 접근 가능 여부
-    func canAccessible() async -> Result<Bool, Error> {
+    public func canAccessible() async -> Result<Bool, Error> {
         var request = URLRequest(url: baseURL!)
         request.httpMethod = "PROPFIND"
         request.setValue("0", forHTTPHeaderField: "Depth")
@@ -117,7 +117,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     ///   - operation: `FileOperationType`
     ///   - overwrite: 덮어쓰기
     /// - Returns: `URLRequest`. 실패 시 널값 반환.
-    func request(for operation: FileOperationType,
+    public func request(for operation: FileOperationType,
                     overwrite: Bool = false) async -> URLRequest? {
         let method: String
         let url: URL
@@ -180,7 +180,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     ///   - destinationPath: 업로드 경로.
     ///   - overwrite: 덮어쓰기 여부.
     /// - Returns: `URLRequest`. 실패 시 널값 반환.
-    func requestForUploadData(to destinationPath: String) async -> URLRequest? {
+    public func requestForUploadData(to destinationPath: String) async -> URLRequest? {
         let url = self.url(of: destinationPath)
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -193,7 +193,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     /// 특정 경로의 아이템을 찾아서 반환
     /// - Parameter path: 상대 경로.
     /// - Returns: `FileItem` 또는 에러 반환.
-    func item(of path: String) async -> Result<WebDAVItem, Error> {
+    public func item(of path: String) async -> Result<WebDAVItem, Error> {
         return await self.item(path: path, attributes: [])
     }
     /// 특정 경로의 특정 키에 부합하는 아이템을 찾아서 반환
@@ -242,7 +242,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     /// - OneDrive / WebDAV 여부에 따라 다른 로직을 실행한다.
     /// - Parameter path: 접근하려는 상대적 경로 지정.
     /// - Returns: `URL` 반환
-    func url(of path: String) -> URL {
+    public func url(of path: String) -> URL {
         // 정규화 처리
         var realPath: String = path.precomposedStringWithCanonicalMapping
         realPath = realPath.addingPercentEncoding(withAllowedCharacters: .filePathAllowed) ?? realPath
@@ -258,7 +258,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     /// 특정 URL의 상대적 경로 반환
     /// - Parameter url: `URL`
     /// - Returns: `String`으로 상대 경로 반환.
-    func relativePath(of url: URL) -> String {
+    public func relativePath(of url: URL) -> String {
         // 정규화 처리
         let relativePath = url.relativePath.precomposedStringWithCanonicalMapping
         if !relativePath.isEmpty, url.baseURL == self.baseURL {
@@ -282,7 +282,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     ///   - path: 경로. 널값 지정 가능.
     ///   - data: `Data`. 널값 지정 가능.
     /// - Returns: `HTTPError` 반환.
-    func serverError(with code: HTTPErrorCode, path: String?, data: Data?) -> HTTPError {
+    public func serverError(with code: HTTPErrorCode, path: String?, data: Data?) -> HTTPError {
         return WebDavHTTPError(code: code,
                                path: path ?? "",
                                serverDescription: data.flatMap({ String(data: $0, encoding: .utf8) }),
@@ -293,7 +293,7 @@ public actor WebDAVFilesProvider: HTTPProviderable {
     ///   - operation: 작업 종류.
     ///   - data: response가 포함된 `Data`
     /// - Returns: HTTP 에러 반환.
-    func multiStatusError(operation: FileOperationType, data: Data) -> HTTPError? {
+    public func multiStatusError(operation: FileOperationType, data: Data) -> HTTPError? {
         let xresponses = WebDavResponse.parse(xmlResponse: data, baseURL: self.baseURL)
         for xresponse in xresponses where (xresponse.status ?? 0) >= 300 {
             let code = xresponse.status.flatMap { HTTPErrorCode(rawValue: $0) } ?? .internalServerError
