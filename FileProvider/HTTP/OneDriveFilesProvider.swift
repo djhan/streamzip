@@ -180,7 +180,7 @@ public actor OneDriveFilesProvider: HTTPProviderable {
                 appId: String,
                 redirectPath: String,
                 route: OneDriveFilesProvider.Route = .me,
-                urlCache: URLCache? = nil) async throws {
+                urlCache: URLCache? = nil) throws {
         
         let baseURL = (serverURL?.absoluteURL ?? Self.graphURL).appendingPathComponent(Self.graphVersion, isDirectory: true)
         let refinedBaseURL = baseURL.absoluteString.hasSuffix("/") ? baseURL : baseURL.appendingPathComponent("")
