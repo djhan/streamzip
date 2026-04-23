@@ -1127,19 +1127,27 @@ open class StreamZipArchiver {
             return nil
         }
         
-        // 첫 번째 경로 컴포넌트를 drive로 간주하고 제거한다.
-        let pathComponents = mainPath.components(separatedBy: "/").filter { !$0.isEmpty }
-        let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
-
         let progress = Progress.init(totalUnitCount: 1)
         Task {
+            
+            // 탐색 경로
+            let pathComponents = mainPath.components(separatedBy: "/")
+            guard let drive = pathComponents.filter({ !$0.isEmpty }).first else {
+                EdgeLogger.shared.fileInfoLogger.log(level: .error, "\(#function) :: \(mainPath) >> drive가 없음, 중지.")
+                return completion(nil, StreamZip.Error.unknown)
+            }
+            // drive 지정
+            await smbProvider.setDrive(drive)
+            // drive를 제외한 나머지 구성 요소를 다시 합침
+            let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
+            
             let result = await smbProvider.contents(of: realPath, showHiddenFiles: false)
             switch result {
             case .success(let items):
                 // contents of directory 배열에 아이템 대입
                 let contentsOfDirectory = items.map { (item) -> ContentOfDirectory in
                     let size = item.fileSize > 0 ? item.fileSize : 0
-                    return ContentOfDirectory.init(path: item.filename,
+                    return ContentOfDirectory.init(path: drive.appendingPathComponent(item.filename),
                                                    isDirectory: item.isDirectory,
                                                    fileSize: UInt64(size))
                 }
@@ -1401,12 +1409,19 @@ open class StreamZipArchiver {
             return nil
         }
 
-        // 첫 번째 경로 컴포넌트를 drive로 간주하고 제거한다.
-        let pathComponents = path.components(separatedBy: "/").filter { !$0.isEmpty }
-        let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
-
         let returnProgress = Progress.init(totalUnitCount: Int64(range.count))
         Task {
+            // 탐색 경로
+            let pathComponents = path.components(separatedBy: "/")
+            guard let drive = pathComponents.filter({ !$0.isEmpty }).first else {
+                EdgeLogger.shared.fileInfoLogger.log(level: .error, "\(#function) :: \(path) >> drive가 없음, 중지.")
+                return completion(nil, StreamZip.Error.unknown)
+            }
+            // drive 지정
+            await smbProvider.setDrive(drive)
+            // drive를 제외한 나머지 구성 요소를 다시 합침
+            let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
+
             let dataResult = await smbProvider.data(of: realPath,
                                                     offset: Int64(range.lowerBound),
                                                     length: Int64(range.count)) { totalUnitCount, completedUnitCount, fractionCompleted, work, label in
