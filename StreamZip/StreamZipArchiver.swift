@@ -921,8 +921,6 @@ open class StreamZipArchiver {
         case .webdav, .webdav_https: return self.getContentsOfDirectoryInWebDav(at: mainPath, completion: completion)
             // oneDrive인 경우
         case .oneDrive: return self.getContentsOfDirectoryInOneDrive(at: mainPath, completion: completion)
-            // SMB인 경우
-        case .smb: return self.getContentsOfDirectoryInSMB(at: mainPath, completion: completion)
 
             // 그 외: 미지원으로 실패 처리
         default:
@@ -1115,54 +1113,7 @@ open class StreamZipArchiver {
         }
         return progress
     }
-    /// SMB 네트웍에서 mainPath 대입 후, contents of directory 배열 생성
-    /// - Parameters:
-    ///     - mainPath: contents 목록을 만들려고 하는 경로
-    ///     - completion: `ContentsOfDirectoryCompletion` 완료 핸들러로 반환
-    /// - Returns: Progress 반환. 실패시 nil 반환
-    private func getContentsOfDirectoryInSMB(at mainPath: String, completion: @escaping ContentsOfDirectoryCompletion) -> Progress? {
-        guard let smbProvider else {
-            EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> smbClient가 nil.")
-            completion(nil, StreamZip.Error.unknown)
-            return nil
-        }
-        
-        let progress = Progress.init(totalUnitCount: 1)
-        Task {
-            
-            // 탐색 경로
-            let pathComponents = mainPath.components(separatedBy: "/")
-            guard let drive = pathComponents.filter({ !$0.isEmpty }).first else {
-                EdgeLogger.shared.fileInfoLogger.log(level: .error, "\(#function) :: \(mainPath) >> drive가 없음, 중지.")
-                return completion(nil, StreamZip.Error.unknown)
-            }
-            // drive 지정
-            await smbProvider.setDrive(drive)
-            // drive를 제외한 나머지 구성 요소를 다시 합침
-            let realPath = pathComponents.filter({ !$0.isEmpty }).dropFirst().joined(separator: "/")
-            
-            let result = await smbProvider.contents(of: realPath, showHiddenFiles: false)
-            switch result {
-            case .success(let items):
-                // contents of directory 배열에 아이템 대입
-                let contentsOfDirectory = items.map { (item) -> ContentOfDirectory in
-                    let size = item.fileSize > 0 ? item.fileSize : 0
-                    return ContentOfDirectory.init(path: drive.appendingPathComponent(item.filename),
-                                                   isDirectory: item.isDirectory,
-                                                   fileSize: UInt64(size))
-                }
-
-                // 완료 처리
-                return completion(contentsOfDirectory, nil)
-
-            case .failure(let error):
-                EdgeLogger.shared.archiveLogger.log(level: .debug, "\(#function) :: \(mainPath) >> 에러 발생 = \(error.localizedDescription).")
-                completion(nil, error)
-            }
-        }
-        
-        return progress
-    }
+    
     // MARK: Get Data
     /// 특정 범위 데이터를 가져오는 메쏘드
     /// - 네트웍에서 사용

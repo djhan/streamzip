@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE2005552F9C3F05007184A8 /* OneDriveProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2005542F9C3F05007184A8 /* OneDriveProvider.swift */; };
 		EE283F1925D8E7D900D3C62B /* CommonLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F1625D8E7CE00D3C62B /* CommonLibrary.framework */; };
 		EE283F2525D8E82100D3C62B /* Detector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE283F2425D8E81900D3C62B /* Detector.framework */; };
 		EE3BCAA22823E2150064E218 /* SftpProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE3BCAA12823E2150064E218 /* SftpProvider.framework */; };
@@ -228,6 +229,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EE2005542F9C3F05007184A8 /* OneDriveProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveProvider.swift; sourceTree = "<group>"; };
 		EE283EA325D8B39700D3C62B /* FilesProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FilesProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE283EE725D8C47000D3C62B /* FilesProvider.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FilesProvider.xcodeproj; path = ../FileProvider/FilesProvider.xcodeproj; sourceTree = "<group>"; };
 		EE283F1125D8E7CE00D3C62B /* CommonLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommonLibrary.xcodeproj; path = ../CommonLibrary/CommonLibrary.xcodeproj; sourceTree = "<group>"; };
@@ -388,6 +390,7 @@
 				EE7732C425D0D37C00414625 /* Info.plist */,
 				EED34A0D2AC66EF300AC1F2F /* README.md */,
 				EE7732E025D0FF4100414625 /* StreamZipArchiver.swift */,
+				EE2005542F9C3F05007184A8 /* OneDriveProvider.swift */,
 			);
 			path = StreamZip;
 			sourceTree = "<group>";
@@ -818,6 +821,7 @@
 				EEEE14DD2F949CCE00F45046 /* SMBFileProvider.swift in Sources */,
 				EEEE14DE2F949CDC00F45046 /* CloudConfiguration.swift in Sources */,
 				EEEE14E12F949CE100F45046 /* WebDAVResponse.swift in Sources */,
+				EE2005552F9C3F05007184A8 /* OneDriveProvider.swift in Sources */,
 				EEEE14E52F949CFB00F45046 /* GetValue.swift in Sources */,
 				EEEE14E62F949CFE00F45046 /* Read.swift in Sources */,
 				EEEE14E72F949D0600F45046 /* CharacterSetExtension.swift in Sources */,

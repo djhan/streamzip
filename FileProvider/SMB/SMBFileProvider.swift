@@ -84,13 +84,32 @@ public actor SMBFileProvider: FileProviderable {
         urlComponents.port = port
         urlComponents.user = username
         urlComponents.password = password
+        var drive = self.drive != nil ? self.drive! : "/"
+        if drive.prefix() != "/" {
+            drive = "/" + drive
+        }
         urlComponents.path = drive
-
         self.baseURL = urlComponents.url
         self.urlCache = urlCache
     }
     
-
+    /// baseURL 업데이트
+    /// - Important: drive 변경 시 반드시 호출한다.
+    private func updateBaseURL() {
+        var urlComponents = URLComponents()
+        urlComponents.scheme = "smb"
+        urlComponents.host = host
+        urlComponents.port = port
+        urlComponents.user = username
+        urlComponents.password = password
+        var drive = self.drive != nil ? self.drive! : "/"
+        if drive.prefix() != "/" {
+            drive = "/" + drive
+        }
+        urlComponents.path = drive
+        self.baseURL = urlComponents.url
+    }
+    
     // MARK: - Connection
     /// 드라이브 목록 가져오기
     /// - Returns: Result 타입으로 성공 시 드라이브 명 `String` 배열 반환. 실패 시 에러 반환.
@@ -122,6 +141,7 @@ public actor SMBFileProvider: FileProviderable {
     /// 드라이브 지정
     public func setDrive(_ drive: String) {
         self.drive = drive
+        updateBaseURL()
     }
 
     /// 연결 메쏘드
