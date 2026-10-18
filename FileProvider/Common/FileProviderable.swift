@@ -408,7 +408,7 @@ extension FileProviderable {
     public func writeFolder(_ localPath: String,
                             to remotePath: String,
                             conflictHandler: (@Sendable () async -> Files.Conflict)? = nil,
-                            _ progressHandler: @escaping @Sendable ProgressHandler) async -> Result<Bool, Error> {
+                            _ progressHandler: @escaping ProgressHandler) async -> Result<Bool, Error> {
         guard Task.isCancelled == false else {
             EdgeLogger.shared.networkLogger.debug("\(#file):\(#function) :: \(localPath) >> 사용자 취소 발생.")
             // 진행 개수 1로 완료 처리

@@ -48,8 +48,8 @@ public actor SMBFileProvider: FileProviderable {
     // MARK: - Deinitialization
     deinit {
         Task { [client] in
-            try await client?.disconnectShare()
-            try await client?.logoff()
+            let _ = try? await client?.disconnectShare()
+            let _ = try? await client?.logoff()
             // 여기선 Logger가 작동하지 않는다.
             print("\(#file):\(#function) :: 해제 완료")
         }
